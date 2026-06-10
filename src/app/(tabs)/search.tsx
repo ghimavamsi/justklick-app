@@ -1,0 +1,10 @@
+import { View, Text } from 'react-native';
+
+export default function SearchScreen() {
+  return (
+    <View className="flex-1 items-center justify-center bg-background p-4">
+      <Text className="text-xl font-bold text-foreground mb-2">Explore</Text>
+      <Text className="text-sm text-muted-foreground text-center">Search for local businesses, coaching centers, hostels, and more.</Text>
+    </View>
+  );
+}
