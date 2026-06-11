@@ -10,7 +10,8 @@ import Animated, {
   SharedValue,
 } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../hooks/useTheme';
 
 const { width, height } = Dimensions.get('window');
 
@@ -39,6 +40,7 @@ const ONBOARDING_DATA = [
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const { colorScheme } = useTheme();
   const scrollOffset = useSharedValue(0);
   const scrollRef = useRef<Animated.ScrollView>(null);
 
@@ -50,15 +52,15 @@ export default function OnboardingScreen() {
 
   const goToNextPage = (index: number) => {
     if (index === ONBOARDING_DATA.length - 1) {
-      router.push('/permissions/location' as any);
+      router.replace('/permissions/location');
     } else {
       scrollRef.current?.scrollTo({ x: width * (index + 1), animated: true });
     }
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" />
+    <View className="flex-1 bg-background">
+      <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       
       <Animated.ScrollView
         ref={scrollRef}
@@ -91,29 +93,17 @@ export default function OnboardingScreen() {
             <View className="absolute bottom-12 w-full flex-row justify-between items-center px-8">
               {/* Pagination Dots */}
               <View className="flex-row gap-2">
-                {ONBOARDING_DATA.map((_, i) => {
-                  const dotStyle = useAnimatedStyle(() => {
-                    const isActive = interpolate(
-                      scrollOffset.value,
-                      [(i - 1) * width, i * width, (i + 1) * width],
-                      [0, 1, 0],
-                      Extrapolation.CLAMP
-                    );
-                    return {
-                      width: 8 + isActive * 16,
-                      backgroundColor: isActive ? PRIMARY : '#E2E8F0',
-                    };
-                  });
-                  return <Animated.View key={i} className="h-2 rounded-full" style={dotStyle} />;
-                })}
+                {ONBOARDING_DATA.map((_, i) => (
+                  <PaginationDot key={i} i={i} scrollOffset={scrollOffset} />
+                ))}
               </View>
 
               {/* Action Button */}
               <TouchableOpacity
                 onPress={() => goToNextPage(index)}
-                className="bg-[#1C398E] h-14 px-8 rounded-full items-center justify-center shadow-md shadow-[#1C398E]/30"
+                className="bg-primary h-14 px-8 rounded-full items-center justify-center shadow-md shadow-primary/30"
               >
-                <Text className="text-white font-bold text-base">
+                <Text className="text-primary-foreground font-bold text-base">
                   {index === ONBOARDING_DATA.length - 1 ? 'Get Started' : 'Continue'}
                 </Text>
               </TouchableOpacity>
@@ -123,6 +113,23 @@ export default function OnboardingScreen() {
       </Animated.ScrollView>
     </View>
   );
+}
+
+function PaginationDot({ i, scrollOffset }: { i: number; scrollOffset: SharedValue<number> }) {
+  const dotStyle = useAnimatedStyle(() => {
+    const isActive = interpolate(
+      scrollOffset.value,
+      [(i - 1) * width, i * width, (i + 1) * width],
+      [0, 1, 0],
+      Extrapolation.CLAMP
+    );
+    return {
+      width: 8 + isActive * 16,
+      backgroundColor: isActive ? PRIMARY : '#64748B',
+      opacity: isActive ? 1 : 0.4
+    };
+  });
+  return <Animated.View className="h-2 rounded-full" style={dotStyle} />;
 }
 
 // ----------------------------------------------------
@@ -158,30 +165,30 @@ function Screen1Illustration({ useParallax }: { useParallax: (range: number[]) =
   return (
     <View className="w-full h-full items-center justify-center">
       {/* Central Node */}
-      <Animated.View className="w-24 h-24 rounded-full bg-[#1C398E]/10 items-center justify-center border-4 border-white shadow-xl z-10" style={centerStyle}>
-        <SymbolView name="mappin.and.ellipse" size={40} tintColor={PRIMARY} />
+      <Animated.View className="w-24 h-24 rounded-full bg-primary/10 items-center justify-center border-4 border-background shadow-xl z-10" style={centerStyle}>
+        <Ionicons name="location" size={40} color={PRIMARY} />
       </Animated.View>
       
       {/* Floating Category Badges */}
-      <Animated.View className="absolute top-[20%] left-[10%] bg-white px-4 py-3 rounded-2xl shadow-sm border border-slate-100 flex-row items-center gap-2" style={node1Style}>
-        <View className="w-8 h-8 rounded-full bg-orange-100 items-center justify-center">
-          <SymbolView name="globe" size={16} tintColor="#EA580C" />
+      <Animated.View className="absolute top-[20%] left-[10%] bg-card px-4 py-3 rounded-2xl shadow-sm border border-border flex-row items-center gap-2" style={node1Style}>
+        <View className="w-8 h-8 rounded-full bg-[#EA580C]/20 items-center justify-center">
+          <Ionicons name="globe" size={16} color="#EA580C" />
         </View>
-        <Text className="font-bold text-slate-700">Consultants</Text>
+        <Text className="font-bold text-foreground">Consultants</Text>
       </Animated.View>
 
-      <Animated.View className="absolute bottom-[30%] right-[5%] bg-white px-4 py-3 rounded-2xl shadow-sm border border-slate-100 flex-row items-center gap-2" style={node2Style}>
-        <View className="w-8 h-8 rounded-full bg-emerald-100 items-center justify-center">
-          <SymbolView name="book.closed.fill" size={16} tintColor="#16A34A" />
+      <Animated.View className="absolute bottom-[30%] right-[5%] bg-card px-4 py-3 rounded-2xl shadow-sm border border-border flex-row items-center gap-2" style={node2Style}>
+        <View className="w-8 h-8 rounded-full bg-[#16A34A]/20 items-center justify-center">
+          <Ionicons name="book" size={16} color="#16A34A" />
         </View>
-        <Text className="font-bold text-slate-700">Coaching</Text>
+        <Text className="font-bold text-foreground">Coaching</Text>
       </Animated.View>
 
-      <Animated.View className="absolute top-[50%] left-[0%] bg-white px-4 py-3 rounded-2xl shadow-sm border border-slate-100 flex-row items-center gap-2" style={node3Style}>
-        <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center">
-          <SymbolView name="building.2.fill" size={16} tintColor="#2563EB" />
+      <Animated.View className="absolute top-[50%] left-[0%] bg-card px-4 py-3 rounded-2xl shadow-sm border border-border flex-row items-center gap-2" style={node3Style}>
+        <View className="w-8 h-8 rounded-full bg-[#2563EB]/20 items-center justify-center">
+          <Ionicons name="business" size={16} color="#2563EB" />
         </View>
-        <Text className="font-bold text-slate-700">Hostels</Text>
+        <Text className="font-bold text-foreground">Hostels</Text>
       </Animated.View>
     </View>
   );
@@ -194,35 +201,35 @@ function Screen2Illustration({ useParallax }: { useParallax: (range: number[]) =
 
   return (
     <View className="w-full h-full items-center justify-center">
-      <Animated.View className="w-72 bg-white rounded-3xl p-5 shadow-lg border border-slate-100 absolute z-10 top-[20%] -rotate-6" style={card1Style}>
+      <Animated.View className="w-72 bg-card rounded-3xl p-5 shadow-lg border border-border absolute z-10 top-[20%] -rotate-6" style={card1Style}>
         <View className="flex-row items-center justify-between mb-3">
           <View className="flex-row items-center gap-3">
-            <View className="w-12 h-12 rounded-full bg-slate-200 items-center justify-center">
-              <SymbolView name="person.fill" size={24} tintColor="#94A3B8" />
+            <View className="w-12 h-12 rounded-full bg-muted items-center justify-center border border-border/50">
+              <Ionicons name="person" size={24} color="#94A3B8" />
             </View>
             <View>
-              <Text className="font-bold text-slate-800 text-lg">Apex Overseas</Text>
+              <Text className="font-bold text-foreground text-lg">Apex Overseas</Text>
               <View className="flex-row items-center gap-1">
-                {[1, 2, 3, 4, 5].map((i) => <SymbolView key={i} name="star.fill" size={12} tintColor="#EAB308" />)}
+                {[1, 2, 3, 4, 5].map((i) => <Ionicons key={i} name="star" size={12} color="#EAB308" />)}
               </View>
             </View>
           </View>
-          <SymbolView name="checkmark.seal.fill" size={24} tintColor={PRIMARY} />
+          <Ionicons name="checkmark-circle" size={24} color={PRIMARY} />
         </View>
-        <Text className="text-slate-500 text-sm leading-5">"Excellent guidance! They helped me get my study visa in just 2 weeks."</Text>
+        <Text className="text-muted-foreground text-sm leading-5">&quot;Excellent guidance! They helped me get my study visa in just 2 weeks.&quot;</Text>
       </Animated.View>
 
-      <Animated.View className="w-64 bg-white rounded-3xl p-5 shadow-xl border border-slate-100 absolute z-20 bottom-[25%] right-0 rotate-3" style={card2Style}>
+      <Animated.View className="w-64 bg-card rounded-3xl p-5 shadow-xl border border-border absolute z-20 bottom-[25%] right-0 rotate-3" style={card2Style}>
          <View className="flex-row items-center gap-3 mb-2">
-            <View className="w-10 h-10 rounded-full bg-slate-200 items-center justify-center">
-              <SymbolView name="person.fill" size={20} tintColor="#94A3B8" />
+            <View className="w-10 h-10 rounded-full bg-muted items-center justify-center border border-border/50">
+              <Ionicons name="person" size={20} color="#94A3B8" />
             </View>
             <View>
-              <Text className="font-bold text-slate-800">Sarah M.</Text>
-              <Text className="text-xs text-slate-400">2 days ago</Text>
+              <Text className="font-bold text-foreground">Sarah M.</Text>
+              <Text className="text-xs text-muted-foreground">2 days ago</Text>
             </View>
           </View>
-          <Text className="text-slate-600 font-medium">★★★★★ Incredible experience.</Text>
+          <Text className="text-muted-foreground font-medium">★★★★★ Incredible experience.</Text>
       </Animated.View>
     </View>
   );
@@ -237,24 +244,24 @@ function Screen3Illustration({ useParallax }: { useParallax: (range: number[]) =
 
   return (
     <View className="w-full h-full items-center justify-center">
-      <Animated.View className="w-48 h-64 bg-white rounded-[32px] shadow-xl border border-slate-100 items-center justify-center z-10" style={centerCard}>
-        <View className="w-20 h-20 rounded-2xl bg-[#1C398E]/10 items-center justify-center mb-4">
-          <SymbolView name="building.columns.fill" size={40} tintColor={PRIMARY} />
+      <Animated.View className="w-48 h-64 bg-card rounded-[32px] shadow-xl border border-border items-center justify-center z-10" style={centerCard}>
+        <View className="w-20 h-20 rounded-2xl bg-primary/10 items-center justify-center mb-4">
+          <Ionicons name="home" size={40} color={PRIMARY} />
         </View>
-        <Text className="font-bold text-xl text-slate-800 text-center px-2">Global Ed</Text>
-        <Text className="text-slate-400 text-sm mt-1">Study Abroad</Text>
+        <Text className="font-bold text-xl text-foreground text-center px-2">Global Ed</Text>
+        <Text className="text-muted-foreground text-sm mt-1">Study Abroad</Text>
       </Animated.View>
 
-      <Animated.View className="absolute top-[25%] right-[15%] w-16 h-16 bg-[#1C398E] rounded-full shadow-lg items-center justify-center border-4 border-white z-20" style={icon1}>
-        <SymbolView name="phone.fill" size={24} tintColor="#FFF" />
+      <Animated.View className="absolute top-[25%] right-[15%] w-16 h-16 bg-primary rounded-full shadow-lg items-center justify-center border-4 border-background z-20" style={icon1}>
+        <Ionicons name="call" size={24} color="#FFF" />
       </Animated.View>
 
-      <Animated.View className="absolute bottom-[30%] left-[10%] w-16 h-16 bg-[#c10007] rounded-full shadow-lg items-center justify-center border-4 border-white z-20" style={icon2}>
-        <SymbolView name="paperplane.fill" size={24} tintColor="#FFF" />
+      <Animated.View className="absolute bottom-[30%] left-[10%] w-16 h-16 bg-accent rounded-full shadow-lg items-center justify-center border-4 border-background z-20" style={icon2}>
+        <Ionicons name="paper-plane" size={24} color="#FFF" />
       </Animated.View>
 
-      <Animated.View className="absolute top-[40%] left-[5%] w-14 h-14 bg-slate-800 rounded-full shadow-lg items-center justify-center border-4 border-white z-20" style={icon3}>
-        <SymbolView name="bookmark.fill" size={20} tintColor="#FFF" />
+      <Animated.View className="absolute top-[40%] left-[5%] w-14 h-14 bg-foreground rounded-full shadow-lg items-center justify-center border-4 border-background z-20" style={icon3}>
+        <Ionicons name="bookmark" size={20} color={useTheme().colorScheme === 'dark' ? '#000' : '#FFF'} />
       </Animated.View>
     </View>
   );
@@ -269,27 +276,27 @@ function Screen4Illustration({ useParallax }: { useParallax: (range: number[]) =
   return (
     <View className="w-full h-full items-center justify-center">
       {/* Isometric Map Base */}
-      <Animated.View className="w-72 h-72 bg-slate-100 rounded-full items-center justify-center border-8 border-white shadow-xl" style={mapStyle}>
+      <Animated.View className="w-72 h-72 bg-muted rounded-full items-center justify-center border-8 border-background shadow-xl" style={mapStyle}>
         {/* Decorative Grid Lines */}
-        <View className="w-full h-[1px] bg-white absolute top-1/3" />
-        <View className="w-full h-[1px] bg-white absolute top-2/3" />
-        <View className="h-full w-[1px] bg-white absolute left-1/3" />
-        <View className="h-full w-[1px] bg-white absolute left-2/3" />
+        <View className="w-full h-[1px] bg-background absolute top-1/3" />
+        <View className="w-full h-[1px] bg-background absolute top-2/3" />
+        <View className="h-full w-[1px] bg-background absolute left-1/3" />
+        <View className="h-full w-[1px] bg-background absolute left-2/3" />
         
         {/* Central Pulse */}
-        <View className="w-32 h-32 rounded-full bg-[#1C398E]/10 absolute items-center justify-center">
-          <View className="w-4 h-4 rounded-full bg={PRIMARY} shadow-sm shadow={PRIMARY}" />
+        <View className="w-32 h-32 rounded-full bg-primary/10 absolute items-center justify-center border border-primary/20">
+          <View className="w-4 h-4 rounded-full bg-primary shadow-sm shadow-primary" />
         </View>
       </Animated.View>
 
       <Animated.View className="absolute top-[25%] right-[20%] items-center" style={pin1}>
-        <View className="bg-white px-3 py-1 rounded-full shadow-sm mb-1"><Text className="text-xs font-bold text-slate-600">Consultant</Text></View>
-        <SymbolView name="mappin.circle.fill" size={32} tintColor={ACCENT} />
+        <View className="bg-card px-3 py-1 rounded-full shadow-sm mb-1 border border-border/50"><Text className="text-xs font-bold text-muted-foreground">Consultant</Text></View>
+        <Ionicons name="location" size={32} color={ACCENT} />
       </Animated.View>
 
       <Animated.View className="absolute bottom-[35%] left-[20%] items-center" style={pin2}>
-        <View className="bg-white px-3 py-1 rounded-full shadow-sm mb-1"><Text className="text-xs font-bold text-slate-600">Hostel</Text></View>
-        <SymbolView name="mappin.circle.fill" size={32} tintColor={PRIMARY} />
+        <View className="bg-card px-3 py-1 rounded-full shadow-sm mb-1 border border-border/50"><Text className="text-xs font-bold text-muted-foreground">Hostel</Text></View>
+        <Ionicons name="location" size={32} color={PRIMARY} />
       </Animated.View>
     </View>
   );

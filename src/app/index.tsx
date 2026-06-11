@@ -11,7 +11,7 @@ import Animated, {
   withRepeat
 } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
+import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../store';
 
 const { width, height } = Dimensions.get('window');
@@ -41,7 +41,8 @@ export default function PremiumSplash() {
   const loaderProgress = useSharedValue(0);
 
   const navigateToNextScreen = () => {
-    if (!hasSeenOnboarding) {
+    const currentHasSeenOnboarding = useAppStore.getState().hasSeenOnboarding;
+    if (!currentHasSeenOnboarding) {
       router.replace('/onboarding');
     } else {
       router.replace('/(auth)/login');
@@ -49,6 +50,9 @@ export default function PremiumSplash() {
   };
 
   useEffect(() => {
+    // Temporarily resetting the state so the flow can be tested
+    useAppStore.setState({ hasSeenOnboarding: false });
+
     // 1. Initial subtle search pulse
     pulseOpacity.value = withTiming(0.15, { duration: 800 });
     pulseScale.value = withRepeat(withTiming(1.5, { duration: 2000, easing: Easing.out(Easing.ease) }), -1, true);
@@ -139,10 +143,10 @@ export default function PremiumSplash() {
         {/* The Motif: Pin & Search */}
         <Animated.View style={motifStyle}>
           <Animated.View style={useAnimatedStyle(() => ({ transform: [{ translateX: motifTranslateX.value }] }))}>
-            <SymbolView name="mappin.circle.fill" size={48} tintColor={PRIMARY} />
+            <Ionicons name="location" size={48} color={PRIMARY} />
           </Animated.View>
           <Animated.View style={useAnimatedStyle(() => ({ transform: [{ translateX: -motifTranslateX.value }] }))}>
-            <SymbolView name="magnifyingglass.circle.fill" size={48} tintColor={ACCENT} />
+            <Ionicons name="search-circle" size={48} color={ACCENT} />
           </Animated.View>
         </Animated.View>
 

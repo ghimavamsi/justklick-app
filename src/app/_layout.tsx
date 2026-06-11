@@ -1,16 +1,18 @@
 import { Stack } from 'expo-router';
-import { useColorScheme } from 'react-native';
+// Removed duplicate nativewind import
 import { useEffect } from 'react';
 import { useFonts, PlusJakartaSans_400Regular, PlusJakartaSans_500Medium, PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans';
 import * as SplashScreen from 'expo-splash-screen';
 import '../global.css';
 import { AppProviders } from '../api/providers';
 
+import { useTheme } from '../hooks/useTheme';
+
 // Prevent auto hide until fonts are loaded
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
 
   const [loaded, error] = useFonts({
     PlusJakartaSans_400Regular,

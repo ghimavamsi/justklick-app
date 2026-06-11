@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StatusBar } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -8,9 +8,10 @@ import Animated, {
   withDelay,
 } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
+import { Ionicons } from '@expo/vector-icons';
 import * as Notifications from 'expo-notifications';
 import { useAppStore } from '../../store';
+import { useTheme } from '../../hooks/useTheme';
 
 const PRIMARY = '#1C398E';
 const ACCENT = '#c10007';
@@ -18,6 +19,7 @@ const ACCENT = '#c10007';
 export default function NotificationPermissionScreen() {
   const router = useRouter();
   const { setNotificationPermission, completeOnboarding } = useAppStore();
+  const { colorScheme } = useTheme();
 
   const bellRotate = useSharedValue(-20);
   const card1TranslateY = useSharedValue(50);
@@ -75,38 +77,40 @@ export default function NotificationPermissionScreen() {
   }));
 
   return (
-    <View className="flex-1 bg-white px-8 pt-20 pb-12">
+    <View className="flex-1 bg-background px-8 pt-20 pb-12">
+      <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
+      
       <View className="flex-1 items-center justify-center">
         
         {/* Animated Premium Illustration */}
         <View className="items-center justify-center mb-12 h-56 w-full">
           
-          <Animated.View className="bg-white w-24 h-24 rounded-full shadow-xl items-center justify-center border-8 border-slate-50 z-30" style={bellStyle}>
-            <SymbolView name="bell.fill" size={40} tintColor={ACCENT} />
-            <View className="absolute top-4 right-5 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />
+          <Animated.View className="bg-card w-24 h-24 rounded-full shadow-xl items-center justify-center border-8 border-background z-30" style={bellStyle}>
+            <Ionicons name="notifications" size={40} color={ACCENT} />
+            <View className="absolute top-4 right-5 w-3 h-3 bg-red-500 rounded-full border-2 border-card" />
           </Animated.View>
 
           {/* Floating Cards (Behind Bell) */}
-          <Animated.View className="absolute top-4 w-56 bg-white rounded-2xl p-4 shadow-lg border border-slate-100 z-20" style={card1Style}>
+          <Animated.View className="absolute top-4 w-56 bg-card rounded-2xl p-4 shadow-lg border border-border z-20" style={card1Style}>
             <View className="flex-row items-center gap-3">
-              <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center">
-                <SymbolView name="tag.fill" size={14} tintColor={PRIMARY} />
+              <View className="w-8 h-8 rounded-full bg-primary/20 items-center justify-center">
+                <Ionicons name="pricetag" size={14} color={PRIMARY} />
               </View>
               <View>
-                <Text className="font-bold text-slate-800 text-sm">Special Offer</Text>
-                <Text className="text-slate-400 text-xs">50% off at local spa</Text>
+                <Text className="font-bold text-foreground text-sm">Special Offer</Text>
+                <Text className="text-muted-foreground text-xs">50% off at local spa</Text>
               </View>
             </View>
           </Animated.View>
 
-          <Animated.View className="absolute -bottom-2 w-64 bg-slate-50 rounded-2xl p-4 shadow-md border border-slate-200 z-10" style={card2Style}>
+          <Animated.View className="absolute -bottom-2 w-64 bg-muted rounded-2xl p-4 shadow-md border border-border z-10" style={card2Style}>
             <View className="flex-row items-center gap-3 opacity-60">
-               <View className="w-8 h-8 rounded-full bg-orange-100 items-center justify-center">
-                <SymbolView name="sparkles" size={14} tintColor="#EA580C" />
+               <View className="w-8 h-8 rounded-full bg-[#EA580C]/20 items-center justify-center">
+                <Ionicons name="sparkles" size={14} color="#EA580C" />
               </View>
               <View>
-                <Text className="font-bold text-slate-800 text-sm">New Business</Text>
-                <Text className="text-slate-400 text-xs">Elite Plumbers joined</Text>
+                <Text className="font-bold text-foreground text-sm">New Business</Text>
+                <Text className="text-muted-foreground text-xs">Elite Plumbers joined</Text>
               </View>
             </View>
           </Animated.View>
@@ -114,18 +118,18 @@ export default function NotificationPermissionScreen() {
         </View>
 
         {/* Typography */}
-        <Text className="text-3xl font-extrabold text-slate-900 text-center mb-3">
+        <Text className="text-3xl font-extrabold text-foreground text-center mb-3">
           Stay Updated
         </Text>
-        <Text className="text-base text-slate-500 text-center mb-10 px-4 leading-relaxed">
+        <Text className="text-base text-muted-foreground text-center mb-10 px-4 leading-relaxed">
           Get notified about new businesses, exclusive offers, trending services, and personalized recommendations.
         </Text>
 
         {/* Benefits List */}
-        <Animated.View className="w-full gap-4 px-4" style={{ opacity: opacity.value }}>
-          <BenefitRow icon="bell.badge.fill" text="New Business Alerts" />
-          <BenefitRow icon="ticket.fill" text="Exclusive Local Offers" />
-          <BenefitRow icon="flame.fill" text="Trending Services" />
+        <Animated.View className="w-full gap-4 px-4" style={useAnimatedStyle(() => ({ opacity: opacity.value }))}>
+          <BenefitRow icon="notifications" text="New Business Alerts" />
+          <BenefitRow icon="ticket" text="Exclusive Local Offers" />
+          <BenefitRow icon="flame" text="Trending Services" />
         </Animated.View>
       </View>
 
@@ -133,29 +137,29 @@ export default function NotificationPermissionScreen() {
       <View className="w-full gap-3 mt-auto pt-4">
         <TouchableOpacity
           onPress={requestPermission}
-          className="bg-[#1C398E] h-14 w-full rounded-full items-center justify-center shadow-lg shadow-[#1C398E]/30"
+          className="bg-primary h-14 w-full rounded-full flex-row items-center justify-center shadow-lg shadow-primary/30"
         >
-          <Text className="text-white font-bold text-lg">Allow Notifications</Text>
+          <Text className="text-primary-foreground font-bold text-lg text-center">Allow Notifications</Text>
         </TouchableOpacity>
         
         <TouchableOpacity
           onPress={skipPermission}
-          className="h-14 w-full rounded-full items-center justify-center"
+          className="h-14 w-full rounded-full flex-row items-center justify-center"
         >
-          <Text className="text-slate-500 font-semibold text-base">Maybe Later</Text>
+          <Text className="text-muted-foreground font-semibold text-base text-center">Maybe Later</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-function BenefitRow({ icon, text }: { icon: string; text: string }) {
+function BenefitRow({ icon, text }: { icon: any; text: string }) {
   return (
     <View className="flex-row items-center gap-4">
-      <View className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center">
-        <SymbolView name={icon as any} size={18} tintColor={PRIMARY} />
+      <View className="w-10 h-10 rounded-full bg-muted border border-border/50 items-center justify-center">
+        <Ionicons name={icon} size={18} color={PRIMARY} />
       </View>
-      <Text className="text-slate-700 font-medium text-[15px]">{text}</Text>
+      <Text className="text-foreground font-medium text-[15px]">{text}</Text>
     </View>
   );
 }

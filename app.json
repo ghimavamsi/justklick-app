@@ -31,6 +31,19 @@
           "image": "./assets/images/Jk.png",
           "imageWidth": 1
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow JustKlick to use your location."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/Jk.png",
+          "color": "#ffffff"
+        }
       ]
     ],
     "experiments": {
