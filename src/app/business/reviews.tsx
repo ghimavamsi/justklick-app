@@ -1,5 +1,5 @@
 import { View, Text, FlatList } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { SymbolView } from 'expo-symbols';
 
 export default function BusinessReviewsScreen() {
   const reviews = [
@@ -19,11 +19,11 @@ export default function BusinessReviewsScreen() {
               <Text className="font-bold text-foreground">{item.name}</Text>
               <View className="flex-row">
                 {[...Array(5)].map((_, i) => (
-                  <Ionicons 
+                  <SymbolView 
                     key={i} 
-                    name={i < item.rating ? "star" : "star-outline"} 
+                    name={i < item.rating ? "star.fill" : "star"} 
                     size={14} 
-                    color="#E11D48" 
+                    tintColor="#E11D48" 
                   />
                 ))}
               </View>

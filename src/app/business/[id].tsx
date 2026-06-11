@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { SymbolView } from 'expo-symbols';
 
 export default function BusinessDetailsScreen() {
   const { id } = useLocalSearchParams();
@@ -10,7 +10,7 @@ export default function BusinessDetailsScreen() {
     <ScrollView className="flex-1 bg-background">
       {/* Cover Image Placeholder */}
       <View className="h-48 w-full bg-muted justify-center items-center">
-        <Ionicons name="image-outline" size={48} color="#94A3B8" />
+        <SymbolView name="photo" size={48} tintColor="#94A3B8" />
       </View>
       
       <View className="p-4">
@@ -20,18 +20,18 @@ export default function BusinessDetailsScreen() {
             <Text className="text-sm text-muted-foreground mt-1">123 Business Avenue, City Center</Text>
           </View>
           <View className="bg-primary/10 px-3 py-1 rounded-full flex-row items-center">
-            <Ionicons name="star" size={14} color="#E11D48" />
+            <SymbolView name="star.fill" size={14} tintColor="#E11D48" />
             <Text className="ml-1 text-sm font-bold text-primary">4.8</Text>
           </View>
         </View>
 
         <View className="flex-row items-center mt-4 pb-4 border-b border-border">
           <TouchableOpacity className="flex-1 flex-row items-center justify-center py-2 bg-primary/10 rounded-lg mr-2">
-            <Ionicons name="call" size={18} color="#2563EB" />
+            <SymbolView name="phone.fill" size={18} tintColor="#2563EB" />
             <Text className="ml-2 font-semibold text-primary">Call</Text>
           </TouchableOpacity>
           <TouchableOpacity className="flex-1 flex-row items-center justify-center py-2 bg-secondary/10 rounded-lg ml-2">
-            <Ionicons name="location" size={18} color="#E11D48" />
+            <SymbolView name="mappin" size={18} tintColor="#E11D48" />
             <Text className="ml-2 font-semibold text-secondary">Direction</Text>
           </TouchableOpacity>
         </View>
@@ -57,7 +57,7 @@ export default function BusinessDetailsScreen() {
               <Text className="font-bold text-foreground">Jane Doe</Text>
               <View className="flex-row">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Ionicons key={i} name="star" size={12} color="#E11D48" />
+                  <SymbolView key={i} name="star.fill" size={12} tintColor="#E11D48" />
                 ))}
               </View>
             </View>

@@ -1,6 +1,6 @@
 import { Stack, useRouter } from 'expo-router';
 import { TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { SymbolView } from 'expo-symbols';
 import { useColorScheme } from 'react-native';
 
 export default function BusinessLayout() {
@@ -19,7 +19,7 @@ export default function BusinessLayout() {
         headerShadowVisible: false,
         headerLeft: () => (
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
-            <Ionicons name="arrow-back" size={24} color={headerText} />
+            <SymbolView name="arrow.left" size={24} tintColor={headerText} />
           </TouchableOpacity>
         ),
       }}

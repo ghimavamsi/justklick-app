@@ -1,13 +1,13 @@
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { SymbolView } from 'expo-symbols';
 import { useColorScheme } from 'react-native';
 
 export default function TabsLayout() {
   const colorScheme = useColorScheme();
   
   // These values should ideally come from our tailwind theme, but for tabs we use hex
-  const tintColor = '#2563EB'; // Primary Blue
-  const inactiveTintColor = '#64748B'; // Muted Foreground
+  const tintColor = '#E60000'; // JustKlick Red
+  const inactiveTintColor = '#A0A0A0'; // Muted Foreground
 
   return (
     <Tabs
@@ -16,14 +16,14 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: inactiveTintColor,
         tabBarStyle: {
           borderTopWidth: 1,
-          borderTopColor: colorScheme === 'dark' ? '#1E293B' : '#E2E8F0',
-          backgroundColor: colorScheme === 'dark' ? '#0B1120' : '#FFFFFF',
+          borderTopColor: colorScheme === 'dark' ? '#27272a' : '#e4e4e7',
+          backgroundColor: colorScheme === 'dark' ? '#09090b' : '#ffffff',
         },
         headerStyle: {
-          backgroundColor: colorScheme === 'dark' ? '#0B1120' : '#FFFFFF',
+          backgroundColor: colorScheme === 'dark' ? '#09090b' : '#ffffff',
         },
         headerTitleStyle: {
-          color: colorScheme === 'dark' ? '#F8FAFC' : '#020617',
+          color: colorScheme === 'dark' ? '#fafafa' : '#09090b',
           fontFamily: 'PlusJakartaSans-Bold',
         },
         tabBarLabelStyle: {
@@ -34,28 +34,28 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <SymbolView name="house.fill" size={24} tintColor={color} />,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
           title: 'Explore',
-          tabBarIcon: ({ color }) => <Ionicons name="search" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <SymbolView name="magnifyingglass" size={24} tintColor={color} />,
         }}
       />
       <Tabs.Screen
         name="notifications"
         options={{
           title: 'Updates',
-          tabBarIcon: ({ color }) => <Ionicons name="notifications" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <SymbolView name="bell.fill" size={24} tintColor={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <SymbolView name="person.fill" size={24} tintColor={color} />,
         }}
       />
     </Tabs>
