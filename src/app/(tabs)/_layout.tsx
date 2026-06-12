@@ -14,6 +14,7 @@ export default function TabsLayout() {
       screenOptions={{
         tabBarActiveTintColor: tintColor,
         tabBarInactiveTintColor: inactiveTintColor,
+        headerShown: false,
         tabBarStyle: {
           borderTopWidth: 1,
           borderTopColor: colorScheme === 'dark' ? '#27272a' : '#e4e4e7',
@@ -34,6 +35,7 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Home',
+          headerShown: false,
           tabBarIcon: ({ color }) => <SymbolView name="house.fill" size={24} tintColor={color} />,
         }}
       />

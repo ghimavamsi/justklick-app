@@ -1,60 +1,153 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
+import React from 'react';
+import { View, Text, StatusBar, ListRenderItem } from 'react-native';
+import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useHomeData } from '../../hooks/useHomeData';
+import { useTheme } from '../../hooks/useTheme';
+
+// Components
+import { HomeHeader } from '../../components/home/HomeHeader';
+import { HeroSearch } from '../../components/home/HeroSearch';
+import { CategoryCarousel } from '../../components/home/CategoryCarousel';
+import { PromoBannerCarousel } from '../../components/home/PromoBannerCarousel';
+import { BusinessSection } from '../../components/home/BusinessSection';
+import { TrendingCategories } from '../../components/home/TrendingCategories';
+import { HomeSkeletons } from '../../components/home/HomeSkeletons';
+
+// Section Enum for FlatList
+type HomeSectionType = 
+  | 'search' 
+  | 'categories' 
+  | 'banners' 
+  | 'featured' 
+  | 'premium' 
+  | 'nearby' 
+  | 'trending' 
+  | 'recommended'
+  | 'footer';
+
+const SECTIONS: HomeSectionType[] = [
+  'search', 
+  'categories', 
+  'banners', 
+  'featured', 
+  'premium', 
+  'nearby', 
+  'trending', 
+  'recommended',
+  'footer'
+];
 
 export default function HomeScreen() {
-  const router = useRouter();
+  const { colorScheme } = useTheme();
+  const { data, isLoading, isError } = useHomeData();
+  const scrollY = useSharedValue(0);
+  const insets = useSafeAreaInsets();
+  
+  // Calculate the expanded header height dynamically based on safe area
+  const headerHeight = Math.max(insets.top, 20) + 12 + 105; // paddingTop + 105
 
-  const categories = [
-    { id: '1', name: 'Software', icon: 'laptopcomputer', color: 'bg-blue-100', iconColor: '#2563EB' },
-    { id: '2', name: 'Coaching', icon: 'graduationcap', color: 'bg-orange-100', iconColor: '#EA580C' },
-    { id: '3', name: 'Hostels', icon: 'building', color: 'bg-emerald-100', iconColor: '#16A34A' },
-    { id: '4', name: 'Overseas', icon: 'globe', color: 'bg-red-100', iconColor: '#E11D48' },
-  ];
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-background">
+        <HomeHeader scrollY={scrollY} />
+        <View style={{ paddingTop: headerHeight }}>
+          <HomeSkeletons />
+        </View>
+      </View>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <View className="flex-1 bg-background items-center justify-center">
+        <Text className="text-foreground">Failed to load data. Please try again.</Text>
+      </View>
+    );
+  }
+
+  const renderSection: ListRenderItem<HomeSectionType> = ({ item }) => {
+    switch (item) {
+      case 'search':
+        return <HeroSearch />;
+      case 'categories':
+        return <CategoryCarousel categories={data.categories} />;
+      case 'banners':
+        return <PromoBannerCarousel banners={data.banners} />;
+      case 'featured':
+        return (
+          <BusinessSection 
+            title="Featured Businesses" 
+            subtitle="Top rated places this week"
+            businesses={data.featuredBusinesses} 
+            variant="featured"
+            icon="star-outline"
+            iconColor="#F59E0B"
+          />
+        );
+      case 'premium':
+        return (
+          <BusinessSection 
+            title="Premium Picks" 
+            businesses={data.premiumBusinesses} 
+            variant="premium"
+            icon="diamond-outline"
+            iconColor="#1C398E"
+          />
+        );
+      case 'nearby':
+        return (
+          <BusinessSection 
+            title="Near You" 
+            subtitle="Discover great places around you"
+            businesses={data.nearbyBusinesses} 
+            variant="nearby"
+            icon="location-outline"
+            iconColor="#10B981"
+          />
+        );
+      case 'trending':
+        return <TrendingCategories categories={data.trendingCategories} />;
+      case 'recommended':
+        return (
+          <BusinessSection 
+            title="Recommended For You" 
+            businesses={data.recommendedBusinesses} 
+            variant="recommended"
+            icon="sparkles-outline"
+            iconColor="#8B5CF6"
+          />
+        );
+      case 'footer':
+        return <View className="h-24 items-center justify-center">
+          <Text className="text-xs text-muted-foreground">Made with ❤️ by JustKlick</Text>
+        </View>;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <ScrollView className="flex-1 bg-background">
-      {/* Header Section */}
-      <View className="px-4 py-6 bg-card rounded-b-3xl shadow-sm">
-        <Text className="text-sm font-medium text-muted-foreground">Location</Text>
-        <View className="flex-row items-center mt-1">
-          <SymbolView name="mappin" size={16} tintColor="#E11D48" />
-          <Text className="ml-1 text-base font-bold text-foreground">Detecting location...</Text>
-          <SymbolView name="chevron.down" size={16} tintColor="#2563EB" style={{ marginLeft: 8 }} />
-        </View>
+    <View className="flex-1 bg-background">
+      <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
+      
+      <HomeHeader scrollY={scrollY} />
 
-        {/* Search Bar Placeholder */}
-        <TouchableOpacity 
-          className="flex-row items-center mt-6 h-12 w-full rounded-full bg-muted px-4"
-          onPress={() => router.push('/(tabs)/search')}
-        >
-          <SymbolView name="magnifyingglass" size={20} tintColor="#64748B" />
-          <Text className="ml-2 text-muted-foreground font-medium">Search for services...</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Categories */}
-      <View className="px-4 py-6">
-        <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-xl font-bold text-foreground">Popular Categories</Text>
-          <Text className="text-sm font-semibold text-primary">See All</Text>
-        </View>
-        
-        <View className="flex-row flex-wrap justify-between">
-          {categories.map((cat) => (
-            <TouchableOpacity 
-              key={cat.id} 
-              className="items-center mb-6 w-1/4"
-              onPress={() => router.push(`/business/${cat.name.toLowerCase()}`)}
-            >
-              <View className={`w-14 h-14 rounded-2xl items-center justify-center mb-2 ${cat.color}`}>
-                <SymbolView name={cat.icon as any} size={28} tintColor={cat.iconColor} />
-              </View>
-              <Text className="text-xs font-semibold text-center text-foreground">{cat.name}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-    </ScrollView>
+      <Animated.FlatList
+        data={SECTIONS}
+        keyExtractor={(item) => item}
+        renderItem={renderSection}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: 40 }}
+      />
+    </View>
   );
 }
