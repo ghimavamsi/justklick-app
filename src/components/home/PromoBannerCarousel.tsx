@@ -60,7 +60,7 @@ export function PromoBannerCarousel({ banners }: PromoBannerCarouselProps) {
         <LinearGradient
           colors={['transparent', 'rgba(0,0,0,0.9)']}
           locations={[0, 0.8]}
-          className="absolute bottom-0 w-full h-[70%]"
+          style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '70%' }}
         />
         
         <View className="flex-1 p-5 justify-between">
