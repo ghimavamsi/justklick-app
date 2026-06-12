@@ -97,7 +97,7 @@ export default function LocationPermissionScreen() {
         
         {/* Animated Premium Illustration */}
         <Animated.View className="items-center justify-center mb-12 h-48 w-48" style={iconStyle}>
-          <Animated.View className="absolute w-48 h-48 bg-primary/20 rounded-full" style={[pulseStyle, { filter: 'blur(30px)' }]} />
+          <Animated.View className="absolute w-48 h-48 bg-primary/20 rounded-full" style={pulseStyle} />
           
           <View className="bg-card w-28 h-28 rounded-full shadow-2xl items-center justify-center border-8 border-background z-10">
             <Ionicons name="location" size={48} color={PRIMARY} />

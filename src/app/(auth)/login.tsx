@@ -104,7 +104,7 @@ export default function PremiumLoginScreen() {
           <View className="w-full h-full items-center justify-center relative">
             
             {/* Background Soft Glow */}
-            <View className="absolute w-64 h-64 bg-primary/10 rounded-full" style={{ filter: 'blur(40px)' }} />
+            <View className="absolute w-64 h-64 bg-primary/10 rounded-full"  />
 
             {/* Central Element */}
             <View className="w-24 h-24 bg-card rounded-[28px] shadow-2xl items-center justify-center border border-border/50 z-20">
@@ -161,8 +161,8 @@ export default function PremiumLoginScreen() {
             activeOpacity={0.7}
           >
             <Image 
-              source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }} 
-              style={{ width: 24, height: 24, position: 'absolute', left: 20 }} 
+              source={require('@/assets/images/google-logo.png')} 
+              style={{ width: 22, height: 22, position: 'absolute', left: 20 }} 
             />
             <Text className="text-[16px] font-bold text-foreground">Continue with Google</Text>
           </TouchableOpacity>

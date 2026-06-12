@@ -4,23 +4,24 @@
     "slug": "justklick_app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/Jk.png",
+    "icon": "./assets/images/app-icon.png",
     "scheme": "justklickapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/images/Jk.png"
+      "icon": "./assets/images/app-icon.png"
     },
     "android": {
+      "userInterfaceStyle": "automatic",
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
-        "foregroundImage": "./assets/images/Jk.png"
+        "foregroundImage": "./assets/images/app-icon.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.himavamsigumpu.justklick_app"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/Jk.png"
+      "favicon": "./assets/images/app-icon.png"
     },
     "plugins": [
       "expo-router",
@@ -28,8 +29,13 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#FFFFFF",
-          "image": "./assets/images/Jk.png",
-          "imageWidth": 1
+          "image": "./assets/images/logo.png",
+          "imageWidth": 200,
+          "dark": {
+            "backgroundColor": "#09090b",
+            "image": "./assets/images/logo.png",
+            "imageWidth": 200
+          }
         }
       ],
       [
@@ -41,7 +47,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/Jk.png",
+          "icon": "./assets/images/app-icon.png",
           "color": "#ffffff"
         }
       ]

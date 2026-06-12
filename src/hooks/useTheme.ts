@@ -7,7 +7,7 @@ type ThemeMode = 'light' | 'dark' | 'system';
 const THEME_STORAGE_KEY = '@app_theme_mode';
 
 export function useTheme() {
-  const { colorScheme, setColorScheme } = useColorScheme();
+  const { colorScheme: nwColorScheme, setColorScheme } = useColorScheme();
   const deviceTheme = useDeviceColorScheme();
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
   const [isReady, setIsReady] = useState(false);
@@ -22,7 +22,7 @@ export function useTheme() {
           setColorScheme(savedTheme);
         } else {
           setThemeMode('system');
-          setColorScheme(deviceTheme || 'light');
+          setColorScheme('system');
         }
       } catch (e) {
         console.error('Failed to load theme', e);
@@ -31,23 +31,15 @@ export function useTheme() {
       }
     };
     loadTheme();
-  }, [deviceTheme]);
-
-  // Sync native system changes if mode is 'system'
-  useEffect(() => {
-    if (isReady && themeMode === 'system') {
-      setColorScheme(deviceTheme || 'light');
-    }
-  }, [deviceTheme, themeMode, isReady]);
+  }, []);
 
   const changeTheme = async (mode: ThemeMode) => {
     setThemeMode(mode);
+    setColorScheme(mode);
     try {
       if (mode === 'system') {
-        setColorScheme(deviceTheme || 'light');
         await AsyncStorage.removeItem(THEME_STORAGE_KEY);
       } else {
-        setColorScheme(mode);
         await AsyncStorage.setItem(THEME_STORAGE_KEY, mode);
       }
     } catch (e) {
@@ -55,9 +47,11 @@ export function useTheme() {
     }
   };
 
+  const resolvedColorScheme = nwColorScheme ?? deviceTheme ?? 'light';
+
   return {
     themeMode,
-    colorScheme,
+    colorScheme: resolvedColorScheme,
     changeTheme,
     isReady,
   };

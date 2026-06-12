@@ -129,12 +129,16 @@ export default function PremiumSplash() {
   }));
 
   return (
-    <View className="flex-1 bg-white items-center justify-center">
+    <View className="flex-1 bg-background items-center justify-center overflow-hidden">
       
+      {/* Mesh Gradient Accents */}
+      <View className="absolute top-[-10%] left-[-10%] w-[60%] h-[40%] rounded-full bg-primary/15"  />
+      <View className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[40%] rounded-full bg-[#c10007]/15"  />
+
       {/* Soft Ambient Center Pulse */}
       <Animated.View 
-        className="absolute w-64 h-64 rounded-full bg-[#203A8A]" 
-        style={[{ filter: 'blur(40px)' }, pulseStyle]} 
+        className="absolute w-64 h-64 rounded-full bg-primary/30" 
+        style={pulseStyle} 
       />
 
       {/* Centerpiece Container */}

@@ -132,7 +132,7 @@ export default function PremiumRegisterScreen() {
         {/* --- HERO AREA --- */}
         <Animated.View style={[{ height: height * 0.35 }, heroAnimatedStyle]} className="items-center justify-center pt-10">
           <View className="w-full h-full items-center justify-center relative">
-            <View className="absolute w-64 h-64 bg-primary/10 rounded-full" style={{ filter: 'blur(40px)' }} />
+            <View className="absolute w-64 h-64 bg-primary/10 rounded-full"  />
             <View className="w-24 h-24 bg-card rounded-[28px] shadow-2xl items-center justify-center border border-border/50 z-20">
               <Ionicons name="person-add" size={36} color={PRIMARY} />
             </View>

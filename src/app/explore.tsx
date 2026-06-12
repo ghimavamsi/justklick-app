@@ -82,7 +82,7 @@ export default function TabTwoScreen() {
                 project.
               </ThemedText>
               <Image
-                source={require('@/assets/images/Jk.png')}
+                source={require('@/assets/images/logo.png')}
                 className="w-full aspect-[296/171] rounded-xl mt-2"
               />
             </ThemedView>
@@ -94,7 +94,7 @@ export default function TabTwoScreen() {
               <ThemedText type="code">@3x</ThemedText> suffixes to provide files for different
               screen densities.
             </ThemedText>
-            <Image source={require('@/assets/images/Jk.png')} className="w-[100px] h-[100px] self-center" />
+            <Image source={require('@/assets/images/app-icon.png')} className="w-[100px] h-[100px] self-center" />
             <ExternalLink href="https://reactnative.dev/docs/images">
               <ThemedText type="linkPrimary">Learn more</ThemedText>
             </ExternalLink>
