@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, SharedValue, Extrapolation } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, SharedValue, Extrapolation, withTiming, useSharedValue, Easing, withRepeat } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuthStore } from '../../store/auth-store';
 import { useUserStore } from '../../store/user-store';
+import { useLocationStore } from '../../store/location-store';
+import { LocationSelectorSheet } from '../location/LocationSelectorSheet';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 
-const { width } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get('window');
 
 interface HomeHeaderProps {
   scrollY: SharedValue<number>;
@@ -18,12 +21,35 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
   const { colorScheme } = useTheme();
   const { isAuthenticated } = useAuthStore();
   const { profile } = useUserStore();
+  const { currentLocation, manualLocation } = useLocationStore();
+  const [isLocationSelectorVisible, setIsLocationSelectorVisible] = useState(false);
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  
+  const activeLocation = manualLocation || currentLocation;
+  const locationText = activeLocation?.shortAddress || 'Set Location';
   
   const paddingTop = Math.max(insets.top, 20) + 8; // Top padding
   const HEADER_EXPANDED_HEIGHT = Math.max(insets.top, 20) + 120; // Increased to prevent bottom clipping
   const HEADER_COLLAPSED_HEIGHT = Math.max(insets.top, 20) + 75;
   const SCROLL_DISTANCE = 60;
+
+  // Infinite Rotation for Search Bar Border
+  const rotation = useSharedValue(0);
+
+  useEffect(() => {
+    rotation.value = withRepeat(
+      withTiming(360, { duration: 4000, easing: Easing.linear }),
+      -1,
+      false
+    );
+  }, []);
+
+  const rotatingStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: `${rotation.value}deg` }],
+    };
+  });
 
   // Header Container Animation
   const headerStyle = useAnimatedStyle(() => {
@@ -127,11 +153,16 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
         
         {/* Left: Location Pill */}
         <Animated.View style={leftSideStyle}>
-          <TouchableOpacity className="flex-row items-center justify-center bg-muted/80 px-4 h-11 rounded-full border border-border/50" activeOpacity={0.7} style={{ maxWidth: 160 }}>
+          <TouchableOpacity 
+            onPress={() => setIsLocationSelectorVisible(true)}
+            className="flex-row items-center justify-center bg-muted/80 px-4 h-11 rounded-full border border-border/50" 
+            activeOpacity={0.7} 
+            style={{ maxWidth: 200 }}
+          >
             <Ionicons name="location" size={24} color="#c10007" />
             <Animated.View style={locationTextStyle}>
               <Text className="text-xs font-extrabold text-foreground" numberOfLines={1}>
-                Vijayawada
+                {locationText}
               </Text>
               <View className="ml-1">
                 <Ionicons name="chevron-down" size={18} color="#64748B" />
@@ -171,15 +202,44 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
         shadowRadius: 16,
         elevation: 8,
       }]}>
-        <TouchableOpacity activeOpacity={0.9} style={{ flex: 1, borderRadius: 999 }}>
+        <TouchableOpacity 
+          activeOpacity={0.9} 
+          style={{ flex: 1, borderRadius: 999 }}
+          onPress={() => router.push('/(tabs)/search')}
+        >
           {/* Gradient Border Wrapper */}
-          <LinearGradient
-            colors={['#1C398E', '#c10007']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={{ flex: 1, borderRadius: 999, padding: 1.5 }}
+          <View 
+            style={{ 
+              flex: 1, 
+              borderRadius: 999, 
+              overflow: 'hidden', 
+              padding: 1.5,
+              position: 'relative',
+              justifyContent: 'center',
+            }}
           >
-            {/* Inner Background Gradient */}
+            {/* Spinning Gradient Background Layer */}
+            <Animated.View
+              style={[
+                {
+                  position: 'absolute',
+                  width: screenWidth * 2,
+                  height: screenWidth * 2,
+                  left: -screenWidth / 2,
+                  top: -screenWidth / 2 + 24, // Center vertically
+                },
+                rotatingStyle,
+              ]}
+            >
+              <LinearGradient
+                colors={['#c10007', '#1C398E', '#c10007']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ flex: 1 }}
+              />
+            </Animated.View>
+
+            {/* Inner Background Gradient (The actual search bar) */}
             <LinearGradient
               colors={isDark ? ['#1e293b', '#0f172a'] : ['#ffffff', '#f8fafc']}
               start={{ x: 0, y: 0 }}
@@ -198,10 +258,14 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
 
               <Ionicons name="mic" size={20} color="#c10007" />
             </LinearGradient>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
       </Animated.View>
 
+      <LocationSelectorSheet 
+        visible={isLocationSelectorVisible} 
+        onClose={() => setIsLocationSelectorVisible(false)} 
+      />
     </Animated.View>
   );
 }

@@ -1,29 +1,141 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from './storage';
+import * as Location from 'expo-location';
+
+export type PermissionStatus = 'undetermined' | 'granted' | 'denied' | 'blocked';
+
+export interface LocationData {
+  latitude: number;
+  longitude: number;
+  addressString: string;
+  shortAddress: string; // e.g. "Vijayawada"
+}
 
 interface LocationState {
-  currentCity: string | null;
-  coordinates: { lat: number; lng: number } | null;
-  savedLocations: string[];
-  setLocation: (city: string, coordinates?: { lat: number; lng: number }) => void;
+  permissionStatus: PermissionStatus;
+  currentLocation: LocationData | null;
+  manualLocation: LocationData | null;
+  savedLocations: string[]; // Keep backward compatibility for recent searches
+  isLoading: boolean;
+  error: string | null;
+
+  // Actions
+  checkPermission: () => Promise<void>;
+  requestPermission: () => Promise<void>;
+  fetchCurrentLocation: () => Promise<void>;
+  setManualLocation: (location: LocationData) => void;
+  clearManualLocation: () => void;
   addSavedLocation: (city: string) => void;
   removeSavedLocation: (city: string) => void;
 }
 
 export const useLocationStore = create<LocationState>()(
   persist(
-    (set) => ({
-      currentCity: null,
-      coordinates: null,
+    (set, get) => ({
+      permissionStatus: 'undetermined',
+      currentLocation: null,
+      manualLocation: null,
       savedLocations: [],
-      setLocation: (city, coordinates) => set({ currentCity: city, ...(coordinates && { coordinates }) }),
+      isLoading: false,
+      error: null,
+
+      checkPermission: async () => {
+        try {
+          const { status } = await Location.getForegroundPermissionsAsync();
+          
+          let internalStatus: PermissionStatus = 'undetermined';
+          if (status === 'granted') internalStatus = 'granted';
+          else if (status === 'denied') internalStatus = 'denied';
+          
+          set({ permissionStatus: internalStatus });
+          
+          if (internalStatus === 'granted') {
+            await get().fetchCurrentLocation();
+          }
+        } catch (error) {
+          console.error('Error checking location permission:', error);
+        }
+      },
+
+      requestPermission: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const { status, canAskAgain } = await Location.requestForegroundPermissionsAsync();
+          
+          let internalStatus: PermissionStatus = 'undetermined';
+          if (status === 'granted') {
+            internalStatus = 'granted';
+          } else if (!canAskAgain) {
+            internalStatus = 'blocked';
+          } else {
+            internalStatus = 'denied';
+          }
+
+          set({ permissionStatus: internalStatus, isLoading: false });
+
+          if (internalStatus === 'granted') {
+            await get().fetchCurrentLocation();
+          }
+        } catch (error) {
+          set({ error: 'Failed to request permissions', isLoading: false });
+        }
+      },
+
+      fetchCurrentLocation: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const location = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          });
+
+          const geocode = await Location.reverseGeocodeAsync({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+
+          if (geocode && geocode.length > 0) {
+            const place = geocode[0];
+            const addressParts = [];
+            if (place.street || place.name) addressParts.push(place.street || place.name);
+            if (place.district || place.city) addressParts.push(place.district || place.city);
+            if (place.region) addressParts.push(place.region);
+
+            const addressString = addressParts.filter(Boolean).join(', ');
+            const shortAddress = place.city || place.district || place.region || 'Current Location';
+
+            set({
+              currentLocation: {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                addressString,
+                shortAddress,
+              },
+              isLoading: false,
+            });
+          } else {
+            set({ error: 'Could not determine address', isLoading: false });
+          }
+        } catch (error) {
+          set({ error: 'Failed to fetch location', isLoading: false });
+        }
+      },
+
+      setManualLocation: (location) => {
+        set({ manualLocation: location });
+      },
+
+      clearManualLocation: () => {
+        set({ manualLocation: null });
+      },
+
       addSavedLocation: (city) =>
         set((state) => ({
           savedLocations: state.savedLocations.includes(city)
             ? state.savedLocations
             : [...state.savedLocations, city],
         })),
+
       removeSavedLocation: (city) =>
         set((state) => ({
           savedLocations: state.savedLocations.filter((loc) => loc !== city),
@@ -32,6 +144,12 @@ export const useLocationStore = create<LocationState>()(
     {
       name: 'location-storage',
       storage: createJSONStorage(() => zustandStorage),
+      // Only persist manual locations and saved locations (don't persist transient GPS or loading states)
+      partialize: (state) => ({
+        manualLocation: state.manualLocation,
+        savedLocations: state.savedLocations,
+        permissionStatus: state.permissionStatus,
+      }),
     }
   )
 );

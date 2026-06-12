@@ -42,14 +42,15 @@ export function BusinessCard({ business, variant = 'featured' }: BusinessCardPro
         activeOpacity={1}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        className={`bg-card rounded-3xl overflow-hidden border ${isPremium ? 'border-[#F59E0B]' : 'border-border/50'}`}
+        className="bg-card rounded-3xl overflow-hidden border"
         style={{
           width: cardWidth,
-          shadowColor: colorScheme === 'dark' ? '#000' : isPremium ? '#F59E0B' : '#64748B',
+          borderColor: isPremium ? '#F59E0B' : (colorScheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'),
+          shadowColor: colorScheme === 'dark' ? 'transparent' : (isPremium ? '#F59E0B' : '#64748B'),
           shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.1,
+          shadowOpacity: colorScheme === 'dark' ? 0 : 0.1,
           shadowRadius: 16,
-          elevation: 5,
+          elevation: colorScheme === 'dark' ? 0 : 5,
         }}
       >
         {/* Cover Image */}

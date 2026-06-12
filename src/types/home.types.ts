@@ -18,6 +18,13 @@ export interface Business {
   distanceStr?: string;
   isPremium?: boolean;
   isTrending?: boolean;
+  tags?: string[];
+  isOpenNow?: boolean;
+  images?: string[];
+  experience?: string;
+  timings?: string;
+  fullAddress?: string;
+  isTrusted?: boolean;
 }
 
 export interface Banner {
