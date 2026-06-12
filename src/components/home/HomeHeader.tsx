@@ -127,10 +127,10 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
         
         {/* Left: Location Pill */}
         <Animated.View style={leftSideStyle}>
-          <TouchableOpacity className="flex-row items-center bg-muted/80 px-4 py-2.5 rounded-full border border-border/50" activeOpacity={0.7} style={{ maxWidth: 160 }}>
+          <TouchableOpacity className="flex-row items-center justify-center bg-muted/80 px-4 h-11 rounded-full border border-border/50" activeOpacity={0.7} style={{ maxWidth: 160 }}>
             <Ionicons name="location" size={24} color="#c10007" />
             <Animated.View style={locationTextStyle}>
-              <Text className="text-sm font-extrabold text-foreground" numberOfLines={1}>
+              <Text className="text-xs font-extrabold text-foreground" numberOfLines={1}>
                 Vijayawada
               </Text>
               <View className="ml-1">

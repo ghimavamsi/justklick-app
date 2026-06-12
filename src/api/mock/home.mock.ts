@@ -34,6 +34,20 @@ const BANNERS: Banner[] = [
     subtitle: 'Discover luxurious student living spaces near you.',
     imageUrl: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=1000&auto=format&fit=crop',
     actionUrl: '/business/hostels'
+  },
+  {
+    id: 'b3',
+    title: 'Advanced Healthcare',
+    subtitle: 'Book appointments with top-rated specialists instantly.',
+    imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1000&auto=format&fit=crop',
+    actionUrl: '/business/healthcare'
+  },
+  {
+    id: 'b4',
+    title: 'Elite Real Estate',
+    subtitle: 'Find your dream home with zero brokerage fees.',
+    imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1000&auto=format&fit=crop',
+    actionUrl: '/business/real-estate'
   }
 ];
 
