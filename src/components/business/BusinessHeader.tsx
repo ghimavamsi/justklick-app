@@ -95,8 +95,8 @@ export function BusinessHeader({ business, scrollY }: Props) {
           <Ionicons name="arrow-back" size={24} color={isDark ? '#FFF' : '#000'} />
         </TouchableOpacity>
 
-        {/* JustDial style: Title slides in next to the icons on the right */}
-        <Animated.View style={[animatedTitleStyle]} className="flex-1 items-end px-4 z-10">
+        {/* Title slides in from the left next to the back button */}
+        <Animated.View style={[animatedTitleStyle]} className="flex-1 items-start pl-3 z-10">
           <Text className="text-lg font-bold text-foreground" numberOfLines={1}>{business.name}</Text>
         </Animated.View>
 

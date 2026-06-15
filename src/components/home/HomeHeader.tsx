@@ -195,7 +195,7 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
         style={[{ position: 'absolute', top: paddingTop + 18, left: 0, right: 0, alignItems: 'center', justifyContent: 'center' }, logoStyle]}
         pointerEvents="none"
       >
-        <Text className="text-2xl font-extrabold tracking-tight text-primary">
+        <Text className="text-3xl font-extrabold tracking-tight text-primary">
           Just<Text className="text-[#c10007]">Klick</Text>
         </Text>
       </Animated.View>
