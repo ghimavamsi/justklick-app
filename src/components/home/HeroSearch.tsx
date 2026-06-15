@@ -18,7 +18,7 @@ export function HeroSearch() {
               key={index}
               className="px-4 py-2 bg-muted rounded-full mr-2 border border-border/50 flex-row items-center"
             >
-              <Ionicons name="time-outline" size={14} color="#64748B" className="mr-1" />
+              <Ionicons name="time-outline" size={14} color="#64748B" style={{ marginRight: 4 }} />
               <Text className="text-xs font-semibold text-foreground ml-1">{search}</Text>
             </TouchableOpacity>
           ))}

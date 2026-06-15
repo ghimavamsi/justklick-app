@@ -2,8 +2,10 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { useRouter } from 'expo-router';
 import { Business } from '../../types/home.types';
 import { useTheme } from '../../hooks/useTheme';
+import { useFavorites, useToggleFavorite } from '../../hooks/useFavorites';
 
 interface BusinessCardProps {
   business: Business;
@@ -14,7 +16,13 @@ const { width } = Dimensions.get('window');
 
 export function BusinessCard({ business, variant = 'featured' }: BusinessCardProps) {
   const { colorScheme } = useTheme();
+  const router = useRouter();
+  const { data: favorites } = useFavorites();
+  const { mutate: toggleFavorite } = useToggleFavorite();
+  
   const scale = useSharedValue(1);
+
+  const isFavorite = favorites?.some((f) => f.id === business.id) ?? false;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -22,6 +30,11 @@ export function BusinessCard({ business, variant = 'featured' }: BusinessCardPro
 
   const handlePressIn = () => { scale.value = withSpring(0.98); };
   const handlePressOut = () => { scale.value = withSpring(1); };
+  const handlePress = () => { router.push(`/business/${business.id}`); };
+
+  const handleFavoritePress = () => {
+    toggleFavorite({ business, isCurrentlyFavorite: isFavorite });
+  };
 
   // Adjust card dimensions and styling based on variant
   let cardWidth = width * 0.75;
@@ -40,6 +53,7 @@ export function BusinessCard({ business, variant = 'featured' }: BusinessCardPro
     <Animated.View style={animatedStyle} className="mr-5 mb-4">
       <TouchableOpacity 
         activeOpacity={1}
+        onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         className="bg-card rounded-3xl overflow-hidden border"
@@ -62,8 +76,15 @@ export function BusinessCard({ business, variant = 'featured' }: BusinessCardPro
           />
           
           {/* Favorite Button Overlay */}
-          <TouchableOpacity className="absolute top-3 right-3 w-8 h-8 bg-background/80 rounded-full items-center justify-center backdrop-blur-md">
-            <Ionicons name="heart-outline" size={18} color={colorScheme === 'dark' ? '#FFF' : '#000'} />
+          <TouchableOpacity 
+            onPress={handleFavoritePress}
+            className="absolute top-3 right-3 w-8 h-8 bg-background/80 rounded-full items-center justify-center backdrop-blur-md"
+          >
+            <Ionicons 
+              name={isFavorite ? "heart" : "heart-outline"} 
+              size={18} 
+              color={isFavorite ? "#ef4444" : (colorScheme === 'dark' ? '#FFF' : '#000')} 
+            />
           </TouchableOpacity>
 
           {/* Premium Badge Overlay */}

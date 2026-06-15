@@ -31,7 +31,7 @@ const IMAGES = [
   'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop', // Office
   'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=800&auto=format&fit=crop', // Hostel
   'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=800&auto=format&fit=crop', // Healthcare
-  'https://images.unsplash.com/photo-1502672260266-1c1c24240f58?q=80&w=800&auto=format&fit=crop', // Girls Hostel
+  'https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=800&auto=format&fit=crop', // Girls Hostel
   'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=800&auto=format&fit=crop', // Premium Hostel
 ];
 

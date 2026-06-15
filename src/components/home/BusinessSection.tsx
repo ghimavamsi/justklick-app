@@ -29,7 +29,7 @@ export function BusinessSection({
       <View className="px-5 mb-4 flex-row items-center justify-between">
         <View className="flex-1 pr-4">
           <View className="flex-row items-center mb-1">
-            {icon && <Ionicons name={icon as any} size={20} color={iconColor} className="mr-2" />}
+            {icon && <Ionicons name={icon as any} size={20} color={iconColor} style={{ marginRight: 8 }} />}
             <Text className="text-xl font-extrabold text-foreground tracking-tight">{title}</Text>
           </View>
           {subtitle && <Text className="text-sm font-medium text-muted-foreground">{subtitle}</Text>}

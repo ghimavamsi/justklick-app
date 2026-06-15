@@ -12,15 +12,22 @@ const { width } = Dimensions.get('window');
 
 export function PromoBannerCarousel({ banners }: PromoBannerCarouselProps) {
   const flatListRef = useRef<FlatList>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(1);
   
+  // Clone first and last items to create the infinite scroll illusion
+  const extendedBanners = banners && banners.length > 0 ? [
+    { ...banners[banners.length - 1], id: `clone-last-${banners[banners.length - 1].id}` },
+    ...banners,
+    { ...banners[0], id: `clone-first-${banners[0].id}` }
+  ] : [];
+
   // Auto-scroll logic
   useEffect(() => {
-    if (!banners || banners.length === 0) return;
+    if (!banners || banners.length <= 1) return;
     
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % banners.length;
+        const nextIndex = prevIndex + 1;
         flatListRef.current?.scrollToIndex({ 
           index: nextIndex, 
           animated: true 
@@ -38,9 +45,35 @@ export function PromoBannerCarousel({ banners }: PromoBannerCarouselProps) {
     index,
   });
 
-  const onMomentumScrollEnd = (event: any) => {
+  const onScroll = (event: any) => {
     const newIndex = Math.round(event.nativeEvent.contentOffset.x / width);
-    setCurrentIndex(newIndex);
+    if (newIndex !== currentIndex) {
+      setCurrentIndex(newIndex);
+    }
+  };
+
+  const handleScrollEnd = (event: any) => {
+    const newIndex = Math.round(event.nativeEvent.contentOffset.x / width);
+    
+    if (newIndex === 0) {
+      // Reached the fake "last" banner, jump to the real "last" banner silently
+      flatListRef.current?.scrollToIndex({ index: banners.length, animated: false });
+      setCurrentIndex(banners.length);
+    } else if (newIndex === extendedBanners.length - 1) {
+      // Reached the fake "first" banner, jump to the real "first" banner silently
+      flatListRef.current?.scrollToIndex({ index: 1, animated: false });
+      setCurrentIndex(1);
+    }
+  };
+
+  const handleAnimationEnd = () => {
+    if (currentIndex === 0) {
+      flatListRef.current?.scrollToIndex({ index: banners.length, animated: false });
+      setCurrentIndex(banners.length);
+    } else if (currentIndex === extendedBanners.length - 1) {
+      flatListRef.current?.scrollToIndex({ index: 1, animated: false });
+      setCurrentIndex(1);
+    }
   };
 
   const renderItem = ({ item }: { item: Banner }) => (
@@ -56,11 +89,13 @@ export function PromoBannerCarousel({ banners }: PromoBannerCarouselProps) {
           resizeMode="cover"
         />
         
-        {/* Bottom-to-Top Gradient Overlay specifically for the text */}
+        {/* Diagonal Gradient Overlay (darker over a larger area for long text) */}
         <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.9)']}
-          locations={[0, 0.8]}
-          style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '70%' }}
+          colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
+          locations={[0, 0.5, 1]}
+          start={{ x: 1, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
         />
         
         <View className="flex-1 p-5 justify-between">
@@ -69,7 +104,7 @@ export function PromoBannerCarousel({ banners }: PromoBannerCarouselProps) {
           </View>
           <View>
             <Text className="text-white font-extrabold text-2xl mb-1 shadow-sm">{item.title}</Text>
-            <Text className="text-gray-200 font-medium text-sm mb-2">{item.subtitle}</Text>
+            <Text className="text-gray-200 font-medium text-sm mb-2" numberOfLines={2}>{item.subtitle}</Text>
             <View className="flex-row items-center">
               <Text className="text-white font-bold text-xs mr-1">Explore</Text>
               <Ionicons name="arrow-forward" size={14} color="#FFF" />
@@ -80,30 +115,43 @@ export function PromoBannerCarousel({ banners }: PromoBannerCarouselProps) {
     </View>
   );
 
+  const getRealIndex = (index: number) => {
+    if (!banners || banners.length === 0) return 0;
+    if (index === 0) return banners.length - 1;
+    if (index === extendedBanners.length - 1) return 0;
+    return index - 1;
+  };
+
   return (
     <View className="py-6">
-      <FlatList
-        ref={flatListRef}
-        data={banners}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        horizontal
-        pagingEnabled
-        snapToInterval={width} // Forces strict 1 item per screen
-        snapToAlignment="center"
-        decelerationRate="fast"
-        showsHorizontalScrollIndicator={false}
-        getItemLayout={getItemLayout}
-        onMomentumScrollEnd={onMomentumScrollEnd}
-        // No paddingHorizontal here, the item itself handles the margins
-      />
+      {extendedBanners.length > 0 && (
+        <FlatList
+          ref={flatListRef}
+          data={extendedBanners}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          horizontal
+          pagingEnabled
+          disableIntervalMomentum={true}
+          snapToInterval={width} // Forces strict 1 item per screen
+          snapToAlignment="center"
+          decelerationRate="fast"
+          showsHorizontalScrollIndicator={false}
+          getItemLayout={getItemLayout}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          onMomentumScrollEnd={handleScrollEnd}
+          onScrollAnimationEnd={handleAnimationEnd}
+          initialScrollIndex={1}
+        />
+      )}
       
       {/* Pagination Dots */}
       <View className="flex-row justify-center mt-4">
-        {banners.map((_, i) => (
+        {banners && banners.map((_, i) => (
           <View 
             key={i} 
-            className={`h-1.5 rounded-full mx-1 ${i === currentIndex ? 'w-5 bg-primary' : 'w-1.5 bg-muted-foreground/30'}`} 
+            className={`h-1.5 rounded-full mx-1 ${i === getRealIndex(currentIndex) ? 'w-5 bg-primary' : 'w-1.5 bg-muted-foreground/30'}`} 
           />
         ))}
       </View>

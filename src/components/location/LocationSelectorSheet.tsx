@@ -183,7 +183,7 @@ export function LocationSelectorSheet({ visible, onClose }: LocationSelectorShee
                             className="flex-row items-center py-3 border-b border-border/30"
                             onPress={() => handleSelectLocation(loc)}
                           >
-                            <Ionicons name="time-outline" size={20} color="#64748B" className="mr-4" />
+                            <Ionicons name="time-outline" size={20} color="#64748B" style={{ marginRight: 16 }} />
                             <Text className="text-sm font-medium text-foreground ml-4">{loc}</Text>
                           </TouchableOpacity>
                         ))}

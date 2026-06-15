@@ -1,17 +1,15 @@
 import React, { useEffect } from 'react';
 import { View, Dimensions } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
-import { useTheme } from '../../hooks/useTheme';
 
 const { width } = Dimensions.get('window');
 
 function SkeletonPulse({ style, className }: { style?: any, className?: string }) {
-  const { colorScheme } = useTheme();
-  const opacity = useSharedValue(0.3);
+  const opacity = useSharedValue(0.4);
 
   useEffect(() => {
     opacity.value = withRepeat(
-      withTiming(0.7, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+      withTiming(0.8, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
       -1,
       true
     );
@@ -21,55 +19,72 @@ function SkeletonPulse({ style, className }: { style?: any, className?: string }
     opacity: opacity.value,
   }));
 
-  const bgClass = colorScheme === 'dark' ? 'bg-slate-800' : 'bg-slate-200';
-
   return (
-    <Animated.View style={[animatedStyle, style]} className={`${bgClass} rounded-md ${className}`} />
+    <Animated.View style={[animatedStyle, style]} className={`bg-muted rounded-md ${className}`} />
   );
 }
 
 export function HomeSkeletons() {
   return (
-    <View className="flex-1 bg-background pt-4">
-      {/* Search Skeleton */}
-      <View className="px-5 mb-8">
-        <SkeletonPulse className="w-full h-14 rounded-2xl" />
-        <View className="flex-row mt-4">
-          {[1, 2, 3].map(i => <SkeletonPulse key={i} className="w-20 h-8 rounded-full mr-2" />)}
-        </View>
+    <View className="flex-1 bg-background">
+      
+      {/* HeroSearch Skeleton */}
+      <View className="px-5 pt-3 pb-3 flex-row">
+        {[1, 2, 3, 4].map(i => (
+          <SkeletonPulse key={i} className="w-24 h-8 rounded-full mr-2" />
+        ))}
       </View>
 
-      {/* Categories Skeleton */}
-      <View className="flex-row px-5 mb-8 overflow-hidden">
+      {/* CategoryCarousel Skeleton */}
+      <View className="py-2 px-5 flex-row overflow-hidden">
         {[1, 2, 3, 4, 5].map(i => (
-          <View key={i} className="items-center mr-6">
-            <SkeletonPulse className="w-16 h-16 rounded-3xl mb-2" />
+          <View key={i} className="w-[76px] items-center mr-4">
+            <SkeletonPulse className="w-16 h-16 rounded-3xl mb-3" />
             <SkeletonPulse className="w-12 h-3" />
           </View>
         ))}
       </View>
 
-      {/* Banner Skeleton */}
-      <View className="px-5 mb-8">
-        <SkeletonPulse className="w-full h-44 rounded-3xl" />
+      {/* PromoBannerCarousel Skeleton */}
+      <View className="py-6 px-5 items-center">
+        <SkeletonPulse className="w-full h-[180px] rounded-3xl" />
+        <View className="flex-row justify-center mt-4">
+          <SkeletonPulse className="w-5 h-1.5 rounded-full mx-1" />
+          <SkeletonPulse className="w-1.5 h-1.5 rounded-full mx-1" />
+          <SkeletonPulse className="w-1.5 h-1.5 rounded-full mx-1" />
+        </View>
       </View>
 
-      {/* Business Section Skeleton */}
-      <View className="px-5 mb-8">
-        <SkeletonPulse className="w-48 h-6 mb-4" />
-        <View className="flex-row">
+      {/* BusinessSection Skeleton (Featured) */}
+      <View className="py-5">
+        <View className="px-5 mb-4">
+          <SkeletonPulse className="w-48 h-6 mb-2" />
+          <SkeletonPulse className="w-32 h-4" />
+        </View>
+        <View className="flex-row pl-5 overflow-hidden">
           {[1, 2].map(i => (
-            <View key={i} className="mr-5 border border-border/20 rounded-3xl overflow-hidden" style={{ width: width * 0.75 }}>
-              <SkeletonPulse className="w-full h-40" />
+            <View 
+              key={i} 
+              className="mr-5 mb-4 bg-card rounded-3xl overflow-hidden border border-border/50" 
+              style={{ width: width * 0.75 }}
+            >
+              <SkeletonPulse className="w-full h-[160px] rounded-none" />
               <View className="p-4">
-                <SkeletonPulse className="w-24 h-3 mb-3" />
+                <View className="flex-row justify-between mb-2">
+                  <SkeletonPulse className="w-20 h-3" />
+                  <SkeletonPulse className="w-12 h-3" />
+                </View>
                 <SkeletonPulse className="w-48 h-5 mb-4" />
-                <SkeletonPulse className="w-32 h-4" />
+                <View className="flex-row mt-auto">
+                  <SkeletonPulse className="w-10 h-4 mr-2" />
+                  <SkeletonPulse className="w-20 h-4" />
+                </View>
               </View>
             </View>
           ))}
         </View>
       </View>
+
     </View>
   );
 }

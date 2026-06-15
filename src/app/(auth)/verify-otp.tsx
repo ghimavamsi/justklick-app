@@ -12,6 +12,8 @@ import Animated, {
   Easing
 } from 'react-native-reanimated';
 import { useTheme } from '../../hooks/useTheme';
+import { useAuthStore } from '../../store/auth-store';
+import { useUserStore } from '../../store/user-store';
 
 const { height } = Dimensions.get('window');
 
@@ -21,6 +23,8 @@ const ACCENT = '#c10007';
 export default function PremiumVerifyOTPScreen() {
   const router = useRouter();
   const { colorScheme } = useTheme();
+  const { login } = useAuthStore();
+  const { setProfile } = useUserStore();
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(30);
@@ -54,7 +58,7 @@ export default function PremiumVerifyOTPScreen() {
   }, []);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setTimeout>;
     if (timer > 0) {
       interval = setInterval(() => {
         setTimer((prev) => prev - 1);
@@ -121,6 +125,16 @@ export default function PremiumVerifyOTPScreen() {
       return;
     }
     setError('');
+    
+    // Authenticate with mock data
+    login('mock-jwt-token-12345');
+    setProfile({
+      id: 'usr_123',
+      name: 'Vamsi Babu',
+      email: 'vamsi@justklick.com',
+      phone: '9876543210',
+    });
+
     // Navigate to tabs on successful verification
     router.replace('/(tabs)');
   };

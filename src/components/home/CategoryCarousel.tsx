@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Category } from '../../types/home.types';
 import { useTheme } from '../../hooks/useTheme';
@@ -11,6 +12,7 @@ interface CategoryCarouselProps {
 export function CategoryCarousel({ categories }: CategoryCarouselProps) {
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
+  const router = useRouter();
 
   const renderItem = ({ item }: { item: Category }) => {
     // In dark mode, we use a stronger opacity (33 in hex = ~20%) to make the color pop against black.
@@ -19,7 +21,8 @@ export function CategoryCarousel({ categories }: CategoryCarouselProps) {
     
     return (
       <TouchableOpacity 
-        className="w-20 items-center justify-start mr-3"
+        className="items-center justify-start mr-4"
+        style={{ minWidth: 76, maxWidth: 110 }}
         activeOpacity={0.7}
       >
         <View 
@@ -39,7 +42,13 @@ export function CategoryCarousel({ categories }: CategoryCarouselProps) {
   };
 
   return (
-    <View className="py-2">
+    <View className="py-2 mb-2">
+      <View className="flex-row items-center justify-between px-5 mb-4">
+        <Text className="text-xl font-extrabold text-foreground tracking-tight">Explore</Text>
+        <TouchableOpacity onPress={() => router.push('/categories' as any)}>
+          <Text className="text-sm font-bold text-primary">View All</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={categories}
         renderItem={renderItem}

@@ -38,11 +38,14 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
   const rotation = useSharedValue(0);
 
   useEffect(() => {
-    rotation.value = withRepeat(
-      withTiming(360, { duration: 4000, easing: Easing.linear }),
-      -1,
-      false
-    );
+    const timer = setTimeout(() => {
+      rotation.value = withRepeat(
+        withTiming(360, { duration: 4000, easing: Easing.linear }),
+        -1,
+        false
+      );
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const rotatingStyle = useAnimatedStyle(() => {
@@ -173,7 +176,10 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
 
         {/* Right: Notification & Avatar */}
         <Animated.View className="flex-row items-center gap-3" style={rightSideStyle}>
-          <TouchableOpacity className="w-11 h-11 rounded-full bg-muted items-center justify-center border border-border relative">
+          <TouchableOpacity 
+            onPress={() => router.push('/notifications')}
+            className="w-11 h-11 rounded-full bg-muted items-center justify-center border border-border relative"
+          >
             <Ionicons name="notifications-outline" size={22} color={isDark ? '#FFF' : '#000'} />
             <View className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-[#c10007]" />
           </TouchableOpacity>
@@ -249,14 +255,12 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
               <Ionicons name="search" size={20} color={isDark ? '#94a3b8' : '#64748B'} />
               
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={{ color: isDark ? '#cbd5e1' : '#64748B', fontSize: 14, fontWeight: '600', letterSpacing: 0.2 }} numberOfLines={1}>
-                  Search businesses...
+                <Text style={{ color: isDark ? '#cbd5e1' : '#64748B', fontSize: 12, fontWeight: '600', letterSpacing: 0.2 }} numberOfLines={1}>
+                  Search businesses, restaurants and more...
                 </Text>
               </View>
 
-              <View style={{ width: 1, height: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)', marginHorizontal: 12 }} />
 
-              <Ionicons name="mic" size={20} color="#c10007" />
             </LinearGradient>
           </View>
         </TouchableOpacity>

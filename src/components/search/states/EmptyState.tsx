@@ -4,10 +4,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSearchStore } from '../../../store/search-store';
 import { RECENT_SEARCHES, TRENDING_SEARCHES } from '../../../api/mock/search.mock';
 import { useTheme } from '../../../hooks/useTheme';
+import { CategoryCarousel } from '../../home/CategoryCarousel';
+import { useHomeData } from '../../../hooks/useHomeData';
 
 export function EmptyState() {
   const { recentSearches, removeRecentSearch, clearRecentSearches, setQuery } = useSearchStore();
   const { colorScheme } = useTheme();
+  const { data: homeData } = useHomeData();
+  const categories = homeData?.categories || [];
+  
   const isDark = colorScheme === 'dark';
 
   // Use mock recent searches if local storage is empty for demonstration purposes
@@ -80,20 +85,9 @@ export function EmptyState() {
         </View>
       </View>
 
-      {/* Popular Categories Grid Placeholder */}
-      <View>
-        <Text className="text-lg font-extrabold text-foreground tracking-tight mb-4">Explore Categories</Text>
-        <View className="flex-row flex-wrap justify-between">
-          {['Restaurants', 'Hospitals', 'Education', 'Automobile'].map((category, idx) => (
-            <TouchableOpacity 
-              key={idx}
-              onPress={() => setQuery(category)}
-              className="w-[48%] bg-card rounded-2xl p-4 mb-3 border border-border shadow-sm items-center justify-center h-24"
-            >
-              <Text className="text-base font-bold text-foreground">{category}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+      {/* Popular Categories Grid */}
+      <View style={{ marginHorizontal: -20 }}>
+        <CategoryCarousel categories={categories} />
       </View>
 
     </ScrollView>

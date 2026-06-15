@@ -161,7 +161,7 @@ export function SearchHeader() {
                   onBlur={() => setIsFocused(false)}
                   onSubmitEditing={handleSubmit}
                   returnKeyType="search"
-                  placeholder="Search businesses..."
+                  placeholder="Search businesses, restaurants and more..."
                   placeholderTextColor="#64748B"
                   className="text-base text-foreground font-bold p-0 m-0"
                   autoCapitalize="none"
@@ -190,9 +190,6 @@ export function SearchHeader() {
                 </TouchableOpacity>
               )}
               
-              <TouchableOpacity className="ml-2">
-                <Ionicons name="mic" size={20} color="#c10007" />
-              </TouchableOpacity>
             </View>
           </View>
         </Animated.View>

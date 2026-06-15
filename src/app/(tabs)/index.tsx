@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StatusBar, ListRenderItem } from 'react-native';
-import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import { View, Text, StatusBar, ListRenderItem, RefreshControl } from 'react-native';
+import Animated, { useAnimatedScrollHandler, useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHomeData } from '../../hooks/useHomeData';
 import { useTheme } from '../../hooks/useTheme';
@@ -40,7 +40,7 @@ const SECTIONS: HomeSectionType[] = [
 
 export default function HomeScreen() {
   const { colorScheme } = useTheme();
-  const { data, isLoading, isError } = useHomeData();
+  const { data, isLoading, isError, refetch, isRefetching } = useHomeData();
   const scrollY = useSharedValue(0);
   const insets = useSafeAreaInsets();
   
@@ -51,6 +51,24 @@ export default function HomeScreen() {
     onScroll: (event) => {
       scrollY.value = event.contentOffset.y;
     },
+  });
+
+  const pullToRefreshGlowStyle = useAnimatedStyle(() => {
+    // When scrollY is negative, the user is pulling down
+    const pullDistance = Math.max(0, -scrollY.value);
+    const opacity = Math.min(pullDistance / 80, 1);
+    const scale = 1 + Math.min(pullDistance / 200, 0.5);
+    
+    return {
+      opacity: isRefetching ? 1 : opacity,
+      transform: [{ scale: isRefetching ? 1.2 : scale }],
+      position: 'absolute',
+      top: headerHeight - 20,
+      left: 0,
+      right: 0,
+      alignItems: 'center',
+      zIndex: 0, // Behind the FlatList content
+    };
   });
 
   if (isLoading) {
@@ -133,10 +151,27 @@ export default function HomeScreen() {
     }
   };
 
+
+
   return (
     <View className="flex-1 bg-background">
       <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       
+      {/* Innovative Pull-to-Refresh Light Effect */}
+      <Animated.View style={pullToRefreshGlowStyle} pointerEvents="none">
+        <View 
+          className="w-48 h-24 rounded-full" 
+          style={{ 
+            backgroundColor: colorScheme === 'dark' ? 'rgba(193, 0, 7, 0.15)' : 'rgba(28, 57, 142, 0.1)',
+            shadowColor: colorScheme === 'dark' ? '#c10007' : '#1C398E',
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 1,
+            shadowRadius: 30,
+            elevation: 10,
+          }} 
+        />
+      </Animated.View>
+
       <HomeHeader scrollY={scrollY} />
 
       <Animated.FlatList
@@ -146,6 +181,16 @@ export default function HomeScreen() {
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl 
+            refreshing={isRefetching} 
+            onRefresh={refetch}
+            tintColor={colorScheme === 'dark' ? '#c10007' : '#1C398E'}
+            colors={['#c10007', '#1C398E', '#F59E0B']}
+            progressBackgroundColor={colorScheme === 'dark' ? '#1e293b' : '#ffffff'}
+            progressViewOffset={headerHeight + 10}
+          />
+        }
         contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: 40 }}
       />
     </View>

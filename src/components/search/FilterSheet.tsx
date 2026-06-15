@@ -91,8 +91,8 @@ export function FilterSheet({ visible, onClose }: FilterSheetProps) {
         </Animated.View>
 
         <Animated.View 
-          style={[sheetStyle, { maxHeight: height * 0.85 }]}
-          className="bg-background rounded-t-[32px] w-full pt-2 pb-6 shadow-2xl flex-shrink"
+          style={[sheetStyle, { height: height * 0.85 }]}
+          className="bg-background rounded-t-[32px] w-full pt-2 pb-6 shadow-2xl"
         >
           <View {...panResponder.panHandlers} className="w-full bg-transparent">
             {/* Drag Handle */}
