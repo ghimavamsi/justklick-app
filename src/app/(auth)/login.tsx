@@ -39,6 +39,10 @@ export default function PremiumLoginScreen() {
   const float3 = useSharedValue(0);
 
   useEffect(() => {
+    import('expo-router').then(({ SplashScreen }) => {
+      SplashScreen.hideAsync();
+    });
+
     // Initial mount animations
     heroOpacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.ease) });
     heroTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });

@@ -171,6 +171,6 @@ export const fetchHomeData = async (): Promise<HomeData> => {
         nearbyBusinesses: NEARBY_BUSINESSES,
         recommendedBusinesses: RECOMMENDED_BUSINESSES,
       });
-    }, 1500);
+    }, 400);
   });
 };

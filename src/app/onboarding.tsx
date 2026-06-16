@@ -50,6 +50,12 @@ export default function OnboardingScreen() {
     },
   });
 
+  React.useEffect(() => {
+    import('expo-router').then(({ SplashScreen }) => {
+      SplashScreen.hideAsync();
+    });
+  }, []);
+
   const goToNextPage = (index: number) => {
     if (index === ONBOARDING_DATA.length - 1) {
       router.replace('/permissions/location');

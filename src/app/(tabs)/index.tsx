@@ -53,6 +53,12 @@ export default function HomeScreen() {
     },
   });
 
+  React.useEffect(() => {
+    import('expo-router').then(({ SplashScreen }) => {
+      SplashScreen.hideAsync();
+    });
+  }, []);
+
   const pullToRefreshGlowStyle = useAnimatedStyle(() => {
     // When scrollY is negative, the user is pulling down
     const pullDistance = Math.max(0, -scrollY.value);

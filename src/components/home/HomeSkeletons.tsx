@@ -85,6 +85,28 @@ export function HomeSkeletons() {
         </View>
       </View>
 
+      {/* BusinessSection Skeleton (Premium) */}
+      <View className="py-5">
+        <View className="px-5 mb-4">
+          <SkeletonPulse className="w-40 h-6 mb-2" />
+        </View>
+        <View className="flex-row pl-5 overflow-hidden">
+          {[1, 2].map(i => (
+            <View 
+              key={i} 
+              className="mr-5 mb-4 bg-card rounded-3xl overflow-hidden border border-border/50" 
+              style={{ width: width * 0.75 }}
+            >
+              <SkeletonPulse className="w-full h-[160px] rounded-none" />
+              <View className="p-4">
+                <SkeletonPulse className="w-48 h-5 mb-4" />
+                <SkeletonPulse className="w-24 h-4" />
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+
     </View>
   );
 }
