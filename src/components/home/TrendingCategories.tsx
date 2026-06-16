@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Category } from '../../types/home.types';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
@@ -34,7 +34,15 @@ export function TrendingCategories({ categories }: TrendingCategoriesProps) {
             }}
           >
             <View className={`w-12 h-12 rounded-2xl items-center justify-center mb-3 ${cat.bgColor}`}>
-              <Ionicons name={cat.iconName as any} size={24} color={cat.color} />
+              {cat.iconName && (cat.iconName.startsWith('http') || cat.iconName.startsWith('/')) ? (
+                <Image 
+                  source={{ uri: cat.iconName }} 
+                  style={{ width: 26, height: 26 }} 
+                  resizeMode="contain" 
+                />
+              ) : (
+                <Ionicons name={(cat.iconName || 'grid-outline') as any} size={24} color={cat.color} />
+              )}
             </View>
             <Text className="text-sm font-bold text-foreground mb-1">{cat.name}</Text>
             <View className="flex-row items-center mt-1">

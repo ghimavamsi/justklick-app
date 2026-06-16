@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Dimensions, Platform, StatusBar, Image } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Dimensions, Platform, StatusBar, Image, ActivityIndicator } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,7 +13,11 @@ import Animated, {
   Easing
 } from 'react-native-reanimated';
 import { useTheme } from '../../hooks/useTheme';
-
+import { useMutation } from '@tanstack/react-query';
+import { authApi } from '../../api/auth';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { useAuthStore } from '../../store/auth-store';
+import { useUserStore } from '../../store/user-store';
 const { height } = Dimensions.get('window');
 
 const PRIMARY = '#1C398E';
@@ -76,6 +80,96 @@ export default function PremiumLoginScreen() {
     transform: [{ translateY: float3.value * 15 }]
   }));
 
+  const mutation = useMutation({
+    mutationFn: (phoneNumber: string) => authApi.sendLoginOtp(phoneNumber),
+    onSuccess: (data) => {
+      // API call succeeded, navigate to verify OTP screen
+      router.push({
+        pathname: '/(auth)/verify-otp',
+        params: { phone }
+      });
+    },
+    onError: (err: any) => {
+      setError(err?.response?.data?.message || 'Failed to send OTP. Please try again.');
+    }
+  });
+
+  const { login } = useAuthStore();
+  const { setProfile } = useUserStore();
+
+  const googleMutation = useMutation({
+    mutationFn: (data: { idToken: string; user: any }) => authApi.googleLogin(data.idToken),
+    onSuccess: (data, variables) => {
+      console.log('Google Auth API Success:', data);
+      login(data.access, data.refresh);
+      
+      // Use the actual Google user data returned by the SDK!
+      const googleUser = variables.user;
+      setProfile({
+        id: googleUser.id || 'google_user',
+        name: googleUser.name || `${googleUser.givenName || ''} ${googleUser.familyName || ''}`.trim() || 'Google User',
+        email: googleUser.email || '',
+        phone: '', // Google Auth usually doesn't provide phone numbers
+      });
+      router.replace('/(tabs)');
+    },
+    onError: (err: any) => {
+      console.log('Google Auth API Error:', err?.response?.status, err?.response?.data);
+      setError(err?.response?.data?.message || 'Google Sign-In failed on our server. Please try again.');
+    }
+  });
+
+  useEffect(() => {
+    // Configure Google Sign-In with the Web Client ID provided by the user
+    GoogleSignin.configure({
+      webClientId: '831597823890-cj7922dosfj6mq44ql15guisi7s7brp1.apps.googleusercontent.com',
+      offlineAccess: true, // required to get the idToken/serverAuthCode
+    });
+  }, []);
+
+  const handleGoogleLogin = async () => {
+    try {
+      console.log('Starting Google Sign-In...');
+      setError('');
+      await GoogleSignin.hasPlayServices();
+      
+      // Force Google Account Chooser to appear every time (clears remembered account)
+      try {
+        await GoogleSignin.signOut();
+      } catch (e) {
+        // ignore if already signed out
+      }
+
+      const userInfo = await GoogleSignin.signIn();
+      console.log('Google Sign-In Response:', JSON.stringify(userInfo, null, 2));
+      
+      if (userInfo.type === 'success' && userInfo.data?.idToken) {
+        console.log('Sending ID Token to Backend...');
+        // Pass both idToken and the user object to the mutation
+        googleMutation.mutate({ 
+          idToken: userInfo.data.idToken, 
+          user: userInfo.data.user 
+        });
+      } else if (userInfo.type === 'cancelled') {
+        console.log('User cancelled login');
+      } else {
+        setError('Failed to get identity token from Google. Check terminal logs.');
+      }
+    } catch (error: any) {
+      console.log('Google Sign-In Exception:', error);
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        setError('Play services not available or outdated.');
+      } else {
+        setError('An unexpected Google error occurred.');
+        console.error(error);
+      }
+    }
+  };
+
   const handleContinue = () => {
     if (!phone) {
       setError('Please enter your mobile number.');
@@ -86,7 +180,7 @@ export default function PremiumLoginScreen() {
       return;
     }
     setError('');
-    router.push('/(auth)/verify-otp');
+    mutation.mutate(phone);
   };
 
   return (
@@ -163,12 +257,20 @@ export default function PremiumLoginScreen() {
           <TouchableOpacity 
             className="w-full h-14 bg-card rounded-2xl flex-row items-center justify-center shadow-sm border border-border mb-6"
             activeOpacity={0.7}
+            onPress={handleGoogleLogin}
+            disabled={googleMutation.isPending}
           >
-            <Image 
-              source={require('@/assets/images/google-logo.png')} 
-              style={{ width: 22, height: 22, position: 'absolute', left: 20 }} 
-            />
-            <Text className="text-[16px] font-bold text-foreground">Continue with Google</Text>
+            {googleMutation.isPending ? (
+              <ActivityIndicator color={PRIMARY} />
+            ) : (
+              <>
+                <Image 
+                  source={require('@/assets/images/google-logo.png')} 
+                  style={{ width: 22, height: 22, position: 'absolute', left: 20 }} 
+                />
+                <Text className="text-[16px] font-bold text-foreground">Continue with Google</Text>
+              </>
+            )}
           </TouchableOpacity>
 
           <View className="flex-row items-center mb-6 px-4">
@@ -209,9 +311,16 @@ export default function PremiumLoginScreen() {
               className="w-full h-14 rounded-xl bg-primary flex-row items-center justify-center shadow-lg shadow-primary/30 mt-2"
               activeOpacity={0.8}
               onPress={handleContinue}
+              disabled={mutation.isPending}
             >
-              <Text className="text-[16px] font-bold text-primary-foreground">Continue with Mobile</Text>
-              <Ionicons name="arrow-forward" size={18} color="#FFF" style={{ position: 'absolute', right: 20 }} />
+              {mutation.isPending ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <>
+                  <Text className="text-[16px] font-bold text-primary-foreground">Continue with Mobile</Text>
+                  <Ionicons name="arrow-forward" size={18} color="#FFF" style={{ position: 'absolute', right: 20 }} />
+                </>
+              )}
             </TouchableOpacity>
           </View>
 

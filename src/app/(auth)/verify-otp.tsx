@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Dimensions, KeyboardAvoidingView, Platform, ScrollView, StatusBar } from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, Text, TouchableOpacity, TextInput, Dimensions, KeyboardAvoidingView, Platform, ScrollView, StatusBar, ActivityIndicator } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   useSharedValue,
@@ -14,6 +14,8 @@ import Animated, {
 import { useTheme } from '../../hooks/useTheme';
 import { useAuthStore } from '../../store/auth-store';
 import { useUserStore } from '../../store/user-store';
+import { useMutation } from '@tanstack/react-query';
+import { authApi } from '../../api/auth';
 
 const { height } = Dimensions.get('window');
 
@@ -118,25 +120,57 @@ export default function PremiumVerifyOTPScreen() {
     }
   };
 
+  const { phone, type, firstName, lastName, email } = useLocalSearchParams<{ 
+    phone: string, 
+    type?: string, 
+    firstName?: string, 
+    lastName?: string, 
+    email?: string 
+  }>();
+
+  const mutation = useMutation({
+    mutationFn: (fullOtp: string) => {
+      if (type === 'register') {
+        return authApi.studentRegister(firstName || '', lastName || '', email || '', phone, fullOtp);
+      }
+      return authApi.studentLogin(phone, fullOtp);
+    },
+    onSuccess: (data) => {
+      // Authenticate with real JWT tokens
+      login(data.access, data.refresh);
+      
+      // Update local profile representation
+      setProfile({
+        id: 'user_from_api',
+        name: type === 'register' ? `${firstName} ${lastName}`.trim() : 'Student',
+        email: email || '',
+        phone: phone,
+      });
+
+      // Navigate based on auth type
+      if (type === 'register') {
+        router.replace('/(auth)/student-onboarding');
+      } else {
+        router.replace('/(tabs)');
+      }
+    },
+    onError: (err: any) => {
+      setError(err?.response?.data?.message || 'Invalid OTP. Please try again.');
+    }
+  });
+
   const handleVerify = () => {
     const fullOtp = otp.join('');
     if (fullOtp.length < 6) {
       setError('Please enter the full 6-digit code.');
       return;
     }
+    if (!phone) {
+      setError('Phone number is missing. Please go back and try again.');
+      return;
+    }
     setError('');
-    
-    // Authenticate with mock data
-    login('mock-jwt-token-12345');
-    setProfile({
-      id: 'usr_123',
-      name: 'Vamsi Babu',
-      email: 'vamsi@justklick.com',
-      phone: '9876543210',
-    });
-
-    // Navigate to tabs on successful verification
-    router.replace('/(tabs)');
+    mutation.mutate(fullOtp);
   };
 
   return (
@@ -257,9 +291,16 @@ export default function PremiumVerifyOTPScreen() {
             className="w-full h-14 rounded-xl bg-primary flex-row items-center justify-center shadow-lg shadow-primary/30"
             activeOpacity={0.8}
             onPress={handleVerify}
+            disabled={mutation.isPending}
           >
-            <Text className="text-[16px] font-bold text-primary-foreground">Verify & Proceed</Text>
-            <Ionicons name="checkmark-circle" size={18} color="#FFF" style={{ position: 'absolute', right: 20 }} />
+            {mutation.isPending ? (
+              <ActivityIndicator color="#FFF" />
+            ) : (
+              <>
+                <Text className="text-[16px] font-bold text-primary-foreground">Verify & Proceed</Text>
+                <Ionicons name="checkmark-circle" size={18} color="#FFF" style={{ position: 'absolute', right: 20 }} />
+              </>
+            )}
           </TouchableOpacity>
 
         </Animated.View>

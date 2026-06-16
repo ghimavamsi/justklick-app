@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Category } from '../../types/home.types';
@@ -32,7 +32,15 @@ export function CategoryCarousel({ categories }: CategoryCarouselProps) {
             borderColor: isDark ? item.color + '40' : item.color + '20' 
           }}
         >
-          <Ionicons name={item.iconName as any} size={28} color={isDark ? '#FFF' : item.color} />
+          {item.iconName && (item.iconName.startsWith('http') || item.iconName.startsWith('/')) ? (
+            <Image 
+              source={{ uri: item.iconName }} 
+              style={{ width: 32, height: 32 }} 
+              resizeMode="contain" 
+            />
+          ) : (
+            <Ionicons name={(item.iconName || 'grid-outline') as any} size={28} color={isDark ? '#FFF' : item.color} />
+          )}
         </View>
         <Text className="text-[11px] font-bold text-foreground text-center tracking-tight" numberOfLines={2}>
           {item.name}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Dimensions, Platform, StatusBar, Modal, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Dimensions, Platform, StatusBar, Modal, Pressable, ActivityIndicator } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,6 +13,8 @@ import Animated, {
   Easing
 } from 'react-native-reanimated';
 import { useTheme } from '../../hooks/useTheme';
+import { useMutation } from '@tanstack/react-query';
+import { authApi } from '../../api/auth';
 
 const { height } = Dimensions.get('window');
 
@@ -86,6 +88,32 @@ export default function PremiumRegisterScreen() {
     transform: [{ translateY: float3.value * 15 }]
   }));
 
+  const mutation = useMutation({
+    mutationFn: () => authApi.sendRegisterOtp(phone, email),
+    onSuccess: () => {
+      // API call succeeded, navigate to verify OTP screen with all registration data
+      const names = fullName.trim().split(' ');
+      const firstName = names[0];
+      const lastName = names.slice(1).join(' ') || '.'; // Backend might require last name
+
+      router.push({
+        pathname: '/(auth)/verify-otp',
+        params: { 
+          type: 'register',
+          phone,
+          email,
+          firstName,
+          lastName,
+          education: selectedEdu
+        }
+      });
+    },
+    onError: (err: any) => {
+      console.log("REGISTER OTP ERROR:", err?.response?.status, err?.response?.data);
+      setError(err?.response?.data?.message || 'Failed to send OTP. Please try again.');
+    }
+  });
+
   const handleRegister = () => {
     if (!fullName.trim() || fullName.length < 2) {
       setError('Please enter a valid full name.');
@@ -105,7 +133,7 @@ export default function PremiumRegisterScreen() {
       return;
     }
     setError('');
-    router.push('/(auth)/verify-otp');
+    mutation.mutate();
   };
 
   return (
@@ -263,9 +291,16 @@ export default function PremiumRegisterScreen() {
               className="w-full h-14 rounded-xl bg-[#c10007] flex-row items-center justify-center shadow-lg shadow-[#c10007]/30 mt-2"
               activeOpacity={0.8}
               onPress={handleRegister}
+              disabled={mutation.isPending}
             >
-              <Text className="text-[16px] font-bold text-white">Create Account</Text>
-              <Ionicons name="arrow-forward" size={18} color="#FFF" style={{ position: 'absolute', right: 20 }} />
+              {mutation.isPending ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <>
+                  <Text className="text-[16px] font-bold text-white">Create Account</Text>
+                  <Ionicons name="arrow-forward" size={18} color="#FFF" style={{ position: 'absolute', right: 20 }} />
+                </>
+              )}
             </TouchableOpacity>
           </View>
 

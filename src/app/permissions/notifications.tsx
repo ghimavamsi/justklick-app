@@ -18,7 +18,7 @@ const ACCENT = '#c10007';
 
 export default function NotificationPermissionScreen() {
   const router = useRouter();
-  const { setNotificationPermission, completeOnboarding } = useAppStore();
+  const { setNotificationPermission, completePermissions } = useAppStore();
   const { colorScheme } = useTheme();
 
   const bellRotate = useSharedValue(-20);
@@ -44,7 +44,7 @@ export default function NotificationPermissionScreen() {
 
   const finishOnboarding = (status: 'granted' | 'denied') => {
     setNotificationPermission(status);
-    completeOnboarding();
+    completePermissions();
     router.replace('/(auth)/login');
   };
 

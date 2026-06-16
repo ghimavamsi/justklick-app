@@ -12,6 +12,7 @@ import Animated, {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../hooks/useTheme';
+import { useAppStore } from '../store';
 
 const { width, height } = Dimensions.get('window');
 
@@ -41,6 +42,7 @@ const ONBOARDING_DATA = [
 export default function OnboardingScreen() {
   const router = useRouter();
   const { colorScheme } = useTheme();
+  const { completeOnboarding } = useAppStore();
   const scrollOffset = useSharedValue(0);
   const scrollRef = useRef<Animated.ScrollView>(null);
 
@@ -58,6 +60,7 @@ export default function OnboardingScreen() {
 
   const goToNextPage = (index: number) => {
     if (index === ONBOARDING_DATA.length - 1) {
+      completeOnboarding();
       router.replace('/permissions/location');
     } else {
       scrollRef.current?.scrollTo({ x: width * (index + 1), animated: true });

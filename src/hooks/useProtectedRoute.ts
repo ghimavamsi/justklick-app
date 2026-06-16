@@ -7,7 +7,7 @@ export function useProtectedRoute() {
   const segments = useSegments();
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
-  const { hasSeenOnboarding } = useAppStore();
+  const { hasSeenOnboarding, hasSeenPermissions } = useAppStore();
 
   useEffect(() => {
     const inAuthGroup = segments[0] === '(auth)';
@@ -21,15 +21,21 @@ export function useProtectedRoute() {
       !inOnboardingOrPermissions &&
       !isSplashScreen
     ) {
-      // Redirect unauthenticated users to login (or onboarding if they haven't seen it)
+      // Flow 1: Must see onboarding first
       if (!hasSeenOnboarding) {
         router.replace('/onboarding');
-      } else {
+      } 
+      // Flow 2: Must complete permissions second
+      else if (!hasSeenPermissions) {
+        router.replace('/permissions/location');
+      } 
+      // Flow 3: Must login third
+      else {
         router.replace('/(auth)/login');
       }
     } else if (isAuthenticated && (inAuthGroup || inOnboardingOrPermissions)) {
-      // If the user is authenticated, they shouldn't see the auth or onboarding screens
+      // If the user is authenticated, they shouldn't see the auth, onboarding, or permission screens
       router.replace('/(tabs)');
     }
-  }, [isAuthenticated, hasSeenOnboarding, segments]);
+  }, [isAuthenticated, hasSeenOnboarding, hasSeenPermissions, segments]);
 }

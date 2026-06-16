@@ -4,10 +4,10 @@ import { useAuthStore } from '../store/auth-store';
 export function setupInterceptors(client: AxiosInstance) {
   client.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      const token = useAuthStore.getState().token;
+      const accessToken = useAuthStore.getState().accessToken;
       
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
+      if (accessToken && config.headers) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
       }
       return config;
     },
@@ -25,6 +25,14 @@ export function setupInterceptors(client: AxiosInstance) {
       if (error.response?.status === 401) {
         useAuthStore.getState().logout();
       }
+
+      // HOTFIX: Backend incorrectly throws a 500 Server Error on expired tokens
+      const responseData = typeof error.response?.data === 'string' ? error.response.data : JSON.stringify(error.response?.data || '');
+      if (error.response?.status === 500 && responseData.includes('ExpiredSignatureError')) {
+        console.warn('Caught ExpiredSignatureError hidden in 500 response. Logging out...');
+        useAuthStore.getState().logout();
+      }
+
       return Promise.reject(error);
     }
   );

@@ -61,7 +61,7 @@ export default function RootLayout() {
     // Return a solid white background WITH the logo instead of null while fonts load.
     // This flawlessly mimics the native splash screen, completely hiding the 4-second Android 12 black screen glitch.
     return (
-      <View style={{ flex: 1, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: osColorScheme === 'dark' ? '#09090b' : '#FFFFFF', alignItems: 'center', justifyContent: 'center' }}>
         <Image 
           source={require('../../assets/images/logo.png')} 
           style={{ width: 200, height: 200 }} 

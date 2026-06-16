@@ -4,17 +4,21 @@ import Animated, { useAnimatedScrollHandler, useSharedValue, useAnimatedStyle, i
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useTheme } from '../../hooks/useTheme';
 import { useUserStore } from '../../store/user-store';
 import { useAuthStore } from '../../store/auth-store';
 import { ProfileDashboardData, ProfileActivityItem } from '../../types/profile.types';
+import { StudentProfileResponse } from '../../types/student.types';
 
 interface AuthenticatedProfileViewProps {
   data: ProfileDashboardData;
+  studentProfile?: StudentProfileResponse;
   onSettingsPress: () => void;
 }
 
-export function AuthenticatedProfileView({ data, onSettingsPress }: AuthenticatedProfileViewProps) {
+export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress }: AuthenticatedProfileViewProps) {
+  const router = useRouter();
   const { colorScheme, changeTheme, themeMode } = useTheme();
   const { profile, clearProfile } = useUserStore();
   const { logout } = useAuthStore();
@@ -47,6 +51,9 @@ export function AuthenticatedProfileView({ data, onSettingsPress }: Authenticate
     const translateY = interpolate(scrollY.value, [0, 100], [0, -20], Extrapolation.CLAMP);
     return { transform: [{ scale }, { translateY }] };
   });
+
+  // Determine if profile is incomplete
+  const isProfileComplete = studentProfile && studentProfile.college_code && studentProfile.course;
 
   return (
     <View className="flex-1 bg-background">
@@ -89,10 +96,34 @@ export function AuthenticatedProfileView({ data, onSettingsPress }: Authenticate
           </Animated.View>
           
           <Text className="text-2xl font-extrabold text-foreground mb-1">{profile?.name || 'JustKlick User'}</Text>
-          <Text className="text-sm font-medium text-muted-foreground">{profile?.phone || '9876543210'} • {profile?.email || 'user@example.com'}</Text>
+          <Text className="text-sm font-medium text-muted-foreground mb-4">{profile?.phone || '9876543210'} • {profile?.email || 'user@example.com'}</Text>
+
+          <TouchableOpacity 
+            onPress={() => router.push('/edit-profile')}
+            className="bg-primary/10 px-6 py-2 rounded-full border border-primary/20 flex-row items-center"
+          >
+            <Ionicons name="pencil" size={14} color="#1C398E" style={{ marginRight: 6 }} />
+            <Text className="text-[#1C398E] font-bold text-sm">Edit Profile</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Profile Completion Card Removed per user request */}
+        {/* Profile Completion Prompt */}
+        {!isProfileComplete && (
+          <View className="px-6 mb-8">
+            <View className="bg-[#c10007]/10 p-5 rounded-3xl border border-[#c10007]/20 flex-row items-center justify-between">
+              <View className="flex-1 mr-4">
+                <Text className="text-[#c10007] font-bold text-lg mb-1">Profile Incomplete</Text>
+                <Text className="text-muted-foreground text-xs leading-relaxed">Fill out your academic and career details to get personalized recommendations and unlock all features.</Text>
+              </View>
+              <TouchableOpacity 
+                onPress={() => router.push('/edit-profile')}
+                className="bg-[#c10007] h-12 px-5 rounded-full items-center justify-center shadow-md shadow-[#c10007]/30"
+              >
+                <Text className="text-white font-bold text-sm">Complete Now</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
 
         {/* Dashboard Stats */}
         <View className="px-6 mb-8">

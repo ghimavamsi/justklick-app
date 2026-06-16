@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { setupInterceptors } from './interceptors';
 
-// Placeholder URL since there is no backend API yet
-export const API_BASE_URL = 'https://mockapi.example.com/api/v1';
+// Live backend URL
+export const API_BASE_URL = 'https://justklick-backend-kjrdc8-2f68d5-162-35-161-160.sslip.io';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

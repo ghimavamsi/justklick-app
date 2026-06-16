@@ -108,7 +108,7 @@ export default function PremiumSplash() {
   }));
 
   return (
-    <View className="flex-1 bg-background items-center justify-center overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
+    <View className="flex-1 bg-background items-center justify-center overflow-hidden">
       
       {/* Mesh Gradient Accents */}
       <View className="absolute top-[-10%] left-[-10%] w-[60%] h-[40%] rounded-full bg-primary/15"  />
