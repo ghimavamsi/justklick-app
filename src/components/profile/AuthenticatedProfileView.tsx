@@ -193,6 +193,15 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
           </View>
         </View>
 
+        {/* Legal & Info */}
+        <View className="px-6 mb-10">
+          <Text className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4 ml-1">Legal & Information</Text>
+          <View className="bg-card rounded-[24px] border border-border shadow-sm overflow-hidden">
+            <SettingsRow icon="document-text-outline" title="Privacy Policy" color="#8b5cf6" onPress={() => router.push('/privacy-policy')} />
+            <SettingsRow icon="shield-checkmark-outline" title="Terms of Use" color="#10b981" isLast onPress={() => router.push('/terms-of-use')} />
+          </View>
+        </View>
+
         {/* Support & Logout */}
         <View className="px-6 gap-3">
           <TouchableOpacity className="w-full h-14 rounded-[16px] bg-card border border-border flex-row items-center justify-center shadow-sm">
@@ -242,9 +251,9 @@ function ActivityCard({ item }: { item: ProfileActivityItem }) {
   );
 }
 
-function SettingsRow({ icon, title, color, isLast }: { icon: any, title: string, color: string, isLast?: boolean }) {
+function SettingsRow({ icon, title, color, isLast, onPress }: { icon: any, title: string, color: string, isLast?: boolean, onPress?: () => void }) {
   return (
-    <TouchableOpacity className={`flex-row items-center justify-between p-5 ${!isLast ? 'border-b border-border' : ''}`}>
+    <TouchableOpacity onPress={onPress} className={`flex-row items-center justify-between p-5 ${!isLast ? 'border-b border-border' : ''}`}>
       <View className="flex-row items-center">
         <View className="w-8 h-8 rounded-full items-center justify-center mr-4" style={{ backgroundColor: `${color}15` }}>
           <Ionicons name={icon} size={16} color={color} />

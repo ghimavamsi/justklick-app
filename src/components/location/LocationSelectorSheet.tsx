@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS, Easing, useAnimatedKeyboard } from 'react-native-reanimated';
 import { useLocationStore, LocationData } from '../../store/location-store';
 import { useTheme } from '../../hooks/useTheme';
+import { useQuery } from '@tanstack/react-query';
+import { homeApi } from '../../api/home';
 
 const { height } = Dimensions.get('window');
 
@@ -44,10 +46,24 @@ const MOCK_LOCATIONS = [
 
 export function LocationSelectorSheet({ visible, onClose }: LocationSelectorSheetProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
   
-  const { setManualLocation, requestPermission, permissionStatus, savedLocations, addSavedLocation, isLoading } = useLocationStore();
+  const { setManualLocation, requestPermission, permissionStatus, savedLocations, addSavedLocation, isLoading, fetchCurrentLocation, clearManualLocation } = useLocationStore();
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500); // 500ms debounce
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  const { data: searchResults = [], isFetching } = useQuery({
+    queryKey: ['locationSearch', debouncedQuery],
+    queryFn: () => homeApi.searchByLocation(debouncedQuery),
+    enabled: debouncedQuery.length > 1,
+  });
 
   const translateY = useSharedValue(height);
   const opacity = useSharedValue(0);
@@ -73,10 +89,10 @@ export function LocationSelectorSheet({ visible, onClose }: LocationSelectorShee
     });
   };
 
-  const handleSelectLocation = (address: string) => {
+  const handleSelectLocation = (address: string, lat?: number, lng?: number) => {
     const loc: LocationData = {
-      latitude: 0,
-      longitude: 0,
+      latitude: lat || 0,
+      longitude: lng || 0,
       addressString: address,
       shortAddress: address.split(',')[0],
     };
@@ -96,8 +112,6 @@ export function LocationSelectorSheet({ visible, onClose }: LocationSelectorShee
   const animatedKeyboardPadding = useAnimatedStyle(() => ({
     paddingBottom: keyboard.height.value,
   }));
-
-  const filteredCities = MOCK_LOCATIONS.filter(c => c.toLowerCase().includes(searchQuery.toLowerCase()));
 
   if (!visible) return null;
 
@@ -148,7 +162,7 @@ export function LocationSelectorSheet({ visible, onClose }: LocationSelectorShee
           </View>
 
           <FlatList 
-            data={searchQuery.length > 0 ? filteredCities : []}
+            data={searchQuery.length > 0 ? searchResults : []}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 20 }}
@@ -158,11 +172,19 @@ export function LocationSelectorSheet({ visible, onClose }: LocationSelectorShee
                   <View>
                     <TouchableOpacity 
                       className="flex-row items-center py-4 border-b border-border/50"
-                      onPress={async () => {
-                        if (permissionStatus !== 'granted') {
-                          await requestPermission();
-                        }
+                      onPress={() => {
+                        // Close the sheet immediately for a snappy UI
                         handleClose();
+                        
+                        // Clear the manual location so the app defaults back to the current GPS location
+                        clearManualLocation();
+                        
+                        // Run permission check and fetch in the background
+                        if (permissionStatus !== 'granted') {
+                          requestPermission();
+                        } else {
+                          fetchCurrentLocation();
+                        }
                       }}
                     >
                       <View className="w-10 h-10 bg-primary/10 rounded-full items-center justify-center mr-4 border border-primary/20">
@@ -211,26 +233,33 @@ export function LocationSelectorSheet({ visible, onClose }: LocationSelectorShee
                     ))}
                   </View>
                 )}
-                {searchQuery && filteredCities.length === 0 && (
+                {searchQuery && searchResults.length === 0 && !isFetching && (
                   <View className="items-center py-8">
                     <Ionicons name="map-outline" size={48} color="#64748B" style={{ opacity: 0.5 }} />
                     <Text className="text-foreground font-semibold text-base mt-4">No locations found</Text>
                     <Text className="text-muted-foreground text-sm mt-1">Try a different search term</Text>
                   </View>
                 )}
+                {searchQuery && isFetching && (
+                  <View className="items-center py-8">
+                    <Text className="text-muted-foreground font-semibold text-sm">Searching locations...</Text>
+                  </View>
+                )}
               </View>
             )}
-            renderItem={({ item }: { item: string }) => (
+            renderItem={({ item }: { item: { name: string, lat: number, lng: number } }) => (
               <TouchableOpacity 
                 className="flex-row items-center py-4 border-b border-border/50"
-                onPress={() => handleSelectLocation(item)}
+                onPress={() => handleSelectLocation(item.name, item.lat, item.lng)}
               >
                 <View className="w-10 h-10 bg-muted rounded-full items-center justify-center mr-4">
                   <Ionicons name="location" size={20} color={isDark ? '#FFF' : '#000'} />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-base font-bold text-foreground mb-0.5">{item.split(',')[0]}</Text>
-                  <Text className="text-xs text-muted-foreground">{item.split(',')[1].trim()}</Text>
+                  <Text className="text-base font-bold text-foreground mb-0.5">{item.name.split(',')[0]}</Text>
+                  <Text className="text-xs text-muted-foreground">
+                    {item.name.includes(',') ? item.name.substring(item.name.indexOf(',') + 1).trim() : ''}
+                  </Text>
                 </View>
               </TouchableOpacity>
             )}

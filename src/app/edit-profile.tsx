@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Dimensions, KeyboardAvoidingView, Platform, Switch, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { studentApi } from '../api/student';
-import { StudentProfilePayload } from '../types/student.types';
 import { useTheme } from '../hooks/useTheme';
+import { StudentProfilePayload } from '../types/student.types';
 
 const COURSES = ['B.Tech', 'M.Tech', 'MBA', 'MCA', 'BBA', 'BCA'];
 const ACADEMIC_YEARS = ['2023-2024', '2024-2025', '2025-2026'];
@@ -82,7 +82,7 @@ export default function EditProfileScreen() {
       <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 ml-1">{label}</Text>
       <View className="flex-row items-center h-12 rounded-xl bg-card border border-border px-4 shadow-sm">
         <Ionicons name={icon as any} size={16} color="#94A3B8" style={{ marginRight: 10 }} />
-        <TextInput 
+        <TextInput
           className="flex-1 text-base font-bold text-foreground h-full"
           placeholder={placeholder}
           placeholderTextColor="#64748B"
@@ -99,7 +99,7 @@ export default function EditProfileScreen() {
       <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 ml-1">{label}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
         {options.map(opt => (
-          <TouchableOpacity 
+          <TouchableOpacity
             key={opt}
             onPress={() => updateField(key, opt)}
             className={`mr-3 px-4 py-3 rounded-xl border ${value === opt ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
@@ -118,7 +118,7 @@ export default function EditProfileScreen() {
         {options.map(opt => {
           const isSelected = selectedValues?.includes(opt) || false;
           return (
-            <TouchableOpacity 
+            <TouchableOpacity
               key={opt}
               onPress={() => toggleArrayItem(key, opt)}
               className={`px-4 py-2 rounded-full border ${isSelected ? 'border-[#c10007] bg-[#c10007]/10' : 'border-border bg-card'}`}
@@ -153,7 +153,7 @@ export default function EditProfileScreen() {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1 bg-background">
-      
+
       {/* Header */}
       <View className="pt-14 pb-4 px-6 border-b border-border bg-card shadow-sm z-10 flex-row items-center justify-between">
         <TouchableOpacity onPress={() => router.back()} className="w-10 h-10 items-center justify-center bg-muted rounded-full">
@@ -166,7 +166,7 @@ export default function EditProfileScreen() {
       </View>
 
       <ScrollView className="flex-1 px-6 pt-6 pb-24" showsVerticalScrollIndicator={false}>
-        
+
         <Text className="text-lg font-bold text-foreground mb-4 mt-2">Academic Information</Text>
         {renderInput('Father\'s Name', 'person', formData.father_name, 'father_name', 'Enter father\'s name')}
         {renderInput('College Code', 'business', formData.college_code, 'college_code', 'Ex: COL-123')}

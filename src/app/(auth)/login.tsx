@@ -99,9 +99,25 @@ export default function PremiumLoginScreen() {
 
   const googleMutation = useMutation({
     mutationFn: (data: { idToken: string; user: any }) => authApi.googleLogin(data.idToken),
-    onSuccess: (data, variables) => {
+    onSuccess: (data: any, variables) => {
       console.log('Google Auth API Success:', data);
-      login(data.access, data.refresh);
+      
+      // Backend might return 200 OK but with success: false in the JSON body
+      if (data.success === false) {
+        setError(data.message || 'Google Sign-In failed on our server. Please try again.');
+        return;
+      }
+
+      // Handle both "access" and "access_token" variations from the backend
+      const accessToken = data.access || data.access_token;
+      const refreshToken = data.refresh || data.refresh_token;
+
+      if (!accessToken) {
+        setError('Received invalid authentication token from the server.');
+        return;
+      }
+
+      login(accessToken, refreshToken);
       
       // Use the actual Google user data returned by the SDK!
       const googleUser = variables.user;
@@ -111,7 +127,7 @@ export default function PremiumLoginScreen() {
         email: googleUser.email || '',
         phone: '', // Google Auth usually doesn't provide phone numbers
       });
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/index' as any); // Force navigate to the Home tab
     },
     onError: (err: any) => {
       console.log('Google Auth API Error:', err?.response?.status, err?.response?.data);
@@ -336,7 +352,7 @@ export default function PremiumLoginScreen() {
           <View className="items-center justify-center mt-auto pb-4">
             <Text className="text-[11px] text-muted-foreground font-medium text-center leading-relaxed px-4">
               By continuing, you agree to our{'\n'}
-              <Text className="font-bold text-primary">Terms of Service</Text> and <Text className="font-bold text-primary">Privacy Policy</Text>
+              <Text className="font-bold text-primary" onPress={() => router.push('/terms-of-use')}>Terms of Service</Text> and <Text className="font-bold text-primary" onPress={() => router.push('/privacy-policy')}>Privacy Policy</Text>
             </Text>
           </View>
 

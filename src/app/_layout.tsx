@@ -29,6 +29,7 @@ function ThemeWrapper({ children }: { children: React.ReactNode }) {
 }
 
 import { useProtectedRoute } from '../hooks/useProtectedRoute';
+import { useLocationStore } from '../store/location-store';
 
 export default function RootLayout() {
   const osColorScheme = useReactNavigationColorScheme();
@@ -56,6 +57,11 @@ export default function RootLayout() {
       return () => clearTimeout(timer);
     }
   }, [loaded, error]);
+
+  // Check location permission on app start and fetch GPS if already granted
+  useEffect(() => {
+    useLocationStore.getState().checkPermission();
+  }, []);
 
   if (!loaded && !error) {
     // Return a solid white background WITH the logo instead of null while fonts load.

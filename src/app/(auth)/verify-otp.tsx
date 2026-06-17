@@ -135,9 +135,24 @@ export default function PremiumVerifyOTPScreen() {
       }
       return authApi.studentLogin(phone, fullOtp);
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
+      // Backend might return 200 OK but with success: false in the JSON body
+      if (data.success === false) {
+        setError(data.message || 'Login failed on our server. Please try again.');
+        return;
+      }
+
+      // Handle both "access" and "access_token" variations from the backend
+      const accessToken = data.access || data.access_token;
+      const refreshToken = data.refresh || data.refresh_token;
+
+      if (!accessToken) {
+        setError('Received invalid authentication token from the server.');
+        return;
+      }
+
       // Authenticate with real JWT tokens
-      login(data.access, data.refresh);
+      login(accessToken, refreshToken);
       
       // Update local profile representation
       setProfile({
@@ -151,7 +166,7 @@ export default function PremiumVerifyOTPScreen() {
       if (type === 'register') {
         router.replace('/(auth)/student-onboarding');
       } else {
-        router.replace('/(tabs)');
+        router.replace('/(tabs)/index' as any); // Force navigate to the Home tab
       }
     },
     onError: (err: any) => {

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
+import { useRouter } from 'expo-router';
 
 interface GuestProfileViewProps {
   onLoginPress: () => void;
@@ -10,6 +11,7 @@ interface GuestProfileViewProps {
 
 export function GuestProfileView({ onLoginPress, onExplorePress }: GuestProfileViewProps) {
   const { colorScheme } = useTheme();
+  const router = useRouter();
 
   return (
     <ScrollView 
@@ -61,7 +63,8 @@ export function GuestProfileView({ onLoginPress, onExplorePress }: GuestProfileV
           <QuickLink icon="compass-outline" title="Explore Categories" onPress={onExplorePress} />
           <QuickLink icon="information-circle-outline" title="About JustKlick" onPress={() => {}} />
           <QuickLink icon="help-buoy-outline" title="Contact Support" onPress={() => {}} />
-          <QuickLink icon="document-text-outline" title="Privacy Policy" onPress={() => {}} />
+          <QuickLink icon="document-text-outline" title="Privacy Policy" onPress={() => router.push('/privacy-policy')} />
+          <QuickLink icon="shield-checkmark-outline" title="Terms of Use" onPress={() => router.push('/terms-of-use')} />
           <QuickLink icon="share-social-outline" title="Share App" isLast onPress={() => {}} />
         </View>
       </View>

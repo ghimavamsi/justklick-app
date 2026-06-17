@@ -32,8 +32,8 @@ export const homeApi = {
   },
 
   // Location Search
-  searchByLocation: async (query: string): Promise<ApiBusiness[]> => {
-    const response = await apiClient.get<ApiBusiness[]>('/api/businesses/locations/search/', {
+  searchByLocation: async (query: string): Promise<{name: string, lat: number, lng: number}[]> => {
+    const response = await apiClient.get<{name: string, lat: number, lng: number}[]>('/api/businesses/locations/search/', {
       params: { q: query }
     });
     return response.data;

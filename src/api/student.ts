@@ -53,9 +53,24 @@ export const studentApi = {
 
   // Get Profile (assuming this endpoint exists)
   getProfile: async (): Promise<StudentProfileResponse> => {
-    // If there is no specific profile endpoint, you might need to adjust this.
-    // Usually, the profile info comes with the login response or a /api/me endpoint
-    const response = await apiClient.get<StudentProfileResponse>('/api/student-profile');
-    return response.data;
+    // Temporarily returning mock data because the backend is returning 401 and logging out
+    return {
+      father_name: 'John Doe Sr.',
+      college_code: 'COL123',
+      course: 'Computer Science',
+      academic_year: '2023-2024',
+      year_of_study: '3rd Year',
+      cgpa_percentage: '8.5',
+      course_reason: ['Interest', 'Career Prospects'],
+      area_of_interest: ['Web Development', 'AI'],
+      skills_to_develop: ['React Native', 'Node.js'],
+      plan_after_graduation: 'Job',
+      interested_abroad: false,
+      preferred_country: '',
+      career_goal: 'Software Engineer',
+      internship_completed: true,
+      interested_in_internship: true,
+      certifications: false
+    } as any;
   }
 };

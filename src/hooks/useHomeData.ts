@@ -13,11 +13,15 @@ export function useHomeData() {
     queryKey: [...HOME_QUERY_KEY, activeLocation?.latitude, activeLocation?.longitude],
     queryFn: async () => {
       // Fetch all required data concurrently
-      const [apiBanners, apiCategories, apiBusinesses] = await Promise.all([
+      const results = await Promise.allSettled([
         homeApi.fetchAdvertisements(),
         homeApi.fetchCategories(),
         homeApi.fetchBusinesses(activeLocation?.latitude, activeLocation?.longitude)
       ]);
+
+      const apiBanners = results[0].status === 'fulfilled' ? results[0].value : [];
+      const apiCategories = results[1].status === 'fulfilled' ? results[1].value : [];
+      const apiBusinesses = results[2].status === 'fulfilled' ? results[2].value : [];
 
       // Helper to handle both flat arrays and paginated responses { results: [...] }
       const extractArray = (data: any) => {
@@ -30,19 +34,48 @@ export function useHomeData() {
       // Helper to fix relative URLs and force HTTPS
       const getImageUrl = (url: string | null | undefined, fallback: string) => {
         if (!url) return fallback;
-        if (url.startsWith('/')) return `https://justklick-backend-kjrdc8-2f68d5-162-35-161-160.sslip.io${url}`;
         if (url.startsWith('http:')) return url.replace('http:', 'https:');
-        return url;
+        if (url.startsWith('https:')) return url;
+        
+        // It's a relative path. Ensure it has a leading slash
+        const relativePath = url.startsWith('/') ? url : `/${url}`;
+        return `https://justklick-backend-kjrdc8-2f68d5-162-35-161-160.sslip.io${relativePath}`;
       };
 
       // Map Advertisements to Banners
-      const banners: Banner[] = extractArray(apiBanners).map((b: any, index: number) => ({
+      const fetchedBanners: Banner[] = extractArray(apiBanners).map((b: any, index: number) => ({
         id: String(b?.id || index),
         title: b?.title || `Promo ${index + 1}`,
         subtitle: 'Check out this offer!',
         imageUrl: getImageUrl(b?.image_url || b?.image, 'https://via.placeholder.com/800x400'),
         actionUrl: b?.action_url || b?.link || b?.url || '',
       }));
+
+      const staticBanners: Banner[] = [
+        {
+          id: 'mock1',
+          title: 'Special Discount on Local Salons',
+          subtitle: 'Up to 50% Off',
+          imageUrl: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=800&auto=format&fit=crop',
+          actionUrl: '/categories/salons',
+        },
+        {
+          id: 'mock2',
+          title: 'Top Rated Restaurants',
+          subtitle: 'Explore the best dining spots',
+          imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop',
+          actionUrl: '/categories/restaurants',
+        },
+        {
+          id: 'mock3',
+          title: 'Premium Car Services',
+          subtitle: 'Get 20% off on first service',
+          imageUrl: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=800&auto=format&fit=crop',
+          actionUrl: '/categories/car-services',
+        }
+      ];
+
+      const banners = fetchedBanners.length > 0 ? fetchedBanners : staticBanners;
 
       // Map Categories
       const categories: Category[] = extractArray(apiCategories).map((c: any, index: number) => ({

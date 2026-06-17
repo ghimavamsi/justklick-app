@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from './storage';
 import * as Location from 'expo-location';
+import { homeApi } from '../api/home';
+import { Alert, Linking } from 'react-native';
 
 export type PermissionStatus = 'undetermined' | 'granted' | 'denied' | 'blocked';
 
@@ -68,6 +70,15 @@ export const useLocationStore = create<LocationState>()(
             internalStatus = 'granted';
           } else if (!canAskAgain) {
             internalStatus = 'blocked';
+            // Show alert to direct user to settings since we can't show system prompt
+            Alert.alert(
+              'Permission Required',
+              'Location permission is required to use this feature. Please enable it in your app settings.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Open Settings', onPress: () => Linking.openSettings() }
+              ]
+            );
           } else {
             internalStatus = 'denied';
           }
@@ -89,10 +100,41 @@ export const useLocationStore = create<LocationState>()(
             accuracy: Location.Accuracy.Balanced,
           });
 
-          const geocode = await Location.reverseGeocodeAsync({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          });
+          try {
+            // Send exact GPS coordinates formatted exactly as the backend expects in the `q` parameter
+            const query = `"latitude": ${location.coords.latitude}, "longitude": ${location.coords.longitude}`;
+            const results = await homeApi.searchByLocation(query);
+
+            if (results && results.length > 0) {
+              const place = results[0];
+              const addressString = place.name;
+              const shortAddress = place.name.split(',')[0];
+
+              set({
+                currentLocation: {
+                  latitude: place.lat,
+                  longitude: place.lng,
+                  addressString,
+                  shortAddress,
+                },
+                isLoading: false,
+              });
+              return;
+            }
+          } catch (backendError) {
+            console.error('Backend reverse geocoding failed:', backendError);
+          }
+
+          // Fallback to Expo Location if backend returns empty or fails
+          let geocode = null;
+          try {
+            geocode = await Location.reverseGeocodeAsync({
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            });
+          } catch (geocodeError) {
+            console.error('Expo reverse geocoding failed:', geocodeError);
+          }
 
           if (geocode && geocode.length > 0) {
             const place = geocode[0];
@@ -108,15 +150,26 @@ export const useLocationStore = create<LocationState>()(
               currentLocation: {
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
-                addressString,
-                shortAddress,
+                addressString: addressString || 'Current Location',
+                shortAddress: shortAddress,
               },
               isLoading: false,
             });
           } else {
-            set({ error: 'Could not determine address', isLoading: false });
+            // Fallback to coordinates if reverse geocoding completely fails
+            set({
+              currentLocation: {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                addressString: 'Current Location',
+                shortAddress: 'Current Location',
+              },
+              error: 'Reverse geocoding failed, using coordinates directly',
+              isLoading: false,
+            });
           }
         } catch (error) {
+          console.error('Location fetch failed completely:', error);
           set({ error: 'Failed to fetch location', isLoading: false });
         }
       },

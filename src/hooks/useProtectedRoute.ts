@@ -13,13 +13,15 @@ export function useProtectedRoute() {
     const inAuthGroup = segments[0] === '(auth)';
     const inOnboardingOrPermissions = segments[0] === 'onboarding' || segments[0] === 'permissions';
     const isSplashScreen = !segments[0]; // index.tsx
+    const isLegalScreen = segments[0] === 'privacy-policy' || segments[0] === 'terms-of-use';
 
     if (
       // If the user is not authenticated and they are NOT on a public screen
       !isAuthenticated &&
       !inAuthGroup &&
       !inOnboardingOrPermissions &&
-      !isSplashScreen
+      !isSplashScreen &&
+      !isLegalScreen
     ) {
       // Flow 1: Must see onboarding first
       if (!hasSeenOnboarding) {
@@ -35,7 +37,7 @@ export function useProtectedRoute() {
       }
     } else if (isAuthenticated && (inAuthGroup || inOnboardingOrPermissions)) {
       // If the user is authenticated, they shouldn't see the auth, onboarding, or permission screens
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/index' as any); // Force navigate to the Home tab instead of restoring the last active tab
     }
   }, [isAuthenticated, hasSeenOnboarding, hasSeenPermissions, segments]);
 }

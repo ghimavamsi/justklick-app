@@ -305,11 +305,19 @@ export default function PremiumRegisterScreen() {
           </View>
 
           {/* --- LOGIN LINK --- */}
-          <View className="flex-row items-center justify-center mb-4">
+          <View className="flex-row items-center justify-center mb-6">
             <Text className="text-[13px] text-muted-foreground font-medium">Already have an account? </Text>
             <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
               <Text className="text-[13px] font-bold text-[#1C398E] tracking-wide">Log In Here</Text>
             </TouchableOpacity>
+          </View>
+
+          {/* --- FOOTER --- */}
+          <View className="items-center justify-center mt-auto pb-2">
+            <Text className="text-[11px] text-muted-foreground font-medium text-center leading-relaxed px-4">
+              By creating an account, you agree to our{'\n'}
+              <Text className="font-bold text-[#1C398E]" onPress={() => router.push('/terms-of-use')}>Terms of Service</Text> and <Text className="font-bold text-[#1C398E]" onPress={() => router.push('/privacy-policy')}>Privacy Policy</Text>
+            </Text>
           </View>
 
         </Animated.View>
