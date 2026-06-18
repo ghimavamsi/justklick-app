@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Platform, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Platform, Image, Modal } from 'react-native';
 import Animated, { useAnimatedScrollHandler, useSharedValue, useAnimatedStyle, interpolate, Extrapolation } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -22,6 +22,7 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
   const { colorScheme, changeTheme, themeMode } = useTheme();
   const { profile, clearProfile } = useUserStore();
   const { logout } = useAuthStore();
+  const [isSupportModalVisible, setIsSupportModalVisible] = useState(false);
   
   const handleLogout = () => {
     clearProfile();
@@ -202,9 +203,11 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
           </View>
         </View>
 
-        {/* Support & Logout */}
         <View className="px-6 gap-3">
-          <TouchableOpacity className="w-full h-14 rounded-[16px] bg-card border border-border flex-row items-center justify-center shadow-sm">
+          <TouchableOpacity 
+            onPress={() => setIsSupportModalVisible(true)}
+            className="w-full h-14 rounded-[16px] bg-card border border-border flex-row items-center justify-center shadow-sm"
+          >
             <Ionicons name="help-buoy-outline" size={20} color={isDark ? '#FFF' : '#000'} style={{ marginRight: 8 }} />
             <Text className="text-foreground font-bold text-[16px]">Help & Support</Text>
           </TouchableOpacity>
@@ -218,6 +221,57 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
         </View>
 
       </Animated.ScrollView>
+
+      {/* Help & Support Modal */}
+      <Modal
+        visible={isSupportModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsSupportModalVisible(false)}
+      >
+        <View className="flex-1 bg-black/50 justify-center items-center px-6">
+          <View className="w-full bg-card rounded-3xl p-6 border border-border shadow-lg">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-xl font-bold text-foreground">Help & Support</Text>
+              <TouchableOpacity onPress={() => setIsSupportModalVisible(false)} className="w-8 h-8 rounded-full bg-muted items-center justify-center">
+                <Ionicons name="close" size={20} color={isDark ? '#FFF' : '#000'} />
+              </TouchableOpacity>
+            </View>
+            
+            <View className="gap-5">
+              <View className="flex-row items-center">
+                <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
+                  <Ionicons name="mail-outline" size={24} color="#1C398E" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm font-bold text-muted-foreground mb-1">Support Email ID</Text>
+                  <Text className="text-base font-medium text-foreground">support@justklick.com</Text>
+                </View>
+              </View>
+
+              <View className="flex-row items-center">
+                <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
+                  <Ionicons name="call-outline" size={24} color="#1C398E" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm font-bold text-muted-foreground mb-1">Support Mobile Number</Text>
+                  <Text className="text-base font-medium text-foreground">+91 9876543210</Text>
+                </View>
+              </View>
+
+              <View className="flex-row items-center">
+                <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
+                  <Ionicons name="location-outline" size={24} color="#1C398E" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm font-bold text-muted-foreground mb-1">Office Address</Text>
+                  <Text className="text-base font-medium text-foreground">123, JustKlick Towers, Tech Park, City, India</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

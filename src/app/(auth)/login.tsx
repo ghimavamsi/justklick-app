@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Dimensions, Platform, StatusBar, Image, ActivityIndicator } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, Image, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Animated, {
-  useSharedValue,
+  Easing,
   useAnimatedStyle,
-  withTiming,
-  withSpring,
+  useSharedValue,
   withDelay,
   withRepeat,
-  Easing
+  withSpring,
+  withTiming
 } from 'react-native-reanimated';
-import { useTheme } from '../../hooks/useTheme';
-import { useMutation } from '@tanstack/react-query';
 import { authApi } from '../../api/auth';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { useTheme } from '../../hooks/useTheme';
 import { useAuthStore } from '../../store/auth-store';
 import { useUserStore } from '../../store/user-store';
 const { height } = Dimensions.get('window');
@@ -33,7 +33,7 @@ export default function PremiumLoginScreen() {
   // Animation Values
   const heroOpacity = useSharedValue(0);
   const heroTranslateY = useSharedValue(30);
-  
+
   const contentOpacity = useSharedValue(0);
   const contentTranslateY = useSharedValue(30);
 
@@ -101,7 +101,7 @@ export default function PremiumLoginScreen() {
     mutationFn: (data: { idToken: string; user: any }) => authApi.googleLogin(data.idToken),
     onSuccess: (data: any, variables) => {
       console.log('Google Auth API Success:', data);
-      
+
       // Backend might return 200 OK but with success: false in the JSON body
       if (data.success === false) {
         setError(data.message || 'Google Sign-In failed on our server. Please try again.');
@@ -118,7 +118,7 @@ export default function PremiumLoginScreen() {
       }
 
       login(accessToken, refreshToken);
-      
+
       // Use the actual Google user data returned by the SDK!
       const googleUser = variables.user;
       setProfile({
@@ -148,7 +148,7 @@ export default function PremiumLoginScreen() {
       console.log('Starting Google Sign-In...');
       setError('');
       await GoogleSignin.hasPlayServices();
-      
+
       // Force Google Account Chooser to appear every time (clears remembered account)
       try {
         await GoogleSignin.signOut();
@@ -158,13 +158,13 @@ export default function PremiumLoginScreen() {
 
       const userInfo = await GoogleSignin.signIn();
       console.log('Google Sign-In Response:', JSON.stringify(userInfo, null, 2));
-      
+
       if (userInfo.type === 'success' && userInfo.data?.idToken) {
         console.log('Sending ID Token to Backend...');
         // Pass both idToken and the user object to the mutation
-        googleMutation.mutate({ 
-          idToken: userInfo.data.idToken, 
-          user: userInfo.data.user 
+        googleMutation.mutate({
+          idToken: userInfo.data.idToken,
+          user: userInfo.data.user
         });
       } else if (userInfo.type === 'cancelled') {
         console.log('User cancelled login');
@@ -202,23 +202,23 @@ export default function PremiumLoginScreen() {
   return (
     <View className="flex-1 bg-background">
       <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
-      <KeyboardAwareScrollView 
-        className="flex-1" 
+      <KeyboardAwareScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
         keyboardShouldPersistTaps="handled"
         enableOnAndroid={true}
         extraScrollHeight={20}
       >
-        
+
         {/* --- HERO AREA (approx 40% height) --- */}
         <Animated.View style={[{ height: height * 0.35 }, heroAnimatedStyle]} className="items-center justify-center pt-10">
-          
+
           {/* Abstract Premium Illustration Container */}
           <View className="w-full h-full items-center justify-center relative">
-            
+
             {/* Background Soft Glow */}
-            <View className="absolute w-64 h-64 bg-primary/10 rounded-full"  />
+            <View className="absolute w-64 h-64 bg-primary/10 rounded-full" />
 
             {/* Central Element */}
             <View className="w-24 h-24 bg-card rounded-[28px] shadow-2xl items-center justify-center border border-border/50 z-20">
@@ -249,7 +249,7 @@ export default function PremiumLoginScreen() {
             </Animated.View>
 
             <Animated.View className="absolute bottom-[40%] left-[10%] z-20" style={floatStyle1}>
-               <View className="w-10 h-10 bg-primary rounded-full shadow-lg items-center justify-center border-2 border-background">
+              <View className="w-10 h-10 bg-primary rounded-full shadow-lg items-center justify-center border-2 border-background">
                 <Ionicons name="business" size={16} color="#FFF" />
               </View>
             </Animated.View>
@@ -259,7 +259,7 @@ export default function PremiumLoginScreen() {
 
         {/* --- WELCOME & AUTH SECTION (Floating Card) --- */}
         <Animated.View style={[contentAnimatedStyle, { shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 20 }]} className="bg-card rounded-[32px] mx-8 px-6 pt-12 pb-6 border border-border -mt-12 mb-8 z-50">
-          
+
           <View className="items-center mt-6 mb-8">
             <Text className="text-xs font-bold text-muted-foreground uppercase tracking-widest text-center mb-1">
               Welcome to
@@ -270,7 +270,7 @@ export default function PremiumLoginScreen() {
           </View>
 
           {/* 1. Primary Option: Google */}
-          <TouchableOpacity 
+          <TouchableOpacity
             className="w-full h-14 bg-card rounded-2xl flex-row items-center justify-center shadow-sm border border-border mb-6"
             activeOpacity={0.7}
             onPress={handleGoogleLogin}
@@ -280,9 +280,9 @@ export default function PremiumLoginScreen() {
               <ActivityIndicator color={PRIMARY} />
             ) : (
               <>
-                <Image 
-                  source={require('@/assets/images/google-logo.png')} 
-                  style={{ width: 22, height: 22, position: 'absolute', left: 20 }} 
+                <Image
+                  source={require('@/assets/images/google-logo.png')}
+                  style={{ width: 22, height: 22, position: 'absolute', left: 20 }}
                 />
                 <Text className="text-[16px] font-bold text-foreground">Continue with Google</Text>
               </>
@@ -298,13 +298,13 @@ export default function PremiumLoginScreen() {
           {/* 2. Secondary Option: Mobile Number */}
           <View className={`w-full bg-muted rounded-[24px] p-5 border ${error ? 'border-destructive/50' : 'border-border/50'} mb-6`}>
             <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 ml-1">Mobile Number</Text>
-            
+
             <View className={`flex-row items-center h-14 rounded-xl bg-card border ${error ? 'border-destructive' : 'border-border'} px-4 mb-3 shadow-sm`}>
               <View className="flex-row items-center border-r border-border pr-3 mr-3">
                 <Text className="text-[16px] font-bold text-foreground">+91</Text>
                 <Ionicons name="chevron-down" size={14} color="#94A3B8" style={{ marginLeft: 6 }} />
               </View>
-              <TextInput 
+              <TextInput
                 className="flex-1 text-lg font-bold text-foreground h-full tracking-wider"
                 placeholder="00000 00000"
                 placeholderTextColor="#64748B"
@@ -323,7 +323,7 @@ export default function PremiumLoginScreen() {
               <Text style={{ color: '#EF4444' }} className="text-xs font-semibold ml-2 mb-4">{error}</Text>
             ) : null}
 
-            <TouchableOpacity 
+            <TouchableOpacity
               className="w-full h-14 rounded-xl bg-primary flex-row items-center justify-center shadow-lg shadow-primary/30 mt-2"
               activeOpacity={0.8}
               onPress={handleContinue}
