@@ -10,6 +10,7 @@ import { useLocationStore } from '../../store/location-store';
 import { LocationSelectorSheet } from '../location/LocationSelectorSheet';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { useNotificationsList } from '../../hooks/useNotifications';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -22,6 +23,11 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
   const { isAuthenticated } = useAuthStore();
   const { profile } = useUserStore();
   const { currentLocation, manualLocation } = useLocationStore();
+  
+  // Get unread notification status
+  const { data: notificationsData } = useNotificationsList('All', '');
+  const hasUnreadNotifications = (notificationsData?.summary?.unreadCount ?? 0) > 0;
+
   const [isLocationSelectorVisible, setIsLocationSelectorVisible] = useState(false);
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -181,7 +187,9 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
             className="w-11 h-11 rounded-full bg-muted items-center justify-center border border-border relative"
           >
             <Ionicons name="notifications-outline" size={22} color={isDark ? '#FFF' : '#000'} />
-            <View className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-[#c10007]" />
+            {hasUnreadNotifications && (
+              <View className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-[#c10007]" />
+            )}
           </TouchableOpacity>
           <TouchableOpacity className="w-11 h-11 rounded-full bg-primary items-center justify-center shadow-sm">
             <Text className="text-primary-foreground font-bold text-base">{getInitials()}</Text>

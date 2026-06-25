@@ -30,7 +30,7 @@ export function BusinessCard({ business, variant = 'featured' }: BusinessCardPro
 
   const handlePressIn = () => { scale.value = withSpring(0.98); };
   const handlePressOut = () => { scale.value = withSpring(1); };
-  const handlePress = () => { router.push(`/business/${business.id}`); };
+  const handlePress = () => { router.push(`/business/${business.slug || business.id}`); };
 
   const handleFavoritePress = () => {
     toggleFavorite({ business, isCurrentlyFavorite: isFavorite });

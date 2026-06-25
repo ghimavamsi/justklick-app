@@ -79,38 +79,15 @@ export function PromoBannerCarousel({ banners }: PromoBannerCarouselProps) {
   const renderItem = ({ item }: { item: Banner }) => (
     <View style={{ width, alignItems: 'center' }}>
       <TouchableOpacity 
-        className="rounded-3xl overflow-hidden shadow-lg border border-border/50"
-        style={{ width: width - 40, height: 180 }}
+        className="rounded-3xl overflow-hidden shadow-lg border border-border/50 bg-card"
+        style={{ width: width - 40, height: 240 }}
         activeOpacity={0.9}
       >
         <Image 
           source={{ uri: item.imageUrl }} 
           className="absolute w-full h-full"
-          resizeMode="cover"
+          resizeMode="stretch"
         />
-        
-        {/* Diagonal Gradient Overlay (darker over a larger area for long text) */}
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
-          locations={[0, 0.5, 1]}
-          start={{ x: 1, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-        />
-        
-        <View className="flex-1 p-5 justify-between">
-          <View className="bg-primary/90 self-start px-3 py-1 rounded-full border border-white/20 shadow-sm">
-            <Text className="text-white text-xs font-bold uppercase tracking-widest">Featured</Text>
-          </View>
-          <View>
-            <Text className="text-white font-extrabold text-2xl mb-1 shadow-sm">{item.title}</Text>
-            <Text className="text-gray-200 font-medium text-sm mb-2" numberOfLines={2}>{item.subtitle}</Text>
-            <View className="flex-row items-center">
-              <Text className="text-white font-bold text-xs mr-1">Explore</Text>
-              <Ionicons name="arrow-forward" size={14} color="#FFF" />
-            </View>
-          </View>
-        </View>
       </TouchableOpacity>
     </View>
   );

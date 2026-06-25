@@ -3,16 +3,12 @@ export type NotificationCategory = 'All' | 'Updates' | 'Offers' | 'Businesses' |
 export type NotificationType = 'business_update' | 'recommendation' | 'offer' | 'review' | 'favorite' | 'system';
 
 export interface NotificationItem {
-  id: string;
-  type: NotificationType;
+  id: string | number;
   title: string;
-  description: string;
-  timestamp: string; // ISO string or relative time string
-  isRead: boolean;
-  businessId?: string;
-  imageUrl?: string;
-  avatarText?: string;
-  actionUrl?: string;
+  message: string;
+  data: any; // Dynamic JSON object from backend
+  is_read: boolean;
+  created_at: string; // ISO string
 }
 
 export interface NotificationSummary {

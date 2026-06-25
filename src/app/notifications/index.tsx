@@ -49,14 +49,14 @@ export default function NotificationsScreen() {
   });
 
   const handleNotificationPress = (notification: NotificationItem) => {
-    if (!notification.isRead) {
+    if (!notification.is_read) {
       markAsRead(notification.id);
     }
     
     // Intelligent Navigation based on notification type
-    console.log('Navigating based on notification:', notification.type);
+    console.log('Navigating based on notification:', notification.data?.type);
     // In future:
-    // if (notification.businessId) router.push(`/business/${notification.businessId}`);
+    // if (notification.data?.businessId) router.push(`/business/${notification.data.businessId}`);
   };
 
   const isSearchActive = debouncedQuery.length > 0;

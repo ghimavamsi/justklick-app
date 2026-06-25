@@ -15,33 +15,11 @@ interface LocationSelectorSheetProps {
 }
 
 const POPULAR_CITIES = [
-  'Hyderabad, Telangana',
-  'Vijayawada, Andhra Pradesh',
-  'Visakhapatnam, Andhra Pradesh',
-  'Bangalore, Karnataka',
-  'Chennai, Tamil Nadu',
-];
-
-const MOCK_LOCATIONS = [
-  ...POPULAR_CITIES,
-  // Hyderabad Areas
-  'Madhapur, Hyderabad, Telangana',
-  'Gachibowli, Hyderabad, Telangana',
-  'Banjara Hills, Hyderabad, Telangana',
-  'Jubilee Hills, Hyderabad, Telangana',
-  'Kondapur, Hyderabad, Telangana',
-  'Kukatpally, Hyderabad, Telangana',
-  'Ameerpet, Hyderabad, Telangana',
-  'Secunderabad, Telangana',
-  // Vijayawada Areas
-  'Benz Circle, Vijayawada, Andhra Pradesh',
-  'Patamata, Vijayawada, Andhra Pradesh',
-  'Bhavanipuram, Vijayawada, Andhra Pradesh',
-  'Labbipet, Vijayawada, Andhra Pradesh',
-  // Bangalore Areas
-  'Koramangala, Bangalore, Karnataka',
-  'Indiranagar, Bangalore, Karnataka',
-  'Whitefield, Bangalore, Karnataka',
+  { name: 'Hyderabad, Telangana', lat: 17.3850, lng: 78.4867 },
+  { name: 'Vijayawada, Andhra Pradesh', lat: 16.5062, lng: 80.6480 },
+  { name: 'Visakhapatnam, Andhra Pradesh', lat: 17.6868, lng: 83.2185 },
+  { name: 'Bangalore, Karnataka', lat: 12.9716, lng: 77.5946 },
+  { name: 'Chennai, Tamil Nadu', lat: 13.0827, lng: 80.2707 },
 ];
 
 export function LocationSelectorSheet({ visible, onClose }: LocationSelectorSheetProps) {
@@ -97,7 +75,7 @@ export function LocationSelectorSheet({ visible, onClose }: LocationSelectorShee
       shortAddress: address.split(',')[0],
     };
     setManualLocation(loc);
-    addSavedLocation(address);
+    addSavedLocation(loc);
     handleClose();
   };
 
@@ -148,7 +126,7 @@ export function LocationSelectorSheet({ visible, onClose }: LocationSelectorShee
               <TextInput 
                 value={searchQuery}
                 onChangeText={setSearchQuery}
-                placeholder="Search city, neighborhood, or zip"
+                placeholder="Search city or neighborhood"
                 placeholderTextColor="#64748B"
                 className="flex-1 ml-2 text-foreground font-medium text-base"
                 autoFocus
@@ -199,16 +177,29 @@ export function LocationSelectorSheet({ visible, onClose }: LocationSelectorShee
                     {savedLocations.length > 0 && (
                       <View className="mt-6 mb-2">
                         <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Recent Locations</Text>
-                        {savedLocations.map(loc => (
-                          <TouchableOpacity 
-                            key={loc}
-                            className="flex-row items-center py-3 border-b border-border/30"
-                            onPress={() => handleSelectLocation(loc)}
-                          >
-                            <Ionicons name="time-outline" size={20} color="#64748B" style={{ marginRight: 16 }} />
-                            <Text className="text-sm font-medium text-foreground ml-4">{loc}</Text>
-                          </TouchableOpacity>
-                        ))}
+                        {savedLocations.map((locObj, idx) => {
+                          const isStr = typeof locObj === 'string';
+                          const address = isStr ? locObj : locObj.addressString;
+                          const shortTitle = isStr ? locObj.split(',')[0] : (locObj.shortAddress || address.split(',')[0]);
+                          const subtitle = isStr ? locObj.split(',')[1]?.trim() : locObj.addressString;
+                          const lat = isStr ? 0 : locObj.latitude;
+                          const lng = isStr ? 0 : locObj.longitude;
+                          return (
+                            <TouchableOpacity 
+                              key={`saved-${idx}`}
+                              className="flex-row items-center py-4 border-b border-border/30"
+                              onPress={() => handleSelectLocation(address, lat, lng)}
+                            >
+                              <View className="w-8 h-8 bg-muted rounded-full items-center justify-center mr-4">
+                                <Ionicons name="time-outline" size={16} color={isDark ? '#FFF' : '#000'} />
+                              </View>
+                              <View className="flex-1 pr-4">
+                                <Text className="text-sm font-bold text-foreground mb-0.5" numberOfLines={1}>{shortTitle}</Text>
+                                <Text className="text-xs text-muted-foreground" numberOfLines={1}>{subtitle}</Text>
+                              </View>
+                            </TouchableOpacity>
+                          );
+                        })}
                       </View>
                     )}
 
@@ -216,31 +207,31 @@ export function LocationSelectorSheet({ visible, onClose }: LocationSelectorShee
                       <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Popular Cities</Text>
                     </View>
                     
-                    {POPULAR_CITIES.map(loc => (
+                    {POPULAR_CITIES.map(city => (
                       <TouchableOpacity 
-                        key={loc}
+                        key={city.name}
                         className="flex-row items-center py-4 border-b border-border/30"
-                        onPress={() => handleSelectLocation(loc)}
+                        onPress={() => handleSelectLocation(city.name, city.lat, city.lng)}
                       >
                         <View className="w-8 h-8 bg-muted rounded-full items-center justify-center mr-4">
                           <Ionicons name="location-outline" size={16} color={isDark ? '#FFF' : '#000'} />
                         </View>
                         <View>
-                          <Text className="text-sm font-bold text-foreground mb-0.5">{loc.split(',')[0]}</Text>
-                          <Text className="text-xs text-muted-foreground">{loc.split(',')[1].trim()}</Text>
+                          <Text className="text-sm font-bold text-foreground mb-0.5">{city.name.split(',')[0]}</Text>
+                          <Text className="text-xs text-muted-foreground">{city.name.split(',')[1]?.trim()}</Text>
                         </View>
                       </TouchableOpacity>
                     ))}
                   </View>
                 )}
-                {searchQuery && searchResults.length === 0 && !isFetching && (
+                {!!searchQuery && searchResults.length === 0 && !isFetching && (
                   <View className="items-center py-8">
                     <Ionicons name="map-outline" size={48} color="#64748B" style={{ opacity: 0.5 }} />
                     <Text className="text-foreground font-semibold text-base mt-4">No locations found</Text>
                     <Text className="text-muted-foreground text-sm mt-1">Try a different search term</Text>
                   </View>
                 )}
-                {searchQuery && isFetching && (
+                {!!searchQuery && isFetching && (
                   <View className="items-center py-8">
                     <Text className="text-muted-foreground font-semibold text-sm">Searching locations...</Text>
                   </View>

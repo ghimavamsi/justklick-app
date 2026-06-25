@@ -51,6 +51,26 @@ export default function NotificationPermissionScreen() {
   const requestPermission = async () => {
     try {
       const { status } = await Notifications.requestPermissionsAsync();
+      
+      if (status === 'granted') {
+        try {
+          const tokenData = await Notifications.getExpoPushTokenAsync();
+          if (tokenData && tokenData.data) {
+            const { Platform } = require('react-native');
+            const { notificationsApi } = require('../../api/notifications');
+            // Assuming device_id is difficult to reliably get cross-platform without extra libs, 
+            // we'll pass token and device_type.
+            await notificationsApi.saveDeviceToken({
+              token: tokenData.data,
+              device_type: Platform.OS
+            });
+            console.log('Saved push token to backend', tokenData.data);
+          }
+        } catch (e) {
+          console.log('Failed to fetch/save push token', e);
+        }
+      }
+
       finishOnboarding(status === 'granted' ? 'granted' : 'denied');
     } catch (error) {
       Alert.alert('Error', 'Something went wrong requesting notifications.');

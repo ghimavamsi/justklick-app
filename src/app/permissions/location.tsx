@@ -57,8 +57,8 @@ export default function LocationPermissionScreen() {
         useLocationStore.getState().setManualLocation({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
-          addressString: `${address?.city || address?.subregion || ''}, ${address?.region || ''}`.replace(/^, | , $/g, ''),
-          shortAddress: address?.city || address?.subregion || 'Unknown Location'
+          addressString: [address?.street, address?.district, address?.city, address?.region].filter(Boolean).join(', '),
+          shortAddress: address?.district || address?.subregion || address?.street || address?.name || address?.city || 'Unknown Location'
         });
       }
 

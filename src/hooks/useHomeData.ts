@@ -3,6 +3,8 @@ import { homeApi } from '../api/home';
 import { HomeData, Category, Banner, Business } from '../types/home.types';
 import { useLocationStore } from '../store/location-store';
 
+import { dynamicApi } from '../api/dynamic';
+
 export const HOME_QUERY_KEY = ['homeData'];
 
 export function useHomeData() {
@@ -16,12 +18,18 @@ export function useHomeData() {
       const results = await Promise.allSettled([
         homeApi.fetchAdvertisements(),
         homeApi.fetchCategories(),
-        homeApi.fetchBusinesses(activeLocation?.latitude, activeLocation?.longitude)
+        homeApi.fetchBusinesses(activeLocation?.latitude, activeLocation?.longitude),
+        dynamicApi.getPopularSearches(10), // For trending categories
+        activeLocation?.latitude && activeLocation?.longitude 
+          ? dynamicApi.getPopularNearYou(activeLocation.latitude, activeLocation.longitude, 50, 20)
+          : Promise.resolve([]) // Fallback if no location
       ]);
 
       const apiBanners = results[0].status === 'fulfilled' ? results[0].value : [];
       const apiCategories = results[1].status === 'fulfilled' ? results[1].value : [];
       const apiBusinesses = results[2].status === 'fulfilled' ? results[2].value : [];
+      const apiPopularSearches = results[3].status === 'fulfilled' ? results[3].value : [];
+      const apiPopularNearYou = results[4].status === 'fulfilled' ? results[4].value : [];
 
       // Helper to handle both flat arrays and paginated responses { results: [...] }
       const extractArray = (data: any) => {
@@ -98,6 +106,7 @@ export function useHomeData() {
         return {
           id: String(b?.id || index),
           name: b?.company_name || b?.business_name || b?.name || `Business ${index + 1}`,
+          slug: b?.slug || String(b?.id || index),
           category: b?.category || 'General',
           rating: Number(b?.rating) || 4.5,
           reviewsCount: b?.reviews_count || Math.floor(Math.random() * 500) + 10,
@@ -112,14 +121,49 @@ export function useHomeData() {
         };
       });
 
+      // Map Popular Searches to Trending Categories
+      const trendingCategories: Category[] = extractArray(apiPopularSearches).map((ps: any, index: number) => ({
+        id: String(ps?.category_slug || ps?.id || index),
+        name: ps?.category_name || `Trending ${index + 1}`,
+        iconName: getImageUrl(ps?.category_image, 'flame-outline'),
+        iconLibrary: 'Ionicons',
+        color: '#c10007',
+        bgColor: 'rgba(193, 0, 7, 0.1)',
+      }));
+
+      // Map Popular Near You to Nearby Businesses
+      const nearby: Business[] = extractArray(apiPopularNearYou).map((b: any, index: number) => {
+        let firstImageUrl = null;
+        if (Array.isArray(b?.images) && b.images.length > 0) {
+          firstImageUrl = b.images[0].image || b.images[0].image_url;
+        }
+
+        return {
+          id: String(b?.id || index),
+          name: b?.company_name || b?.business_name || b?.name || `Business ${index + 1}`,
+          slug: b?.slug || String(b?.id || index),
+          category: b?.category || 'General',
+          rating: Number(b?.rating) || 4.5, // The API doesn't seem to return a rating, defaulting
+          reviewsCount: Math.floor(Math.random() * 500) + 10,
+          isVerified: b?.status === 'verified',
+          coverImage: getImageUrl(firstImageUrl || b?.cover_image || b?.image_url, 'https://via.placeholder.com/400x300'),
+          isPremium: false,
+          isTrending: false,
+          tags: [],
+          isOpenNow: true,
+          fullAddress: b?.location || b?.address || 'Location not specified',
+          distanceStr: b?.distance ? `${Number(b.distance).toFixed(1)} km` : 'Near you',
+        };
+      });
+
       // Construct the aggregated HomeData expected by the UI
       return {
         categories: categories,
-        trendingCategories: categories.slice(0, 4), // Fallback: use first 4 categories
+        trendingCategories: trendingCategories.length > 0 ? trendingCategories : categories.slice(0, 4),
         banners: banners,
         featuredBusinesses: businesses.filter(b => b.isVerified).slice(0, 5),
         premiumBusinesses: businesses.filter(b => b.isPremium).slice(0, 5),
-        nearbyBusinesses: businesses.slice(0, 5),
+        nearbyBusinesses: nearby.length > 0 ? nearby : businesses.slice(0, 5),
         recommendedBusinesses: businesses.slice(0, 5),
       };
     },

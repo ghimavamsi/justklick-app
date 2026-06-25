@@ -68,7 +68,7 @@ export function BusinessHeader({ business, scrollY }: Props) {
                 onPress={() => {
                   setMenuVisible(false);
                   if (item.label === 'Write a Review') {
-                    router.push(`/business/${business.id}/write-review`);
+                    router.push(`/business/${business.slug || business.id}/write-review`);
                   }
                 }}
               >

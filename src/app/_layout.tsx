@@ -82,11 +82,7 @@ export default function RootLayout() {
       <AppProviders>
         <ThemeProvider value={osColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <ThemeWrapper>
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="business" options={{ headerShown: false }} />
-            </Stack>
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }} />
           </ThemeWrapper>
         </ThemeProvider>
       </AppProviders>

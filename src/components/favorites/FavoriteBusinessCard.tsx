@@ -53,7 +53,7 @@ export function FavoriteBusinessCard({ business, index, onRemove }: Props) {
         <View className="bg-card rounded-[24px] border border-border shadow-sm overflow-hidden">
           <TouchableOpacity 
             activeOpacity={0.9}
-            onPress={() => router.push(`/business/${business.id}` as any)}
+            onPress={() => router.push(`/business/${business.slug || business.id}` as any)}
             className="p-4 flex-row"
           >
             {/* Cover Image */}

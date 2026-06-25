@@ -18,7 +18,7 @@ interface LocationState {
   permissionStatus: PermissionStatus;
   currentLocation: LocationData | null;
   manualLocation: LocationData | null;
-  savedLocations: string[]; // Keep backward compatibility for recent searches
+  savedLocations: any[]; // Store objects but allow legacy strings
   isLoading: boolean;
   error: string | null;
 
@@ -28,8 +28,8 @@ interface LocationState {
   fetchCurrentLocation: () => Promise<void>;
   setManualLocation: (location: LocationData) => void;
   clearManualLocation: () => void;
-  addSavedLocation: (city: string) => void;
-  removeSavedLocation: (city: string) => void;
+  addSavedLocation: (location: LocationData) => void;
+  removeSavedLocation: (address: string) => void;
 }
 
 export const useLocationStore = create<LocationState>()(
@@ -100,32 +100,6 @@ export const useLocationStore = create<LocationState>()(
             accuracy: Location.Accuracy.Balanced,
           });
 
-          try {
-            // Send exact GPS coordinates formatted exactly as the backend expects in the `q` parameter
-            const query = `"latitude": ${location.coords.latitude}, "longitude": ${location.coords.longitude}`;
-            const results = await homeApi.searchByLocation(query);
-
-            if (results && results.length > 0) {
-              const place = results[0];
-              const addressString = place.name;
-              const shortAddress = place.name.split(',')[0];
-
-              set({
-                currentLocation: {
-                  latitude: place.lat,
-                  longitude: place.lng,
-                  addressString,
-                  shortAddress,
-                },
-                isLoading: false,
-              });
-              return;
-            }
-          } catch (backendError) {
-            console.error('Backend reverse geocoding failed:', backendError);
-          }
-
-          // Fallback to Expo Location if backend returns empty or fails
           let geocode = null;
           try {
             geocode = await Location.reverseGeocodeAsync({
@@ -144,7 +118,7 @@ export const useLocationStore = create<LocationState>()(
             if (place.region) addressParts.push(place.region);
 
             const addressString = addressParts.filter(Boolean).join(', ');
-            const shortAddress = place.city || place.district || place.region || 'Current Location';
+            const shortAddress = place.district || place.subregion || place.street || place.name || place.city || 'Current Location';
 
             set({
               currentLocation: {
@@ -182,16 +156,20 @@ export const useLocationStore = create<LocationState>()(
         set({ manualLocation: null });
       },
 
-      addSavedLocation: (city) =>
-        set((state) => ({
-          savedLocations: state.savedLocations.includes(city)
-            ? state.savedLocations
-            : [...state.savedLocations, city],
-        })),
+      addSavedLocation: (location) =>
+        set((state) => {
+          const locStr = location.addressString;
+          const filtered = state.savedLocations.filter((loc) => 
+            (typeof loc === 'string' ? loc : loc.addressString) !== locStr
+          );
+          return { savedLocations: [location, ...filtered].slice(0, 5) };
+        }),
 
-      removeSavedLocation: (city) =>
+      removeSavedLocation: (address) =>
         set((state) => ({
-          savedLocations: state.savedLocations.filter((loc) => loc !== city),
+          savedLocations: state.savedLocations.filter((loc) => 
+            (typeof loc === 'string' ? loc : loc.addressString) !== address
+          ),
         })),
     }),
     {

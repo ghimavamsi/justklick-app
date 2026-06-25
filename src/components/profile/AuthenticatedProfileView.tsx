@@ -10,6 +10,7 @@ import { useUserStore } from '../../store/user-store';
 import { useAuthStore } from '../../store/auth-store';
 import { ProfileDashboardData, ProfileActivityItem } from '../../types/profile.types';
 import { StudentProfileResponse } from '../../types/student.types';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AuthenticatedProfileViewProps {
   data: ProfileDashboardData;
@@ -19,12 +20,14 @@ interface AuthenticatedProfileViewProps {
 
 export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress }: AuthenticatedProfileViewProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { colorScheme, changeTheme, themeMode } = useTheme();
   const { profile, clearProfile } = useUserStore();
   const { logout } = useAuthStore();
   const [isSupportModalVisible, setIsSupportModalVisible] = useState(false);
   
   const handleLogout = () => {
+    queryClient.clear(); // Clear all cached queries (favorites, notifications, etc.) to prevent data leak between accounts
     clearProfile();
     logout();
   };
@@ -205,7 +208,7 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
 
         <View className="px-6 gap-3">
           <TouchableOpacity 
-            onPress={() => setIsSupportModalVisible(true)}
+            onPress={() => router.push('/contact' as any)}
             className="w-full h-14 rounded-[16px] bg-card border border-border flex-row items-center justify-center shadow-sm"
           >
             <Ionicons name="help-buoy-outline" size={20} color={isDark ? '#FFF' : '#000'} style={{ marginRight: 8 }} />

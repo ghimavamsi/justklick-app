@@ -38,26 +38,31 @@ export function BusinessContact({ business }: Props) {
       {/* Contact Section */}
       <View className="mb-6">
         <Text className="text-xl font-extrabold text-foreground mb-4">Contact Info</Text>
-        <View className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-          
-          <TouchableOpacity 
-            className="flex-row items-center p-4 border-b border-border/50"
-            onPress={() => Linking.openURL(`tel:${business.contact.mobile}`)}
-          >
-            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center mr-3">
-              <Ionicons name="call" size={18} color="#1C398E" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-sm text-muted-foreground font-medium mb-0.5">Mobile Number</Text>
-              <Text className="text-base font-bold text-foreground">{business.contact.mobile}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#94A3B8" />
-          </TouchableOpacity>
+        {(!business.contact.mobile && !business.contact.email && !business.contact.website) ? (
+          <Text className="text-muted-foreground text-sm italic">No contact information available.</Text>
+        ) : (
+          <View className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+            
+            {!!business.contact.mobile && (
+              <TouchableOpacity 
+                className="flex-row items-center p-4 border-b border-border/50"
+                onPress={() => Linking.openURL(`tel:${business.contact.mobile}`)}
+              >
+                <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center mr-3">
+                  <Ionicons name="call" size={18} color="#1C398E" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm text-muted-foreground font-medium mb-0.5">Mobile Number</Text>
+                  <Text className="text-base font-bold text-foreground">{business.contact.mobile}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#94A3B8" />
+              </TouchableOpacity>
+            )}
 
-          {business.contact.email && (
-            <TouchableOpacity 
-              className="flex-row items-center p-4 border-b border-border/50"
-              onPress={() => Linking.openURL(`mailto:${business.contact.email}`)}
+            {!!business.contact.email && (
+              <TouchableOpacity 
+                className="flex-row items-center p-4 border-b border-border/50"
+                onPress={() => Linking.openURL(`mailto:${business.contact.email}`)}
             >
               <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center mr-3">
                 <Ionicons name="mail" size={18} color="#1C398E" />
@@ -86,7 +91,8 @@ export function BusinessContact({ business }: Props) {
             </TouchableOpacity>
           )}
 
-        </View>
+          </View>
+        )}
       </View>
 
     </View>

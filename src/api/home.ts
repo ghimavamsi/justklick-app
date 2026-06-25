@@ -15,11 +15,17 @@ export const homeApi = {
   },
 
   // Business Listing
-  fetchBusinesses: async (lat?: number, lng?: number): Promise<ApiBusiness[]> => {
+  fetchBusinesses: async (lat?: number, lng?: number, query?: string, category?: string): Promise<ApiBusiness[]> => {
     const params: any = {};
     if (lat !== undefined && lng !== undefined) {
       params.lat = lat;
       params.lng = lng;
+    }
+    if (query) {
+      params.search = query; // Or params.q = query, based on DRF conventions (usually 'search')
+    }
+    if (category) {
+      params.category = category;
     }
     const response = await apiClient.get<ApiBusiness[]>('/api/businesses/', { params });
     return response.data;
@@ -33,7 +39,7 @@ export const homeApi = {
 
   // Location Search
   searchByLocation: async (query: string): Promise<{name: string, lat: number, lng: number}[]> => {
-    const response = await apiClient.get<{name: string, lat: number, lng: number}[]>('/api/businesses/locations/search/', {
+    const response = await apiClient.get<{name: string, lat: number, lng: number}[]>('/api/locations/search/', {
       params: { q: query }
     });
     return response.data;

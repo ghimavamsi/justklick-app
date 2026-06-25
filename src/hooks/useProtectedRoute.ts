@@ -37,7 +37,7 @@ export function useProtectedRoute() {
       }
     } else if (isAuthenticated && (inAuthGroup || inOnboardingOrPermissions)) {
       // If the user is authenticated, they shouldn't see the auth, onboarding, or permission screens
-      router.replace('/(tabs)/index' as any); // Force navigate to the Home tab instead of restoring the last active tab
+      router.replace('/(tabs)');
     }
   }, [isAuthenticated, hasSeenOnboarding, hasSeenPermissions, segments]);
 }

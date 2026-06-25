@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, FlatList, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFavorites, useToggleFavorite } from '../../hooks/useFavorites';
 import { FavoritesSkeleton } from './FavoritesSkeleton';
@@ -9,7 +9,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { Business } from '../../types/home.types';
 
 export function FavoritesAuthView() {
-  const { data: favorites, isLoading } = useFavorites();
+  const { data: favorites, isLoading, refetch, isRefetching } = useFavorites();
   const { mutate: toggleFavorite } = useToggleFavorite();
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
@@ -118,14 +118,18 @@ export function FavoritesAuthView() {
 
       <View className="flex-1 px-6">
         {filteredData.length === 0 ? (
-          <View className="flex-1 items-center justify-center pt-10">
+          <ScrollView 
+            contentContainerStyle={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 40 }}
+            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={isDark ? "#FFF" : "#000"} />}
+          >
             <Text className="text-lg font-bold text-foreground">No matches found</Text>
             <Text className="text-muted-foreground text-sm mt-2">Try a different search term</Text>
-          </View>
+          </ScrollView>
         ) : (
           <FlatList
             data={filteredData}
             keyExtractor={(item) => item.id}
+            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={isDark ? "#FFF" : "#000"} />}
             renderItem={({ item, index }: { item: Business; index: number }) => (
               <FavoriteBusinessCard 
                 business={item} 

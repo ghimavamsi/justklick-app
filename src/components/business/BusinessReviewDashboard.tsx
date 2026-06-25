@@ -76,7 +76,7 @@ export function BusinessReviewDashboard({ business }: Props) {
       {/* Write a Review Button */}
       <TouchableOpacity 
         className="mt-4 w-full bg-primary py-3.5 rounded-xl flex-row justify-center items-center shadow-sm"
-        onPress={() => router.push(`/business/${business.id}/write-review`)}
+        onPress={() => router.push(`/business/${business.slug || business.id}/write-review`)}
       >
         <Ionicons name="create-outline" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
         <Text className="text-white font-bold text-base flex-shrink-0">Write a Review</Text>

@@ -1,128 +1,116 @@
-import { Image } from 'expo-image';
-import { SymbolView } from 'expo-symbols';
-import { Platform, Pressable, ScrollView } from 'react-native';
+import React from 'react';
+import { View, ScrollView, Text, ActivityIndicator, Image, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useQuery } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
+import { dynamicApi } from '@/api/dynamic';
+import { useTheme } from '@/hooks/useTheme';
 
-import { ExternalLink } from '@/components/external-link';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Collapsible } from '@/components/ui/collapsible';
+export default function ExploreScreen() {
+  const insets = useSafeAreaInsets();
+  const { colorScheme } = useTheme();
 
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
-
-export default function TabTwoScreen() {
-  const safeAreaInsets = useSafeAreaInsets();
-  const insets = {
-    ...safeAreaInsets,
-    bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
-  };
-  const theme = useTheme();
-
-  const contentPlatformStyle = Platform.select({
-    android: {
-      paddingTop: insets.top,
-      paddingLeft: insets.left,
-      paddingRight: insets.right,
-      paddingBottom: insets.bottom,
-    },
-    web: {
-      paddingTop: Spacing.six,
-      paddingBottom: Spacing.four,
-    },
+  const { data: touristPlaces, isLoading: isPlacesLoading } = useQuery({
+    queryKey: ['touristPlaces'],
+    queryFn: () => dynamicApi.getTouristPlaces()
   });
 
+  const { data: faqs, isLoading: isFaqsLoading } = useQuery({
+    queryKey: ['faqs'],
+    queryFn: () => dynamicApi.getFaqs()
+  });
+
+  const { data: whyChooseUs, isLoading: isWhyLoading } = useQuery({
+    queryKey: ['whyChooseUs'],
+    queryFn: () => dynamicApi.getWhyChooseUs()
+  });
+
+  const isLoading = isPlacesLoading || isFaqsLoading || isWhyLoading;
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background">
+        <ActivityIndicator size="large" color="#1C398E" />
+      </View>
+    );
+  }
+
   return (
-    <ScrollView
-      className="flex-1"
-      style={{ backgroundColor: theme.background }}
-      contentInset={insets}
-      contentContainerStyle={contentPlatformStyle}>
-      <ThemedView className="grow" style={{ maxWidth: MaxContentWidth }}>
-        <ThemedView className="gap-3 items-center px-4 py-6">
-          <ThemedText type="subtitle">Explore</ThemedText>
-          <ThemedText className="text-center" themeColor="textSecondary">
-            This starter app includes example{'\n'}code to help you get started.
-          </ThemedText>
+    <ScrollView 
+      className="flex-1 bg-background"
+      contentContainerStyle={{ paddingTop: Math.max(insets.top, 20) + 10, paddingBottom: 100 }}
+    >
+      {/* Header */}
+      <View className="px-5 mb-6">
+        <Text className="text-3xl font-extrabold text-foreground mb-1">Explore</Text>
+        <Text className="text-sm text-muted-foreground">Discover tourist places and learn more about us</Text>
+      </View>
 
-          <ExternalLink href="https://docs.expo.dev" asChild>
-            <Pressable className="active:opacity-70">
-              <ThemedView type="backgroundElement" className="flex-row px-4 py-2 rounded-[20px] justify-center gap-1 items-center">
-                <ThemedText type="link">Expo documentation</ThemedText>
-                <SymbolView
-                  tintColor={theme.text}
-                  name={{ ios: 'arrow.up.right.square', android: 'link', web: 'link' }}
-                  size={12}
+      {/* Tourist Places */}
+      {touristPlaces && touristPlaces.length > 0 && (
+        <View className="mb-8">
+          <View className="px-5 mb-4 flex-row items-center justify-between">
+            <Text className="text-lg font-bold text-foreground">Top Tourist Places</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 15 }}>
+            {touristPlaces.map((place) => (
+              <View key={place.id} className="w-64 bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+                <Image 
+                  source={{ uri: place.image ? (place.image.startsWith('http') ? place.image : `https://justklick-backend-kjrdc8-2f68d5-162-35-161-160.sslip.io${place.image}`) : 'https://via.placeholder.com/400x200' }} 
+                  className="w-full h-32" 
                 />
-              </ThemedView>
-            </Pressable>
-          </ExternalLink>
-        </ThemedView>
+                <View className="p-4">
+                  <Text className="font-bold text-base text-foreground mb-1" numberOfLines={1}>{place.title}</Text>
+                  <View className="flex-row items-center mb-2">
+                    <Ionicons name="location" size={14} color="#64748B" />
+                    <Text className="text-xs text-muted-foreground ml-1" numberOfLines={1}>{place.location}</Text>
+                  </View>
+                  <Text className="text-xs text-muted-foreground" numberOfLines={2}>{place.description}</Text>
+                  <View className="flex-row items-center mt-2">
+                    <Ionicons name="star" size={14} color="#F59E0B" />
+                    <Text className="text-xs font-bold text-foreground ml-1">{place.rating}</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      )}
 
-        <ThemedView className="gap-5 px-4 pt-3">
-          <Collapsible title="File-based routing">
-            <ThemedText type="small">
-              This app has two screens: <ThemedText type="code">src/app/index.tsx</ThemedText> and{' '}
-              <ThemedText type="code">src/app/explore.tsx</ThemedText>
-            </ThemedText>
-            <ThemedText type="small">
-              The layout file in <ThemedText type="code">src/app/_layout.tsx</ThemedText> sets up
-              the tab navigator.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/router/introduction">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
+      {/* Why Choose Us */}
+      {whyChooseUs && whyChooseUs.length > 0 && (
+        <View className="px-5 mb-8">
+          <Text className="text-lg font-bold text-foreground mb-4">Why Choose Us</Text>
+          <View className="gap-4">
+            {whyChooseUs.map((item) => (
+              <View key={item.id} className="flex-row items-start bg-card p-4 rounded-2xl border border-border shadow-sm">
+                <View className="w-10 h-10 bg-primary/10 rounded-full items-center justify-center mr-4">
+                  <Ionicons name={item.icon ? (item.icon as any) : "checkmark-circle"} size={20} color="#1C398E" />
+                </View>
+                <View className="flex-1">
+                  <Text className="font-bold text-foreground mb-1">{item.title}</Text>
+                  <Text className="text-xs text-muted-foreground leading-relaxed">{item.description}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
 
-          <Collapsible title="Android, iOS, and web support">
-            <ThemedView type="backgroundElement" className="items-center">
-              <ThemedText type="small">
-                You can open this project on Android, iOS, and the web. To open the web version,
-                press <ThemedText type="smallBold">w</ThemedText> in the terminal running this
-                project.
-              </ThemedText>
-              <Image
-                source={require('@/assets/images/logo.png')}
-                className="w-full aspect-[296/171] rounded-xl mt-2"
-              />
-            </ThemedView>
-          </Collapsible>
-
-          <Collapsible title="Images">
-            <ThemedText type="small">
-              For static images, you can use the <ThemedText type="code">@2x</ThemedText> and{' '}
-              <ThemedText type="code">@3x</ThemedText> suffixes to provide files for different
-              screen densities.
-            </ThemedText>
-            <Image source={require('@/assets/images/app-icon.png')} className="w-[100px] h-[100px] self-center" />
-            <ExternalLink href="https://reactnative.dev/docs/images">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Light and dark mode components">
-            <ThemedText type="small">
-              This template has light and dark mode support. The{' '}
-              <ThemedText type="code">useColorScheme()</ThemedText> hook lets you inspect what the
-              user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Animations">
-            <ThemedText type="small">
-              This template includes an example of an animated component. The{' '}
-              <ThemedText type="code">src/components/ui/collapsible.tsx</ThemedText> component uses
-              the powerful <ThemedText type="code">react-native-reanimated</ThemedText> library to
-              animate opening this hint.
-            </ThemedText>
-          </Collapsible>
-        </ThemedView>
-
-      </ThemedView>
+      {/* FAQs */}
+      {faqs && faqs.length > 0 && (
+        <View className="px-5 mb-8">
+          <Text className="text-lg font-bold text-foreground mb-4">Frequently Asked Questions</Text>
+          <View className="bg-card rounded-2xl border border-border overflow-hidden">
+            {faqs.map((faq: any, index: number) => (
+              <View key={faq.id || index} className={`p-4 ${index !== faqs.length - 1 ? 'border-b border-border' : ''}`}>
+                <Text className="font-bold text-foreground mb-2">{faq.question || faq.title}</Text>
+                <Text className="text-xs text-muted-foreground leading-relaxed">{faq.answer || faq.description}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
     </ScrollView>
   );
 }
-

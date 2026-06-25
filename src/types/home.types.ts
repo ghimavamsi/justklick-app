@@ -10,6 +10,7 @@ export interface Category {
 export interface Business {
   id: string;
   name: string;
+  slug: string;
   category: string;
   rating: number;
   reviewsCount: number;

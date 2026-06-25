@@ -23,55 +23,80 @@ export function useBusinessDetails(id: string) {
 
       // Extract images array of strings
       const rawImages = Array.isArray(b?.images) ? b.images : [];
-      const gallery = rawImages.length > 0 
+      let gallery = rawImages.length > 0 
         ? rawImages.map((imgObj: any) => getImageUrl(imgObj.image || imgObj.image_url, 'https://via.placeholder.com/800x600'))
-        : ['https://via.placeholder.com/800x600'];
+        : [];
+      
+      if (gallery.length === 0 && (b?.image || b?.cover_image)) {
+        gallery = [getImageUrl(b?.image || b?.cover_image, 'https://via.placeholder.com/800x600')];
+      }
 
-      // Map API schema to UI schema
+      if (gallery.length === 0) {
+        gallery = ['https://via.placeholder.com/800x600'];
+      }
+
+      // Parse dynamic field_values
+      let parsedServices: any[] = [];
+      let parsedAmenities: any[] = [];
+      if (Array.isArray(b?.field_values)) {
+        const servicesField = b.field_values.find((f: any) => f.field_key === 'services');
+        if (servicesField && servicesField.value) {
+          try {
+            const arr = JSON.parse(servicesField.value);
+            if (Array.isArray(arr)) {
+              parsedServices = arr.map((s, i) => ({ id: String(i), name: s, iconName: 'checkmark-circle-outline' }));
+            }
+          } catch (e) {}
+        }
+        const amenitiesField = b.field_values.find((f: any) => f.field_key === 'amenities');
+        if (amenitiesField && amenitiesField.value) {
+          try {
+            const arr = JSON.parse(amenitiesField.value);
+            if (Array.isArray(arr)) {
+              parsedAmenities = arr.map((s, i) => ({ id: String(i), name: s, iconName: 'star-outline' }));
+            }
+          } catch (e) {}
+        }
+      }
+      
+      // Map API schema to UI schema without dummy data
       return {
         id: String(b?.id || id),
         name: b?.company_name || b?.business_name || b?.name || 'Unknown Business',
+        slug: b?.slug || id,
         category: b?.category || 'General',
-        rating: Number(b?.rating) || 4.5,
-        reviewsCount: b?.reviews_count || Math.floor(Math.random() * 500) + 10,
+        rating: Number(b?.rating) || 0,
+        reviewsCount: b?.reviews_count || 0,
         isVerified: b?.status === 'verified' || !!b?.is_verified,
         coverImage: gallery[0],
         gallery: gallery,
         isPremium: !!b?.is_premium,
         isOpenNow: b?.is_open_now !== undefined ? !!b?.is_open_now : true,
-        fullAddress: b?.location || b?.full_address || 'Location not specified',
-        distanceStr: b?.distance || '2.5 km',
-        description: b?.description || 'No description available.',
-        about: b?.description || 'No description available.',
-        establishedYear: b?.established_year || 2020,
-        services: Array.isArray(b?.services) 
-          ? b.services.map((s: any, i: number) => typeof s === 'string' 
-              ? { id: String(i), name: s, iconName: 'checkmark-circle-outline' } 
-              : s) 
-          : [{ id: '1', name: 'Consultation', iconName: 'people-outline' }],
-        amenities: Array.isArray(b?.amenities) 
-          ? b.amenities.map((a: any, i: number) => typeof a === 'string' 
-              ? { id: String(i), name: a, iconName: 'star-outline' } 
-              : a) 
-          : [{ id: '1', name: 'Parking', iconName: 'car-outline' }],
+        fullAddress: b?.location || b?.address || b?.full_address || '',
+        distanceStr: b?.distance || '',
+        description: b?.description || '',
+        about: b?.description || '',
+        establishedYear: b?.established_year || null,
+        services: parsedServices,
+        amenities: parsedAmenities,
         location: {
-          address: b?.location || b?.full_address || 'Location not specified',
-          area: 'Downtown',
-          city: 'City',
-          state: 'State',
-          pincode: '000000',
+          address: b?.address || b?.location || b?.full_address || '',
+          area: b?.location?.split(' ')?.[0] || '',
+          city: b?.location?.split(' ')?.[1] || '',
+          state: b?.location?.split(' ')?.[2] || '',
+          pincode: '',
         },
         contact: {
-          mobile: b?.phone || '+1 234 567 8900',
-          email: b?.email || 'contact@business.com',
-          website: b?.website || 'https://example.com'
+          mobile: b?.phone || b?.whatsapp || '',
+          email: b?.email || '',
+          website: b?.website || ''
         },
         ratingSummary: {
-          '5': 60,
-          '4': 25,
-          '3': 10,
-          '2': 3,
-          '1': 2
+          '5': 0,
+          '4': 0,
+          '3': 0,
+          '2': 0,
+          '1': 0
         },
         hours: []
       } as BusinessDetails;
@@ -80,10 +105,23 @@ export function useBusinessDetails(id: string) {
   });
 }
 
+import { vendorsApi } from '../api/vendors';
+
 export function useBusinessReviews(id: string) {
   return useQuery({
     queryKey: [BUSINESS_REVIEWS_KEY, id],
-    queryFn: () => businessDetailsService.getBusinessReviews(id),
+    queryFn: async () => {
+      try {
+        const response = await vendorsApi.getBusinessReviews(Number(id));
+        // Ensure we return an array. Assuming API returns an array or { results: [] }
+        if (Array.isArray(response)) return response;
+        if (response && Array.isArray(response.results)) return response.results;
+        return [];
+      } catch (err) {
+        console.warn('Failed to fetch real reviews, returning empty', err);
+        return [];
+      }
+    },
     enabled: !!id,
   });
 }
@@ -91,7 +129,10 @@ export function useBusinessReviews(id: string) {
 export function useSimilarBusinesses(id: string) {
   return useQuery({
     queryKey: [SIMILAR_BUSINESSES_KEY, id],
-    queryFn: () => businessDetailsService.getSimilarBusinesses(id),
+    queryFn: async () => {
+      // Return empty array for similar businesses until a real API is available
+      return [];
+    },
     enabled: !!id,
   });
 }

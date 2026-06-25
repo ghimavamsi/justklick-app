@@ -90,7 +90,12 @@ export default function PremiumRegisterScreen() {
 
   const mutation = useMutation({
     mutationFn: () => authApi.sendRegisterOtp(phone, email),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data.success === false) {
+        setError(data.message || 'Account already exists. Please login instead.');
+        return;
+      }
+
       // API call succeeded, navigate to verify OTP screen with all registration data
       const names = fullName.trim().split(' ');
       const firstName = names[0];

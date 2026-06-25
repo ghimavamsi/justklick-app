@@ -3,7 +3,8 @@ import { View, Text, FlatList, TouchableOpacity, ScrollView, Image, Dimensions }
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSearchStore } from '../../../store/search-store';
-import { MOCK_NEARBY_DATA, SUBCATEGORIES, FILTERS, MOCK_SEARCH_BANNERS } from '../../../api/mock/search.mock';
+import { SUBCATEGORIES, FILTERS, MOCK_SEARCH_BANNERS } from '../../../api/mock/search.mock';
+import { useSearchAPI } from '../../../hooks/useSearchAPI';
 import { SearchResultCard } from '../SearchResultCard';
 import { SearchResultSkeleton } from '../SearchResultSkeleton';
 import { FilterSheet } from '../FilterSheet';
@@ -16,17 +17,24 @@ export function ResultsState() {
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
   
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: apiData, isLoading: isApiLoading } = useSearchAPI(query, activeSubcategory);
   const [isFilterSheetVisible, setFilterSheetVisible] = useState(false);
 
-  // Trigger loading state on query or filter changes
+  // Combine API loading with local simulated delay for filter transitions if needed, 
+  // but mostly just rely on isApiLoading
+  const [isFilterLoading, setIsFilterLoading] = useState(false);
+  const isLoading = isApiLoading || isFilterLoading;
+
+  // Trigger loading state on filter changes (mock delay for local sorting/filtering)
   useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000); // 1-second simulated network delay
-    return () => clearTimeout(timer);
-  }, [query, activeSubcategory, activeFilters]);
+    if (!isApiLoading) {
+      setIsFilterLoading(true);
+      const timer = setTimeout(() => {
+        setIsFilterLoading(false);
+      }, 300); 
+      return () => clearTimeout(timer);
+    }
+  }, [activeFilters, isApiLoading]);
 
   const matchingKey = Object.keys(SUBCATEGORIES).find(key => query.toLowerCase().includes(key));
   const availableSubcategories = matchingKey ? SUBCATEGORIES[matchingKey] : [];
@@ -42,21 +50,9 @@ export function ResultsState() {
   };
 
   const filteredData = useMemo(() => {
-    let data = MOCK_NEARBY_DATA;
+    let data = apiData || [];
 
-    if (query) {
-      const q = query.toLowerCase();
-      data = data.filter(b => 
-        b.name.toLowerCase().includes(q) || 
-        b.category.toLowerCase().includes(q) ||
-        b.tags?.some(tag => tag.toLowerCase().includes(q))
-      );
-    }
-
-    if (activeSubcategory) {
-      data = data.filter(b => b.tags?.includes(activeSubcategory));
-    }
-
+    // Local filtering for toggles
     if (activeFilters['top_rated']) {
       data = data.filter(b => b.rating >= 4.5);
     }
@@ -77,7 +73,7 @@ export function ResultsState() {
     }
 
     return data;
-  }, [query, activeSubcategory, activeFilters]);
+  }, [apiData, activeFilters]);
 
   const bannerListRef = useRef<FlatList>(null);
   const [activeBannerIndex, setActiveBannerIndex] = useState(0);
@@ -127,18 +123,8 @@ export function ResultsState() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={{ width, paddingHorizontal: 16 }}>
-              <TouchableOpacity activeOpacity={0.9} className="rounded-2xl overflow-hidden shadow-sm w-full bg-muted" style={{ height: 140 }}>
-                <Image source={{ uri: item.image }} className="w-full h-full" resizeMode="cover" />
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.9)']}
-                  style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', justifyContent: 'flex-end', padding: 16 }}
-                >
-                  <Text className="text-white font-extrabold text-xl shadow-sm">{item.title}</Text>
-                </LinearGradient>
-                
-                <View className="absolute top-3 left-3 bg-black/60 px-2 py-1 rounded border border-white/20">
-                  <Text className="text-white text-[10px] font-bold uppercase tracking-wider">Sponsored</Text>
-                </View>
+              <TouchableOpacity activeOpacity={0.9} className="rounded-2xl overflow-hidden shadow-sm w-full bg-muted" style={{ height: 200 }}>
+                <Image source={{ uri: item.image }} className="w-full h-full" resizeMode="stretch" />
               </TouchableOpacity>
             </View>
           )}

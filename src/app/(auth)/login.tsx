@@ -83,6 +83,10 @@ export default function PremiumLoginScreen() {
   const mutation = useMutation({
     mutationFn: (phoneNumber: string) => authApi.sendLoginOtp(phoneNumber),
     onSuccess: (data) => {
+      if (data.success === false) {
+        setError(data.message || 'Student account not found. Please register.');
+        return;
+      }
       // API call succeeded, navigate to verify OTP screen
       router.push({
         pathname: '/(auth)/verify-otp',
@@ -109,11 +113,12 @@ export default function PremiumLoginScreen() {
       }
 
       // Handle both "access" and "access_token" variations from the backend
-      const accessToken = data.access || data.access_token;
-      const refreshToken = data.refresh || data.refresh_token;
+      console.log('Google Auth Response:', JSON.stringify(data, null, 2));
+      const accessToken = data.access || data.access_token || data?.token?.access || data?.data?.access;
+      const refreshToken = data.refresh || data.refresh_token || data?.token?.refresh || data?.data?.refresh;
 
       if (!accessToken) {
-        setError('Received invalid authentication token from the server.');
+        setError(`Received invalid authentication token from the server. Payload: ${JSON.stringify(data)}`);
         return;
       }
 
@@ -125,9 +130,9 @@ export default function PremiumLoginScreen() {
         id: googleUser.id || 'google_user',
         name: googleUser.name || `${googleUser.givenName || ''} ${googleUser.familyName || ''}`.trim() || 'Google User',
         email: googleUser.email || '',
-        phone: '', // Google Auth usually doesn't provide phone numbers
+        phone: '', // Google Auth usually doesn't provide phone numbers 
       });
-      router.replace('/(tabs)/index' as any); // Force navigate to the Home tab
+      router.replace('/(tabs)');
     },
     onError: (err: any) => {
       console.log('Google Auth API Error:', err?.response?.status, err?.response?.data);

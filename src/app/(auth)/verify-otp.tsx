@@ -92,11 +92,19 @@ export default function PremiumVerifyOTPScreen() {
   const handleOtpChange = (value: string, index: number) => {
     if (error) setError('');
 
-    // Production-ready: Handle pasting a full 6-digit code or auto-fill
-    if (value.length === 6) {
-      const newOtp = value.split('').slice(0, 6);
+    // Handle pasting or auto-fill (value > 1 character)
+    if (value.length > 1) {
+      const digits = value.replace(/\D/g, '').split('').slice(0, 6);
+      const newOtp = [...otp];
+      for (let i = 0; i < digits.length; i++) {
+        newOtp[i] = digits[i];
+      }
       setOtp(newOtp);
-      inputs.current[5]?.focus();
+      
+      const lastIndex = Math.min(digits.length - 1, 5);
+      if (lastIndex >= 0) {
+        inputs.current[lastIndex]?.focus();
+      }
       return;
     }
 
@@ -135,19 +143,36 @@ export default function PremiumVerifyOTPScreen() {
       }
       return authApi.studentLogin(phone, fullOtp);
     },
-    onSuccess: (data: any) => {
-      // Backend might return 200 OK but with success: false in the JSON body
+    onSuccess: (response: any) => {
+      // Both studentLogin and studentRegister return the full Axios response object now
+      const data = response.data;
+      const headers = response.headers;
+
+      console.log('Login OTP Response Data:', JSON.stringify(data, null, 2));
+      console.log('Login OTP Response Headers:', JSON.stringify(headers, null, 2));
+
       if (data.success === false) {
         setError(data.message || 'Login failed on our server. Please try again.');
         return;
       }
 
-      // Handle both "access" and "access_token" variations from the backend
-      const accessToken = data.access || data.access_token;
-      const refreshToken = data.refresh || data.refresh_token;
+      // Check if tokens are in cookies or headers
+      let accessToken = data.access || data.access_token || data?.token?.access || data?.data?.access;
+      let refreshToken = data.refresh || data.refresh_token || data?.token?.refresh || data?.data?.refresh;
+
+      if (!accessToken && headers && headers['set-cookie']) {
+        console.log('Found set-cookie header:', headers['set-cookie']);
+        // Parse access token from cookies if possible (basic approach)
+        const cookies = headers['set-cookie'].join(';');
+        const accessMatch = cookies.match(/access=([^;]+)/);
+        if (accessMatch) accessToken = accessMatch[1];
+        
+        const refreshMatch = cookies.match(/refresh=([^;]+)/);
+        if (refreshMatch) refreshToken = refreshMatch[1];
+      }
 
       if (!accessToken) {
-        setError('Received invalid authentication token from the server.');
+        setError(`Received invalid authentication token from the server. Payload: ${JSON.stringify(data)}`);
         return;
       }
 
@@ -166,7 +191,7 @@ export default function PremiumVerifyOTPScreen() {
       if (type === 'register') {
         router.replace('/(auth)/student-onboarding');
       } else {
-        router.replace('/(tabs)/index' as any); // Force navigate to the Home tab
+        router.replace('/(tabs)');
       }
     },
     onError: (err: any) => {
@@ -257,28 +282,40 @@ export default function PremiumVerifyOTPScreen() {
             </Text>
           </View>
 
-          <View className="w-full bg-muted rounded-[24px] p-6 border border-border/50 mb-6">
+          <View className="w-full bg-muted rounded-[24px] p-6 border border-border/50 mb-6 relative">
             
-            {/* OTP Input Container */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: 8 }}>
+            {/* Hidden Input for Auto-Fill & KeyPress */}
+            <TextInput
+              ref={(ref) => { inputs.current[0] = ref; }}
+              style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 10, color: 'transparent' }}
+              caretHidden={true}
+              keyboardType="number-pad"
+              maxLength={6}
+              textContentType="oneTimeCode"
+              autoComplete="sms-otp"
+              value={otp.join('')}
+              onChangeText={(val) => {
+                const digits = val.replace(/\D/g, '').split('').slice(0, 6);
+                const newOtp = ['', '', '', '', '', ''];
+                for (let i = 0; i < digits.length; i++) {
+                  newOtp[i] = digits[i];
+                }
+                setOtp(newOtp);
+                if (error) setError('');
+              }}
+            />
+
+            {/* OTP Visual Container */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: 8 }} pointerEvents="none">
               {otp.map((digit, index) => (
                 <View 
                   key={index} 
                   style={{ width: '14%', aspectRatio: 0.8 }}
                   className={`rounded-[8px] bg-card border ${digit ? 'border-primary' : 'border-border'} shadow-sm items-center justify-center`}
                 >
-                  <TextInput
-                    ref={(ref) => { inputs.current[index] = ref; }}
-                    className={`w-full h-full text-center text-xl font-black ${digit ? 'text-primary' : 'text-foreground'} pb-1`}
-                    keyboardType="number-pad"
-                    maxLength={6} // Allows pasting full code
-                    textContentType="oneTimeCode" // iOS Auto-fill
-                    autoComplete="sms-otp" // Android Auto-fill
-                    value={digit}
-                    onChangeText={(val) => handleOtpChange(val, index)}
-                    onKeyPress={(e) => handleKeyPress(e, index)}
-                    selectTextOnFocus
-                  />
+                  <Text className={`text-center text-xl font-black ${digit ? 'text-primary' : 'text-foreground'}`}>
+                    {digit}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -296,7 +333,14 @@ export default function PremiumVerifyOTPScreen() {
             {timer > 0 ? (
               <Text className="text-[13px] font-bold text-muted-foreground tracking-wide">Wait {timer}s</Text>
             ) : (
-              <TouchableOpacity onPress={() => setTimer(30)} activeOpacity={0.7}>
+              <TouchableOpacity onPress={async () => {
+                setTimer(30);
+                try {
+                  await authApi.resendOtp(phone, email);
+                } catch (e) {
+                  setError('Failed to resend OTP');
+                }
+              }} activeOpacity={0.7}>
                 <Text className="text-[13px] font-bold text-[#c10007] tracking-wide">Resend OTP</Text>
               </TouchableOpacity>
             )}

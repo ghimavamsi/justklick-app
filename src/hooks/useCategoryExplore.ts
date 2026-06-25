@@ -42,7 +42,7 @@ const mapToExploreCategory = (c: any, index: number): ExploreCategory => {
     color: '#1C398E',
     bgColor: 'rgba(28, 57, 142, 0.1)',
     gradientColors: gradients[index % gradients.length],
-    businessCount: Math.floor(Math.random() * 500) + 50, // mock count for now
+    businessCount: c?.business_count || 0, // Using real data
     isPopular: index % 3 === 0,
     isTrending: index % 4 === 0,
     cardSize: sizes[index % sizes.length],

@@ -2,11 +2,10 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSearchStore } from '../../../store/search-store';
-import { SEARCH_SUGGESTIONS } from '../../../api/mock/search.mock';
 import { useTheme } from '../../../hooks/useTheme';
 
 export function TypingState() {
-  const { query, setQuery, setPhase, setIsFocused } = useSearchStore();
+  const { query, setQuery, setPhase, setIsFocused, recentSearches } = useSearchStore();
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
 
@@ -25,8 +24,10 @@ export function TypingState() {
     }
   };
 
-  // Basic mock filtering based on query
-  const suggestions = SEARCH_SUGGESTIONS.filter(s => s.text.toLowerCase().includes(query.toLowerCase()));
+  // Only show recent searches that match the current query
+  const suggestions = recentSearches
+    .filter(s => s.toLowerCase().includes(query.toLowerCase()))
+    .map((s, index) => ({ id: `recent-${index}`, text: s, type: 'query' }));
 
   return (
     <ScrollView 

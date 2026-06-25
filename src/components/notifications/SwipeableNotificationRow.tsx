@@ -24,7 +24,7 @@ export function SwipeableNotificationRow({ notification, onPress }: SwipeableNot
 
     return (
       <View className="flex-row items-center w-32 justify-end">
-        {!notification.isRead && (
+        {!notification.is_read && (
           <TouchableOpacity 
             onPress={() => markAsRead(notification.id)}
             className="w-16 h-full items-center justify-center bg-blue-500"

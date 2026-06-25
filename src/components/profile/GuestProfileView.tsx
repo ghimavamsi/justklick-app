@@ -62,7 +62,7 @@ export function GuestProfileView({ onLoginPress, onExplorePress }: GuestProfileV
         <View className="bg-card rounded-[24px] border border-border shadow-sm overflow-hidden">
           <QuickLink icon="compass-outline" title="Explore Categories" onPress={onExplorePress} />
           <QuickLink icon="information-circle-outline" title="About JustKlick" onPress={() => {}} />
-          <QuickLink icon="help-buoy-outline" title="Contact Support" onPress={() => {}} />
+          <QuickLink icon="help-buoy-outline" title="Contact Support" onPress={() => router.push('/contact' as any)} />
           <QuickLink icon="document-text-outline" title="Privacy Policy" onPress={() => router.push('/privacy-policy')} />
           <QuickLink icon="shield-checkmark-outline" title="Terms of Use" onPress={() => router.push('/terms-of-use')} />
           <QuickLink icon="share-social-outline" title="Share App" isLast onPress={() => {}} />
