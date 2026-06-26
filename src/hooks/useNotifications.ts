@@ -7,6 +7,8 @@ import { useAuthStore } from '../store/auth-store';
 export const NOTIFICATIONS_KEY = (category: string, query: string) => ['notifications', category, query];
 
 export function useNotificationsList(category: NotificationCategory, query: string) {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   return useQuery<NotificationsData>({
     queryKey: NOTIFICATIONS_KEY(category, query),
     queryFn: async () => {
@@ -54,8 +56,13 @@ export function useNotificationsList(category: NotificationCategory, query: stri
           },
           notifications,
         };
-      } catch (e) {
-        console.error('Failed to fetch real notifications', e);
+      } catch (e: any) {
+        // Suppress logging if it's the known backend ExpiredSignatureError
+        const errorText = typeof e.response?.data === 'string' ? e.response?.data : JSON.stringify(e.response?.data || '');
+        if (!(e.response?.status === 500 && errorText.includes('ExpiredSignatureError'))) {
+          console.error('Failed to fetch real notifications', e);
+        }
+        
         // Return empty state instead of mock data for production
         return {
           summary: { unreadCount: 0, insightText: 'Failed to load notifications.' },
@@ -63,7 +70,7 @@ export function useNotificationsList(category: NotificationCategory, query: stri
         };
       }
     },
-    enabled: useAuthStore.getState().isAuthenticated,
+    enabled: isAuthenticated,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

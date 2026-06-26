@@ -1,1 +1,3262 @@
-{"openapi": "3.1.0", "info": {"title": "NinjaAPI", "version": "1.0.0", "description": ""}, "paths": {"/api/google-auth": {"post": {"operationId": "apps_accounts_api_google_auth_verify", "summary": "Google Auth Verify", "parameters": [], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AuthTokenOut"}}}}}, "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/GoogleAuthIn"}}}, "required": true}}}, "/api/register/send-otp": {"post": {"operationId": "apps_accounts_api_register_send_otp", "summary": "Register Send Otp", "parameters": [], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MessageOut"}}}}}, "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/SendOTPIn"}}}, "required": true}}}, "/api/register/verify-otp": {"post": {"operationId": "apps_accounts_api_register_verify_otp", "summary": "Register Verify Otp", "parameters": [], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MessageOut"}}}}}, "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/VerifyOTPIn"}}}, "required": true}}}, "/api/login/send-otp": {"post": {"operationId": "apps_accounts_api_login_send_otp", "summary": "Login Send Otp", "parameters": [], "responses": {"200": {"description": "OK"}}, "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/SendOTPIn"}}}, "required": true}}}, "/api/login/verify-otp": {"post": {"operationId": "apps_accounts_api_login_verify_otp", "summary": "Login Verify Otp", "parameters": [], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MessageOut"}}}}}, "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/VerifyOTPIn"}}}, "required": true}}}, "/api/resend-otp": {"post": {"operationId": "apps_accounts_api_resend_otp_view", "summary": "Resend Otp View", "parameters": [], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MessageOut"}}}}}, "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/SendOTPIn"}}}, "required": true}}}, "/api/send-email-login-otp": {"post": {"operationId": "apps_accounts_api_send_email_login_otp", "summary": "Send Email Login Otp", "parameters": [{"in": "query", "name": "email", "schema": {"title": "Email", "type": "string"}, "required": true}], "responses": {"200": {"description": "OK"}}}}, "/api/student-register": {"post": {"operationId": "apps_accounts_api_register", "summary": "Register", "parameters": [{"in": "query", "name": "first_name", "schema": {"title": "First Name", "type": "string"}, "required": true}, {"in": "query", "name": "last_name", "schema": {"title": "Last Name", "type": "string"}, "required": true}, {"in": "query", "name": "email", "schema": {"title": "Email", "type": "string"}, "required": true}, {"in": "query", "name": "phone", "schema": {"title": "Phone", "type": "string"}, "required": true}, {"in": "query", "name": "otp", "schema": {"title": "Otp", "type": "string"}, "required": true}], "responses": {"200": {"description": "OK"}}}, "get": {"operationId": "apps_accounts_api_student_register_page", "summary": "Student Register Page", "parameters": [], "responses": {"200": {"description": "OK"}}}}, "/api/student-login": {"post": {"operationId": "apps_accounts_api_login", "summary": "Login", "parameters": [{"in": "query", "name": "phone", "schema": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Phone"}, "required": false}, {"in": "query", "name": "email", "schema": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Email"}, "required": false}, {"in": "query", "name": "otp", "schema": {"default": "", "title": "Otp", "type": "string"}, "required": false}], "responses": {"200": {"description": "OK"}}}, "get": {"operationId": "apps_accounts_api_student_login_page", "summary": "Student Login Page", "parameters": [], "responses": {"200": {"description": "OK"}}}}, "/api/dashboard": {"get": {"operationId": "apps_accounts_api_dashboard", "summary": "Dashboard", "parameters": [], "responses": {"200": {"description": "OK"}}}}, "/api/student-onboarding": {"post": {"operationId": "apps_accounts_api_student_onboarding", "summary": "Student Onboarding", "parameters": [], "responses": {"200": {"description": "OK"}}, "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/StudentOnboardingSchema"}}}, "required": true}, "security": [{"CustomJWTAuth": []}]}}, "/api/student-profile": {"get": {"operationId": "apps_accounts_api_student_profile", "summary": "Student Profile", "parameters": [], "responses": {"200": {"description": "OK"}}, "security": [{"CustomJWTAuth": []}]}}, "/api/student-profile-update": {"put": {"operationId": "apps_accounts_api_update_student_profile", "summary": "Update Student Profile", "parameters": [], "responses": {"200": {"description": "OK"}}, "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/StudentProfileUpdateSchema"}}}, "required": true}, "security": [{"CustomJWTAuth": []}]}}, "/api/submit-lead": {"post": {"operationId": "apps_accounts_api_submit_lead", "summary": "Submit Lead", "parameters": [], "responses": {"200": {"description": "OK"}}, "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/LeadSchema"}}}, "required": true}}}, "/api/student-logout": {"post": {"operationId": "apps_accounts_api_student_logout", "summary": "Student Logout", "parameters": [], "responses": {"200": {"description": "OK"}}, "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/LogoutSchema"}}}, "required": true}, "security": [{"CustomJWTAuth": []}]}}, "/api/advertisements/active/": {"get": {"operationId": "apps_advertisements_api_list_active_advertisements", "summary": "List Active Advertisements", "parameters": [], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"items": {"$ref": "#/components/schemas/AdvertisementOut"}, "title": "Response", "type": "array"}}}}}, "description": "Retrieve all active advertisements (where plan is valid and not expired).", "tags": ["Advertisements"]}}, "/api/notifications/save-device-token": {"post": {"operationId": "apps_notifications_api_save_device_token", "summary": "Save Device Token", "parameters": [], "responses": {"200": {"description": "OK"}}, "description": "Save or update the FCM device token for the logged-in user.\nRequired field in .env  : (none \u2014 uses firebase-service-account.json)\nRequired in settings.py : FCM_DJANGO_SETTINGS", "tags": ["Notifications"], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeviceTokenSchema"}}}, "required": true}}}, "/api/notifications/send-login-push": {"post": {"operationId": "apps_notifications_api_send_login_push", "summary": "Send Login Push", "parameters": [], "responses": {"200": {"description": "OK"}}, "description": "Send a login success push notification to the current user.", "tags": ["Notifications"]}}, "/api/notifications/send": {"post": {"operationId": "apps_notifications_api_send_notification", "summary": "Send Notification", "parameters": [], "responses": {"200": {"description": "OK"}}, "description": "Send a notification to a specific user by user_id.\nSaves the notification to the DB and sends a FCM push notification.\n\nRequired IDs / keys (add to .env):\n  - Firebase service account JSON file at  credentials/firebase-service-account.json\n  - FCM_DJANGO_SETTINGS block in settings.py  (see settings note below)", "tags": ["Notifications"], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/SendNotificationSchema"}}}, "required": true}}}, "/api/notifications/list": {"get": {"operationId": "apps_notifications_api_list_notifications", "summary": "List Notifications", "parameters": [], "responses": {"200": {"description": "OK"}}, "description": "Returns all notifications for the currently authenticated user,\nnewest first.", "tags": ["Notifications"]}}, "/api/notifications/{notification_id}/mark-read": {"patch": {"operationId": "apps_notifications_api_mark_notification_read", "summary": "Mark Notification Read", "parameters": [{"in": "path", "name": "notification_id", "schema": {"title": "Notification Id", "type": "integer"}, "required": true}], "responses": {"200": {"description": "OK"}}, "description": "Mark a specific notification as read for the logged-in user.", "tags": ["Notifications"]}}, "/api/notifications/mark-all-read": {"patch": {"operationId": "apps_notifications_api_mark_all_notifications_read", "summary": "Mark All Notifications Read", "parameters": [], "responses": {"200": {"description": "OK"}}, "description": "Bulk mark all notifications as read for the logged-in user.", "tags": ["Notifications"]}}, "/api/categories/": {"get": {"operationId": "apps_categories_api_list_categories", "summary": "List Categories", "parameters": [], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"items": {"$ref": "#/components/schemas/CategorySchema"}, "title": "Response", "type": "array"}}}}}}}, "/api/businesses/": {"get": {"operationId": "apps_businesses_api_list_businesses", "summary": "List Businesses", "parameters": [{"in": "query", "name": "search", "schema": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Search"}, "required": false}, {"in": "query", "name": "location", "schema": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Location"}, "required": false}, {"in": "query", "name": "lat", "schema": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Lat"}, "required": false}, {"in": "query", "name": "lng", "schema": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Lng"}, "required": false}], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"items": {"$ref": "#/components/schemas/BusinessListSchema"}, "title": "Response", "type": "array"}}}}}}}, "/api/businesses/locations/search/": {"get": {"operationId": "apps_businesses_api_search_locations", "summary": "Search Locations", "parameters": [{"in": "query", "name": "q", "schema": {"title": "Q", "type": "string"}, "required": true}], "responses": {"200": {"description": "OK"}}}}, "/api/businesses/{slug}/": {"get": {"operationId": "apps_businesses_api_get_business", "summary": "Get Business", "parameters": [{"in": "path", "name": "slug", "schema": {"title": "Slug", "type": "string"}, "required": true}], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BusinessDetailSchema"}}}}}}}, "/api/vendors/reviews": {"post": {"operationId": "apps_vendors_api_create_review", "summary": "Create Review", "parameters": [], "responses": {"200": {"description": "OK"}}, "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateReviewSchema"}}}, "required": true}, "security": [{"CustomJWTAuth": []}]}}, "/api/vendors/business/{business_id}/reviews": {"get": {"operationId": "apps_vendors_api_business_reviews", "summary": "Business Reviews", "parameters": [{"in": "path", "name": "business_id", "schema": {"title": "Business Id", "type": "integer"}, "required": true}], "responses": {"200": {"description": "OK"}}}}, "/api/dynamic/why-choose-us/": {"get": {"operationId": "apps_dynamic_api_why_choose_us_list", "summary": "Why Choose Us List", "parameters": [], "responses": {"200": {"description": "OK"}}, "tags": ["Sections"]}}, "/api/dynamic/faqs/": {"get": {"operationId": "apps_dynamic_api_faq_list", "summary": "Faq List", "parameters": [], "responses": {"200": {"description": "OK"}}, "tags": ["Sections"]}}, "/api/dynamic/about": {"get": {"operationId": "apps_dynamic_api_homepage", "summary": "Homepage", "parameters": [], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HomePageSchema"}}}}}, "tags": ["Sections"]}}, "/api/dynamic/contact-page": {"get": {"operationId": "apps_dynamic_api_contact_page", "summary": "Contact Page", "parameters": [], "responses": {"200": {"description": "OK"}}, "tags": ["Sections"]}}, "/api/dynamic/contact-submit": {"post": {"operationId": "apps_dynamic_api_contact_submit", "summary": "Contact Submit", "parameters": [], "responses": {"200": {"description": "OK"}}, "tags": ["Sections"], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ContactEnquirySchema"}}}, "required": true}}}, "/api/dynamic/contact-enquiries": {"get": {"operationId": "apps_dynamic_api_contact_enquiries", "summary": "Contact Enquiries", "parameters": [], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"items": {"$ref": "#/components/schemas/ContactEnquiryResponseSchema"}, "title": "Response", "type": "array"}}}}}, "tags": ["Sections"]}}, "/api/dynamic/tourist-places/": {"get": {"operationId": "apps_dynamic_api_tourist_places", "summary": "Tourist Places", "parameters": [], "responses": {"200": {"description": "OK", "content": {"application/json": {"schema": {"items": {"$ref": "#/components/schemas/TouristPlaceSchema"}, "title": "Response", "type": "array"}}}}}, "tags": ["Sections"]}}}, "components": {"schemas": {"AuthTokenOut": {"properties": {"success": {"title": "Success", "type": "boolean"}, "status": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Status"}, "access": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Access"}, "refresh": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Refresh"}, "message": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Message"}}, "required": ["success"], "title": "AuthTokenOut", "type": "object"}, "GoogleAuthIn": {"properties": {"id_token": {"title": "Id Token", "type": "string"}}, "required": ["id_token"], "title": "GoogleAuthIn", "type": "object"}, "MessageOut": {"properties": {"success": {"title": "Success", "type": "boolean"}, "message": {"title": "Message", "type": "string"}}, "required": ["success", "message"], "title": "MessageOut", "type": "object"}, "SendOTPIn": {"properties": {"phone": {"title": "Phone", "type": "string"}, "email": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Email"}}, "required": ["phone"], "title": "SendOTPIn", "type": "object"}, "VerifyOTPIn": {"properties": {"phone": {"title": "Phone", "type": "string"}, "otp": {"title": "Otp", "type": "string"}}, "required": ["phone", "otp"], "title": "VerifyOTPIn", "type": "object"}, "StudentOnboardingSchema": {"properties": {"father_name": {"title": "Father Name", "type": "string"}, "college_code": {"title": "College Code", "type": "string"}, "course": {"title": "Course", "type": "string"}, "academic_year": {"title": "Academic Year", "type": "string"}, "year_of_study": {"title": "Year Of Study", "type": "string"}, "cgpa_percentage": {"title": "Cgpa Percentage", "type": "string"}, "course_reason": {"items": {"type": "string"}, "title": "Course Reason", "type": "array"}, "area_of_interest": {"items": {"type": "string"}, "title": "Area Of Interest", "type": "array"}, "skills_to_develop": {"items": {"type": "string"}, "title": "Skills To Develop", "type": "array"}, "plan_after_graduation": {"title": "Plan After Graduation", "type": "string"}, "interested_abroad": {"title": "Interested Abroad", "type": "boolean"}, "preferred_country": {"default": "", "title": "Preferred Country", "type": "string"}, "career_goal": {"title": "Career Goal", "type": "string"}, "internship_completed": {"title": "Internship Completed", "type": "boolean"}, "interested_in_internship": {"title": "Interested In Internship", "type": "boolean"}, "certifications": {"title": "Certifications", "type": "boolean"}}, "required": ["father_name", "college_code", "course", "academic_year", "year_of_study", "cgpa_percentage", "course_reason", "area_of_interest", "skills_to_develop", "plan_after_graduation", "interested_abroad", "career_goal", "internship_completed", "interested_in_internship", "certifications"], "title": "StudentOnboardingSchema", "type": "object"}, "StudentProfileUpdateSchema": {"properties": {"father_name": {"title": "Father Name", "type": "string"}, "college_code": {"title": "College Code", "type": "string"}, "dept_course": {"title": "Dept Course", "type": "string"}, "academic_year": {"title": "Academic Year", "type": "string"}, "year_of_study": {"title": "Year Of Study", "type": "string"}, "cgpa_percentage": {"title": "Cgpa Percentage", "type": "string"}, "course_reason": {"items": {"type": "string"}, "title": "Course Reason", "type": "array"}, "area_of_interest": {"items": {"type": "string"}, "title": "Area Of Interest", "type": "array"}, "skills_to_develop": {"items": {"type": "string"}, "title": "Skills To Develop", "type": "array"}, "plan_after_graduation": {"title": "Plan After Graduation", "type": "string"}, "interested_abroad": {"title": "Interested Abroad", "type": "string"}, "preferred_country": {"default": "", "title": "Preferred Country", "type": "string"}, "career_goal": {"title": "Career Goal", "type": "string"}, "internship_completed": {"title": "Internship Completed", "type": "boolean"}, "interested_in_internship": {"title": "Interested In Internship", "type": "boolean"}, "certifications": {"title": "Certifications", "type": "boolean"}}, "required": ["father_name", "college_code", "dept_course", "academic_year", "year_of_study", "cgpa_percentage", "course_reason", "area_of_interest", "skills_to_develop", "plan_after_graduation", "interested_abroad", "career_goal", "internship_completed", "interested_in_internship", "certifications"], "title": "StudentProfileUpdateSchema", "type": "object"}, "LeadSchema": {"properties": {"business_id": {"title": "Business Id", "type": "integer"}, "name": {"title": "Name", "type": "string"}, "email": {"title": "Email", "type": "string"}, "phone": {"title": "Phone", "type": "string"}, "subject": {"title": "Subject", "type": "string"}, "message": {"title": "Message", "type": "string"}}, "required": ["business_id", "name", "email", "phone", "subject", "message"], "title": "LeadSchema", "type": "object"}, "LogoutSchema": {"properties": {"refresh_token": {"title": "Refresh Token", "type": "string"}}, "required": ["refresh_token"], "title": "LogoutSchema", "type": "object"}, "AdvertisementOut": {"properties": {"id": {"title": "Id", "type": "integer"}, "image": {"title": "Image", "type": "string"}, "redirect_url": {"title": "Redirect Url", "type": "string"}, "created_at": {"format": "date-time", "title": "Created At", "type": "string"}}, "required": ["id", "image", "redirect_url", "created_at"], "title": "AdvertisementOut", "type": "object"}, "DeviceTokenSchema": {"properties": {"token": {"title": "Token", "type": "string"}, "type": {"default": "web", "title": "Type", "type": "string"}}, "required": ["token"], "title": "DeviceTokenSchema", "type": "object"}, "SendNotificationSchema": {"properties": {"user_id": {"title": "User Id", "type": "integer"}, "title": {"title": "Title", "type": "string"}, "message": {"title": "Message", "type": "string"}, "data": {"anyOf": [{"additionalProperties": true, "type": "object"}, {"type": "null"}], "title": "Data"}}, "required": ["user_id", "title", "message"], "title": "SendNotificationSchema", "type": "object"}, "CategoryFieldSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "label": {"title": "Label", "type": "string"}, "field_key": {"title": "Field Key", "type": "string"}, "field_type": {"title": "Field Type", "type": "string"}, "is_required": {"title": "Is Required", "type": "boolean"}, "order": {"title": "Order", "type": "integer"}}, "required": ["id", "label", "field_key", "field_type", "is_required", "order"], "title": "CategoryFieldSchema", "type": "object"}, "CategorySchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "name": {"title": "Name", "type": "string"}, "slug": {"title": "Slug", "type": "string"}, "image": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Image"}, "is_active": {"title": "Is Active", "type": "boolean"}, "fields": {"default": [], "items": {"$ref": "#/components/schemas/CategoryFieldSchema"}, "title": "Fields", "type": "array"}}, "required": ["id", "name", "slug", "is_active"], "title": "CategorySchema", "type": "object"}, "BusinessImageSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "image": {"title": "Image", "type": "string"}}, "required": ["id", "image"], "title": "BusinessImageSchema", "type": "object"}, "BusinessListSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "company_name": {"title": "Company Name", "type": "string"}, "slug": {"title": "Slug", "type": "string"}, "category": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Category"}, "location": {"title": "Location", "type": "string"}, "phone": {"title": "Phone", "type": "string"}, "status": {"title": "Status", "type": "string"}, "latitude": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Latitude"}, "longitude": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Longitude"}, "images": {"default": [], "items": {"$ref": "#/components/schemas/BusinessImageSchema"}, "title": "Images", "type": "array"}}, "required": ["id", "company_name", "slug", "location", "phone", "status"], "title": "BusinessListSchema", "type": "object"}, "BusinessDetailSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "company_name": {"title": "Company Name", "type": "string"}, "slug": {"title": "Slug", "type": "string"}, "category": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Category"}, "location": {"title": "Location", "type": "string"}, "address": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Address"}, "email": {"title": "Email", "type": "string"}, "phone": {"title": "Phone", "type": "string"}, "whatsapp": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Whatsapp"}, "website": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Website"}, "description": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Description"}, "status": {"title": "Status", "type": "string"}, "latitude": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Latitude"}, "longitude": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Longitude"}, "images": {"default": [], "items": {"$ref": "#/components/schemas/BusinessImageSchema"}, "title": "Images", "type": "array"}, "field_values": {"default": [], "items": {"$ref": "#/components/schemas/FieldValueSchema"}, "title": "Field Values", "type": "array"}}, "required": ["id", "company_name", "slug", "location", "email", "phone", "status"], "title": "BusinessDetailSchema", "type": "object"}, "FieldValueSchema": {"properties": {"label": {"title": "Label", "type": "string"}, "field_key": {"title": "Field Key", "type": "string"}, "field_type": {"title": "Field Type", "type": "string"}, "value": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Value"}}, "required": ["label", "field_key", "field_type"], "title": "FieldValueSchema", "type": "object"}, "CreateReviewSchema": {"properties": {"business_id": {"title": "Business Id", "type": "integer"}, "rating": {"title": "Rating", "type": "integer"}, "review": {"title": "Review", "type": "string"}}, "required": ["business_id", "rating", "review"], "title": "CreateReviewSchema", "type": "object"}, "AboutSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "section_tag": {"title": "Section Tag", "type": "string"}, "main_title": {"title": "Main Title", "type": "string"}, "main_description": {"title": "Main Description", "type": "string"}, "button_text": {"title": "Button Text", "type": "string"}, "button_link": {"title": "Button Link", "type": "string"}, "about_image": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "About Image"}, "top_badge_text": {"title": "Top Badge Text", "type": "string"}, "trust_card_title": {"title": "Trust Card Title", "type": "string"}, "trust_card_subtitle": {"title": "Trust Card Subtitle", "type": "string"}, "visitors_icon": {"title": "Visitors Icon", "type": "string"}, "visitors_count": {"title": "Visitors Count", "type": "string"}, "visitors_label": {"title": "Visitors Label", "type": "string"}, "students_icon": {"title": "Students Icon", "type": "string"}, "students_count": {"title": "Students Count", "type": "string"}, "students_label": {"title": "Students Label", "type": "string"}, "businesses_icon": {"title": "Businesses Icon", "type": "string"}, "businesses_count": {"title": "Businesses Count", "type": "string"}, "businesses_label": {"title": "Businesses Label", "type": "string"}, "feature_one_icon": {"title": "Feature One Icon", "type": "string"}, "feature_one_title": {"title": "Feature One Title", "type": "string"}, "feature_two_icon": {"title": "Feature Two Icon", "type": "string"}, "feature_two_title": {"title": "Feature Two Title", "type": "string"}, "feature_three_icon": {"title": "Feature Three Icon", "type": "string"}, "feature_three_title": {"title": "Feature Three Title", "type": "string"}, "mission_icon": {"title": "Mission Icon", "type": "string"}, "mission_title": {"title": "Mission Title", "type": "string"}, "mission_description": {"title": "Mission Description", "type": "string"}, "is_active": {"title": "Is Active", "type": "boolean"}}, "required": ["id", "section_tag", "main_title", "main_description", "button_text", "button_link", "top_badge_text", "trust_card_title", "trust_card_subtitle", "visitors_icon", "visitors_count", "visitors_label", "students_icon", "students_count", "students_label", "businesses_icon", "businesses_count", "businesses_label", "feature_one_icon", "feature_one_title", "feature_two_icon", "feature_two_title", "feature_three_icon", "feature_three_title", "mission_icon", "mission_title", "mission_description", "is_active"], "title": "AboutSchema", "type": "object"}, "BulkPartnerSectionSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "section_name": {"title": "Section Name", "type": "string"}, "title": {"title": "Title", "type": "string"}, "description": {"title": "Description", "type": "string"}, "is_active": {"title": "Is Active", "type": "boolean"}, "images": {"default": [], "items": {"$ref": "#/components/schemas/PartnerImageSchema"}, "title": "Images", "type": "array"}}, "required": ["id", "section_name", "title", "description", "is_active"], "title": "BulkPartnerSectionSchema", "type": "object"}, "HomePageSchema": {"properties": {"about": {"anyOf": [{"$ref": "#/components/schemas/AboutSchema"}, {"type": "null"}]}, "promise": {"anyOf": [{"$ref": "#/components/schemas/PromiseSectionSchema"}, {"type": "null"}]}, "partners": {"items": {"$ref": "#/components/schemas/BulkPartnerSectionSchema"}, "title": "Partners", "type": "array"}, "team": {"items": {"$ref": "#/components/schemas/TeamSectionSchema"}, "title": "Team", "type": "array"}, "services": {"items": {"$ref": "#/components/schemas/ServiceSectionSchema"}, "title": "Services", "type": "array"}, "why_choose_us": {"items": {"$ref": "#/components/schemas/WhyChooseUsSchema"}, "title": "Why Choose Us", "type": "array"}}, "required": ["partners", "team", "services", "why_choose_us"], "title": "HomePageSchema", "type": "object"}, "PartnerImageSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "image": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Image"}}, "required": ["id"], "title": "PartnerImageSchema", "type": "object"}, "PopularServiceItemSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "name": {"title": "Name", "type": "string"}, "link": {"title": "Link", "type": "string"}, "display_order": {"title": "Display Order", "type": "integer"}, "is_active": {"title": "Is Active", "type": "boolean"}}, "required": ["id", "name", "link", "display_order", "is_active"], "title": "PopularServiceItemSchema", "type": "object"}, "PopularServiceSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "service_name": {"title": "Service Name", "type": "string"}}, "required": ["id", "service_name"], "title": "PopularServiceSchema", "type": "object"}, "PromiseCardSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "icon": {"title": "Icon", "type": "string"}, "title": {"title": "Title", "type": "string"}, "description": {"title": "Description", "type": "string"}, "display_order": {"title": "Display Order", "type": "integer"}, "is_active": {"title": "Is Active", "type": "boolean"}}, "required": ["id", "icon", "title", "description", "display_order", "is_active"], "title": "PromiseCardSchema", "type": "object"}, "PromiseSectionSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "section_name": {"title": "Section Name", "type": "string"}, "title": {"title": "Title", "type": "string"}, "description": {"title": "Description", "type": "string"}, "is_active": {"title": "Is Active", "type": "boolean"}, "cards": {"default": [], "items": {"$ref": "#/components/schemas/PromiseCardSchema"}, "title": "Cards", "type": "array"}}, "required": ["id", "section_name", "title", "description", "is_active"], "title": "PromiseSectionSchema", "type": "object"}, "ServiceSectionSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "section_title": {"title": "Section Title", "type": "string"}, "title": {"title": "Title", "type": "string"}, "description": {"title": "Description", "type": "string"}, "is_active": {"title": "Is Active", "type": "boolean"}, "items": {"default": [], "items": {"$ref": "#/components/schemas/PopularServiceItemSchema"}, "title": "Items", "type": "array"}}, "required": ["id", "section_title", "title", "description", "is_active"], "title": "ServiceSectionSchema", "type": "object"}, "TeamSectionSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "section_name": {"title": "Section Name", "type": "string"}, "title": {"title": "Title", "type": "string"}, "description": {"title": "Description", "type": "string"}, "image": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Image"}, "name": {"title": "Name", "type": "string"}, "role": {"title": "Role", "type": "string"}, "member_description": {"title": "Member Description", "type": "string"}, "is_active": {"title": "Is Active", "type": "boolean"}}, "required": ["id", "section_name", "title", "description", "name", "role", "member_description", "is_active"], "title": "TeamSectionSchema", "type": "object"}, "ValueItemSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "image": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Image"}, "title": {"title": "Title", "type": "string"}, "description": {"title": "Description", "type": "string"}}, "required": ["id", "title", "description"], "title": "ValueItemSchema", "type": "object"}, "WhyChooseUsCounterSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "count": {"title": "Count", "type": "integer"}, "label": {"title": "Label", "type": "string"}}, "required": ["id", "count", "label"], "title": "WhyChooseUsCounterSchema", "type": "object"}, "WhyChooseUsSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "section_name": {"title": "Section Name", "type": "string"}, "title": {"title": "Title", "type": "string"}, "description": {"title": "Description", "type": "string"}, "mission_icon": {"title": "Mission Icon", "type": "string"}, "mission_title": {"title": "Mission Title", "type": "string"}, "mission_description": {"title": "Mission Description", "type": "string"}, "second_section_name": {"title": "Second Section Name", "type": "string"}, "second_title": {"title": "Second Title", "type": "string"}, "second_description": {"title": "Second Description", "type": "string"}, "is_active": {"title": "Is Active", "type": "boolean"}, "services": {"default": [], "items": {"$ref": "#/components/schemas/PopularServiceSchema"}, "title": "Services", "type": "array"}, "values": {"default": [], "items": {"$ref": "#/components/schemas/ValueItemSchema"}, "title": "Values", "type": "array"}, "counters": {"default": [], "items": {"$ref": "#/components/schemas/WhyChooseUsCounterSchema"}, "title": "Counters", "type": "array"}}, "required": ["id", "section_name", "title", "description", "mission_icon", "mission_title", "mission_description", "second_section_name", "second_title", "second_description", "is_active"], "title": "WhyChooseUsSchema", "type": "object"}, "ContactEnquirySchema": {"properties": {"full_name": {"title": "Full Name", "type": "string"}, "email": {"title": "Email", "type": "string"}, "phone": {"title": "Phone", "type": "string"}, "subject": {"title": "Subject", "type": "string"}, "message": {"title": "Message", "type": "string"}}, "required": ["full_name", "email", "phone", "subject", "message"], "title": "ContactEnquirySchema", "type": "object"}, "ContactEnquiryResponseSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "full_name": {"title": "Full Name", "type": "string"}, "email": {"title": "Email", "type": "string"}, "phone": {"title": "Phone", "type": "string"}, "subject": {"title": "Subject", "type": "string"}, "message": {"title": "Message", "type": "string"}}, "required": ["id", "full_name", "email", "phone", "subject", "message"], "title": "ContactEnquiryResponseSchema", "type": "object"}, "TouristPlaceSchema": {"properties": {"id": {"title": "Id", "type": "integer"}, "title": {"title": "Title", "type": "string"}, "location": {"title": "Location", "type": "string"}, "description": {"title": "Description", "type": "string"}, "rating": {"title": "Rating", "type": "number"}, "image": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Image"}}, "required": ["id", "title", "location", "description", "rating", "image"], "title": "TouristPlaceSchema", "type": "object"}}, "securitySchemes": {"CustomJWTAuth": {"type": "http", "scheme": "bearer"}}}, "servers": []}
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NinjaAPI",
+    "version": "1.0.0",
+    "description": ""
+  },
+  "paths": {
+    "/api/google-auth": {
+      "post": {
+        "operationId": "apps_accounts_api_google_auth_verify",
+        "summary": "Google Auth Verify",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokenOut"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleAuthIn"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/register/send-otp": {
+      "post": {
+        "operationId": "apps_accounts_api_register_send_otp",
+        "summary": "Register Send Otp",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOut"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendOTPIn"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/register/verify-otp": {
+      "post": {
+        "operationId": "apps_accounts_api_register_verify_otp",
+        "summary": "Register Verify Otp",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOut"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOTPIn"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/login/send-otp": {
+      "post": {
+        "operationId": "apps_accounts_api_login_send_otp",
+        "summary": "Login Send Otp",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendOTPIn"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/login/verify-otp": {
+      "post": {
+        "operationId": "apps_accounts_api_login_verify_otp",
+        "summary": "Login Verify Otp",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOut"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOTPIn"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/resend-otp": {
+      "post": {
+        "operationId": "apps_accounts_api_resend_otp_view",
+        "summary": "Resend Otp View",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOut"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendOTPIn"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/send-email-login-otp": {
+      "post": {
+        "operationId": "apps_accounts_api_send_email_login_otp",
+        "summary": "Send Email Login Otp",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "schema": {
+              "title": "Email",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/student-register": {
+      "post": {
+        "operationId": "apps_accounts_api_register",
+        "summary": "Register",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "first_name",
+            "schema": {
+              "title": "First Name",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "last_name",
+            "schema": {
+              "title": "Last Name",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "email",
+            "schema": {
+              "title": "Email",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "phone",
+            "schema": {
+              "title": "Phone",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "otp",
+            "schema": {
+              "title": "Otp",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "operationId": "apps_accounts_api_student_register_page",
+        "summary": "Student Register Page",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/student-login": {
+      "post": {
+        "operationId": "apps_accounts_api_login",
+        "summary": "Login",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "phone",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Phone"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "email",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Email"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "otp",
+            "schema": {
+              "default": "",
+              "title": "Otp",
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "operationId": "apps_accounts_api_student_login_page",
+        "summary": "Student Login Page",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "operationId": "apps_accounts_api_dashboard",
+        "summary": "Dashboard",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/student-login-redirect": {
+      "get": {
+        "operationId": "apps_accounts_api_student_redirect",
+        "summary": "Student Redirect",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/student-onboarding": {
+      "post": {
+        "operationId": "apps_accounts_api_student_onboarding",
+        "summary": "Student Onboarding",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudentOnboardingSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/student-profile": {
+      "get": {
+        "operationId": "apps_accounts_api_student_profile",
+        "summary": "Student Profile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/student-profile-update": {
+      "put": {
+        "operationId": "apps_accounts_api_update_student_profile",
+        "summary": "Update Student Profile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudentProfileUpdateSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/submit-lead": {
+      "post": {
+        "operationId": "apps_accounts_api_submit_lead",
+        "summary": "Submit Lead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadSchema"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/student-logout": {
+      "post": {
+        "operationId": "apps_accounts_api_student_logout",
+        "summary": "Student Logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/advertisements/": {
+      "get": {
+        "operationId": "apps_advertisements_api_list_active_advertisements",
+        "summary": "List Active Advertisements",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AdvertisementOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Advertisements"
+        ]
+      }
+    },
+    "/api/notifications/save-device-token": {
+      "post": {
+        "operationId": "apps_notifications_api_save_device_token",
+        "summary": "Save Device Token",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Save or update the FCM device token for the logged-in user.\nRequired field in .env  : (none — uses firebase-service-account.json)\nRequired in settings.py : FCM_DJANGO_SETTINGS",
+        "tags": [
+          "Notifications"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceTokenSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/send-login-push": {
+      "post": {
+        "operationId": "apps_notifications_api_send_login_push",
+        "summary": "Send Login Push",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Send a login success push notification to the current user.",
+        "tags": [
+          "Notifications"
+        ],
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/send": {
+      "post": {
+        "operationId": "apps_notifications_api_send_notification",
+        "summary": "Send Notification",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Send a notification to a specific user by user_id.\nSaves the notification to the DB and sends a FCM push notification.\n\nRequired IDs / keys (add to .env):\n  - Firebase service account JSON file at  credentials/firebase-service-account.json\n  - FCM_DJANGO_SETTINGS block in settings.py  (see settings note below)",
+        "tags": [
+          "Notifications"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendNotificationSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/list": {
+      "get": {
+        "operationId": "apps_notifications_api_list_notifications",
+        "summary": "List Notifications",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Returns all notifications for the currently authenticated user,\nnewest first.",
+        "tags": [
+          "Notifications"
+        ],
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/{notification_id}/mark-read": {
+      "patch": {
+        "operationId": "apps_notifications_api_mark_notification_read",
+        "summary": "Mark Notification Read",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notification_id",
+            "schema": {
+              "title": "Notification Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Mark a specific notification as read for the logged-in user.",
+        "tags": [
+          "Notifications"
+        ],
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/mark-all-read": {
+      "patch": {
+        "operationId": "apps_notifications_api_mark_all_notifications_read",
+        "summary": "Mark All Notifications Read",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Bulk mark all notifications as read for the logged-in user.",
+        "tags": [
+          "Notifications"
+        ],
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/delete/{notification_id}": {
+      "delete": {
+        "operationId": "apps_notifications_api_notification_delete",
+        "summary": "Notification Delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notification_id",
+            "schema": {
+              "title": "Notification Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Delete a specific notification.",
+        "tags": [
+          "Notifications"
+        ],
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/categories/": {
+      "get": {
+        "operationId": "apps_categories_api_list_categories",
+        "summary": "List Categories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CategorySchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/businesses/": {
+      "get": {
+        "operationId": "apps_businesses_api_list_businesses",
+        "summary": "List Businesses",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "location",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Location"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "category_slug",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Slug"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "lat",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lat"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "lng",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lng"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BusinessListSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/businesses/favourites/": {
+      "post": {
+        "operationId": "apps_businesses_api_save_business",
+        "summary": "Save Business",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "business_id",
+            "schema": {
+              "title": "Business Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "apps_businesses_api_get_saved_businesses",
+        "summary": "Get Saved Businesses",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/businesses/favourites/{saved_id}/": {
+      "delete": {
+        "operationId": "apps_businesses_api_unsave_business",
+        "summary": "Unsave Business",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "saved_id",
+            "schema": {
+              "title": "Saved Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/businesses/{slug}/": {
+      "get": {
+        "operationId": "apps_businesses_api_get_business",
+        "summary": "Get Business",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessDetailSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/businesses/categories/{slug}/filters/": {
+      "get": {
+        "operationId": "apps_businesses_api_get_category_filters",
+        "summary": "Get Category Filters",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/locations/search/": {
+      "get": {
+        "operationId": "apps_businesses_locations_api_search_locations",
+        "summary": "Search Locations",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "title": "Q",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/vendors/reviews": {
+      "post": {
+        "operationId": "apps_vendors_api_create_review",
+        "summary": "Create Review",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReviewSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "CustomJWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/vendors/business/{business_id}/reviews": {
+      "get": {
+        "operationId": "apps_vendors_api_business_reviews",
+        "summary": "Business Reviews",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "business_id",
+            "schema": {
+              "title": "Business Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/vendors/total/{business_id}/reviews/count": {
+      "get": {
+        "operationId": "apps_vendors_api_reviews_count",
+        "summary": "Reviews Count",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "business_id",
+            "schema": {
+              "title": "Business Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dynamic/popular-near-you/": {
+      "get": {
+        "operationId": "apps_dynamic_api_popular_near_you",
+        "summary": "Popular Near You",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "latitude",
+            "schema": {
+              "title": "Latitude",
+              "type": "number"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "longitude",
+            "schema": {
+              "title": "Longitude",
+              "type": "number"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "radius",
+            "schema": {
+              "default": 10,
+              "title": "Radius",
+              "type": "number"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "category_id",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 50,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NearbyBusinessSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get popular services/businesses near the user's current location.\n\nQuery Parameters:\n- latitude: User's current latitude (required)\n- longitude: User's current longitude (required)\n- radius: Search radius in kilometers (default: 10km)\n- category_id: Filter by category ID (optional)\n- limit: Maximum number of results to return (default: 50)\n\nReturns: List of verified businesses sorted by distance (closest first)",
+        "tags": [
+          "Sections"
+        ]
+      }
+    },
+    "/api/dynamic/popular-searches/": {
+      "get": {
+        "operationId": "apps_dynamic_api_popular_searches",
+        "summary": "Popular Searches",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 10,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PopularSearchSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get most searched categories with their top business listings.\n\nQuery Parameters:\n- limit: Number of popular categories to return\n\nReturns:\n- Category details\n- Search count\n- Number of verified listings\n- Top 5 verified business listings",
+        "tags": [
+          "Sections"
+        ]
+      }
+    },
+    "/api/dynamic/why-choose-us/": {
+      "get": {
+        "operationId": "apps_dynamic_api_why_choose_us_list",
+        "summary": "Why Choose Us List",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WhyChooseUssSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "List all active \"Why Choose Us\" items with icons.\nReturns: List of WhyChooseUss items ordered by newest first.",
+        "tags": [
+          "Sections"
+        ]
+      }
+    },
+    "/api/dynamic/faqs/": {
+      "get": {
+        "operationId": "apps_dynamic_api_faq_list",
+        "summary": "Faq List",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Sections"
+        ]
+      }
+    },
+    "/api/dynamic/about": {
+      "get": {
+        "operationId": "apps_dynamic_api_homepage",
+        "summary": "Homepage",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HomePageSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Sections"
+        ]
+      }
+    },
+    "/api/dynamic/contact-page": {
+      "get": {
+        "operationId": "apps_dynamic_api_contact_page",
+        "summary": "Contact Page",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Sections"
+        ]
+      }
+    },
+    "/api/dynamic/contact-submit": {
+      "post": {
+        "operationId": "apps_dynamic_api_contact_submit",
+        "summary": "Contact Submit",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Sections"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactEnquirySchema"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/dynamic/contact-enquiries": {
+      "get": {
+        "operationId": "apps_dynamic_api_contact_enquiries",
+        "summary": "Contact Enquiries",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ContactEnquiryResponseSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Sections"
+        ]
+      }
+    },
+    "/api/dynamic/tourist-places/": {
+      "get": {
+        "operationId": "apps_dynamic_api_tourist_places",
+        "summary": "Tourist Places",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TouristPlaceSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Sections"
+        ]
+      }
+    },
+    "/api/dynamic/terms": {
+      "get": {
+        "operationId": "apps_dynamic_api_get_active_terms",
+        "summary": "Get Active Terms",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LegalPageOutSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Retrieves the latest active version of the Terms & Conditions.",
+        "tags": [
+          "Sections"
+        ]
+      }
+    },
+    "/api/dynamic/privacy": {
+      "get": {
+        "operationId": "apps_dynamic_api_get_active_privacy",
+        "summary": "Get Active Privacy",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LegalPageOutSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Retrieves the latest active version of the Privacy Policy.",
+        "tags": [
+          "Sections"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuthTokenOut": {
+        "properties": {
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "access": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Access"
+          },
+          "refresh": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refresh"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "title": "AuthTokenOut",
+        "type": "object"
+      },
+      "GoogleAuthIn": {
+        "properties": {
+          "id_token": {
+            "title": "Id Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id_token"
+        ],
+        "title": "GoogleAuthIn",
+        "type": "object"
+      },
+      "MessageOut": {
+        "properties": {
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ],
+        "title": "MessageOut",
+        "type": "object"
+      },
+      "SendOTPIn": {
+        "properties": {
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          }
+        },
+        "required": [
+          "phone"
+        ],
+        "title": "SendOTPIn",
+        "type": "object"
+      },
+      "VerifyOTPIn": {
+        "properties": {
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "otp": {
+            "title": "Otp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "phone",
+          "otp"
+        ],
+        "title": "VerifyOTPIn",
+        "type": "object"
+      },
+      "StudentOnboardingSchema": {
+        "properties": {
+          "father_name": {
+            "title": "Father Name",
+            "type": "string"
+          },
+          "college_code": {
+            "title": "College Code",
+            "type": "string"
+          },
+          "course": {
+            "title": "Course",
+            "type": "string"
+          },
+          "academic_year": {
+            "title": "Academic Year",
+            "type": "string"
+          },
+          "year_of_study": {
+            "title": "Year Of Study",
+            "type": "string"
+          },
+          "cgpa_percentage": {
+            "title": "Cgpa Percentage",
+            "type": "string"
+          },
+          "course_reason": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Course Reason",
+            "type": "array"
+          },
+          "area_of_interest": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Area Of Interest",
+            "type": "array"
+          },
+          "skills_to_develop": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills To Develop",
+            "type": "array"
+          },
+          "plan_after_graduation": {
+            "title": "Plan After Graduation",
+            "type": "string"
+          },
+          "interested_abroad": {
+            "title": "Interested Abroad",
+            "type": "boolean"
+          },
+          "preferred_country": {
+            "default": "",
+            "title": "Preferred Country",
+            "type": "string"
+          },
+          "career_goal": {
+            "title": "Career Goal",
+            "type": "string"
+          },
+          "internship_completed": {
+            "title": "Internship Completed",
+            "type": "boolean"
+          },
+          "interested_in_internship": {
+            "title": "Interested In Internship",
+            "type": "boolean"
+          },
+          "certifications": {
+            "title": "Certifications",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "father_name",
+          "college_code",
+          "course",
+          "academic_year",
+          "year_of_study",
+          "cgpa_percentage",
+          "course_reason",
+          "area_of_interest",
+          "skills_to_develop",
+          "plan_after_graduation",
+          "interested_abroad",
+          "career_goal",
+          "internship_completed",
+          "interested_in_internship",
+          "certifications"
+        ],
+        "title": "StudentOnboardingSchema",
+        "type": "object"
+      },
+      "StudentProfileUpdateSchema": {
+        "properties": {
+          "father_name": {
+            "title": "Father Name",
+            "type": "string"
+          },
+          "college_code": {
+            "title": "College Code",
+            "type": "string"
+          },
+          "dept_course": {
+            "title": "Dept Course",
+            "type": "string"
+          },
+          "academic_year": {
+            "title": "Academic Year",
+            "type": "string"
+          },
+          "year_of_study": {
+            "title": "Year Of Study",
+            "type": "string"
+          },
+          "cgpa_percentage": {
+            "title": "Cgpa Percentage",
+            "type": "string"
+          },
+          "course_reason": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Course Reason",
+            "type": "array"
+          },
+          "area_of_interest": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Area Of Interest",
+            "type": "array"
+          },
+          "skills_to_develop": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills To Develop",
+            "type": "array"
+          },
+          "plan_after_graduation": {
+            "title": "Plan After Graduation",
+            "type": "string"
+          },
+          "interested_abroad": {
+            "title": "Interested Abroad",
+            "type": "string"
+          },
+          "preferred_country": {
+            "default": "",
+            "title": "Preferred Country",
+            "type": "string"
+          },
+          "career_goal": {
+            "title": "Career Goal",
+            "type": "string"
+          },
+          "internship_completed": {
+            "title": "Internship Completed",
+            "type": "boolean"
+          },
+          "interested_in_internship": {
+            "title": "Interested In Internship",
+            "type": "boolean"
+          },
+          "certifications": {
+            "title": "Certifications",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "father_name",
+          "college_code",
+          "dept_course",
+          "academic_year",
+          "year_of_study",
+          "cgpa_percentage",
+          "course_reason",
+          "area_of_interest",
+          "skills_to_develop",
+          "plan_after_graduation",
+          "interested_abroad",
+          "career_goal",
+          "internship_completed",
+          "interested_in_internship",
+          "certifications"
+        ],
+        "title": "StudentProfileUpdateSchema",
+        "type": "object"
+      },
+      "LeadSchema": {
+        "properties": {
+          "business_id": {
+            "title": "Business Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "name",
+          "email",
+          "phone",
+          "subject",
+          "message"
+        ],
+        "title": "LeadSchema",
+        "type": "object"
+      },
+      "LogoutSchema": {
+        "properties": {
+          "refresh_token": {
+            "title": "Refresh Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ],
+        "title": "LogoutSchema",
+        "type": "object"
+      },
+      "AdvertisementOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "image": {
+            "title": "Image",
+            "type": "string"
+          },
+          "redirect_url": {
+            "title": "Redirect Url",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "image",
+          "redirect_url",
+          "created_at"
+        ],
+        "title": "AdvertisementOut",
+        "type": "object"
+      },
+      "DeviceTokenSchema": {
+        "properties": {
+          "token": {
+            "title": "Token",
+            "type": "string"
+          },
+          "type": {
+            "default": "web",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "DeviceTokenSchema",
+        "type": "object"
+      },
+      "SendNotificationSchema": {
+        "properties": {
+          "user_id": {
+            "title": "User Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          }
+        },
+        "required": [
+          "user_id",
+          "title",
+          "message"
+        ],
+        "title": "SendNotificationSchema",
+        "type": "object"
+      },
+      "CategoryFieldSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "field_key": {
+            "title": "Field Key",
+            "type": "string"
+          },
+          "field_type": {
+            "title": "Field Type",
+            "type": "string"
+          },
+          "options": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Options"
+          },
+          "show_as_filter": {
+            "title": "Show As Filter",
+            "type": "boolean"
+          },
+          "is_required": {
+            "title": "Is Required",
+            "type": "boolean"
+          },
+          "order": {
+            "title": "Order",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "field_key",
+          "field_type",
+          "show_as_filter",
+          "is_required",
+          "order"
+        ],
+        "title": "CategoryFieldSchema",
+        "type": "object"
+      },
+      "CategorySchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "fields": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CategoryFieldSchema"
+            },
+            "title": "Fields",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "is_active"
+        ],
+        "title": "CategorySchema",
+        "type": "object"
+      },
+      "BusinessImageSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "image": {
+            "title": "Image",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "image"
+        ],
+        "title": "BusinessImageSchema",
+        "type": "object"
+      },
+      "BusinessListSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "company_name": {
+            "title": "Company Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "location": {
+            "title": "Location",
+            "type": "string"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "images": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/BusinessImageSchema"
+            },
+            "title": "Images",
+            "type": "array"
+          },
+          "field_values": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FieldValueSchema"
+            },
+            "title": "Field Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "company_name",
+          "slug",
+          "location",
+          "status"
+        ],
+        "title": "BusinessListSchema",
+        "type": "object"
+      },
+      "FieldValueSchema": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "field_key": {
+            "title": "Field Key",
+            "type": "string"
+          },
+          "field_type": {
+            "title": "Field Type",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "label",
+          "field_key",
+          "field_type"
+        ],
+        "title": "FieldValueSchema",
+        "type": "object"
+      },
+      "BusinessDetailSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "company_name": {
+            "title": "Company Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "location": {
+            "title": "Location",
+            "type": "string"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "whatsapp": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Whatsapp"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "images": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/BusinessImageSchema"
+            },
+            "title": "Images",
+            "type": "array"
+          },
+          "field_values": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FieldValueSchema"
+            },
+            "title": "Field Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "company_name",
+          "slug",
+          "location",
+          "email",
+          "status"
+        ],
+        "title": "BusinessDetailSchema",
+        "type": "object"
+      },
+      "CreateReviewSchema": {
+        "properties": {
+          "business_id": {
+            "title": "Business Id",
+            "type": "integer"
+          },
+          "rating": {
+            "title": "Rating",
+            "type": "number"
+          },
+          "review": {
+            "title": "Review",
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "rating",
+          "review"
+        ],
+        "title": "CreateReviewSchema",
+        "type": "object"
+      },
+      "NearbyBusinessImageSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "NearbyBusinessImageSchema",
+        "type": "object"
+      },
+      "NearbyBusinessSchema": {
+        "description": "Schema for businesses near user's current location",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "company_name": {
+            "title": "Company Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "location": {
+            "title": "Location",
+            "type": "string"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "distance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance"
+          },
+          "images": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/NearbyBusinessImageSchema"
+            },
+            "title": "Images",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "company_name",
+          "slug",
+          "location",
+          "phone",
+          "email",
+          "status"
+        ],
+        "title": "NearbyBusinessSchema",
+        "type": "object"
+      },
+      "BusinessListingSchema": {
+        "description": "Summary schema for a business listing shown inside popular searches",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "company_name": {
+            "title": "Company Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "location": {
+            "title": "Location",
+            "type": "string"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image"
+          }
+        },
+        "required": [
+          "id",
+          "company_name",
+          "slug",
+          "location",
+          "phone"
+        ],
+        "title": "BusinessListingSchema",
+        "type": "object"
+      },
+      "PopularSearchSchema": {
+        "description": "Schema for popular category searches with top business listings",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "category_name": {
+            "title": "Category Name",
+            "type": "string"
+          },
+          "category_slug": {
+            "title": "Category Slug",
+            "type": "string"
+          },
+          "category_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Image"
+          },
+          "search_count": {
+            "title": "Search Count",
+            "type": "integer"
+          },
+          "listings_count": {
+            "title": "Listings Count",
+            "type": "integer"
+          },
+          "display_order": {
+            "title": "Display Order",
+            "type": "integer"
+          },
+          "is_featured": {
+            "title": "Is Featured",
+            "type": "boolean"
+          },
+          "top_listings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/BusinessListingSchema"
+            },
+            "title": "Top Listings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "category_name",
+          "category_slug",
+          "search_count",
+          "listings_count",
+          "display_order",
+          "is_featured"
+        ],
+        "title": "PopularSearchSchema",
+        "type": "object"
+      },
+      "WhyChooseUssSchema": {
+        "description": "Response schema for simple WhyChooseUss items (list endpoint).",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "is_active",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "WhyChooseUssSchema",
+        "type": "object"
+      },
+      "AboutSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "section_tag": {
+            "title": "Section Tag",
+            "type": "string"
+          },
+          "main_title": {
+            "title": "Main Title",
+            "type": "string"
+          },
+          "main_description": {
+            "title": "Main Description",
+            "type": "string"
+          },
+          "button_text": {
+            "title": "Button Text",
+            "type": "string"
+          },
+          "button_link": {
+            "title": "Button Link",
+            "type": "string"
+          },
+          "about_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "About Image"
+          },
+          "top_badge_text": {
+            "title": "Top Badge Text",
+            "type": "string"
+          },
+          "trust_card_title": {
+            "title": "Trust Card Title",
+            "type": "string"
+          },
+          "trust_card_subtitle": {
+            "title": "Trust Card Subtitle",
+            "type": "string"
+          },
+          "visitors_icon": {
+            "title": "Visitors Icon",
+            "type": "string"
+          },
+          "visitors_count": {
+            "title": "Visitors Count",
+            "type": "string"
+          },
+          "visitors_label": {
+            "title": "Visitors Label",
+            "type": "string"
+          },
+          "students_icon": {
+            "title": "Students Icon",
+            "type": "string"
+          },
+          "students_count": {
+            "title": "Students Count",
+            "type": "string"
+          },
+          "students_label": {
+            "title": "Students Label",
+            "type": "string"
+          },
+          "businesses_icon": {
+            "title": "Businesses Icon",
+            "type": "string"
+          },
+          "businesses_count": {
+            "title": "Businesses Count",
+            "type": "string"
+          },
+          "businesses_label": {
+            "title": "Businesses Label",
+            "type": "string"
+          },
+          "feature_one_icon": {
+            "title": "Feature One Icon",
+            "type": "string"
+          },
+          "feature_one_title": {
+            "title": "Feature One Title",
+            "type": "string"
+          },
+          "feature_two_icon": {
+            "title": "Feature Two Icon",
+            "type": "string"
+          },
+          "feature_two_title": {
+            "title": "Feature Two Title",
+            "type": "string"
+          },
+          "feature_three_icon": {
+            "title": "Feature Three Icon",
+            "type": "string"
+          },
+          "feature_three_title": {
+            "title": "Feature Three Title",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "section_tag",
+          "main_title",
+          "main_description",
+          "button_text",
+          "button_link",
+          "top_badge_text",
+          "trust_card_title",
+          "trust_card_subtitle",
+          "visitors_icon",
+          "visitors_count",
+          "visitors_label",
+          "students_icon",
+          "students_count",
+          "students_label",
+          "businesses_icon",
+          "businesses_count",
+          "businesses_label",
+          "feature_one_icon",
+          "feature_one_title",
+          "feature_two_icon",
+          "feature_two_title",
+          "feature_three_icon",
+          "feature_three_title",
+          "is_active"
+        ],
+        "title": "AboutSchema",
+        "type": "object"
+      },
+      "BulkPartnerSectionSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "section_name": {
+            "title": "Section Name",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "images": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PartnerImageSchema"
+            },
+            "title": "Images",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "section_name",
+          "title",
+          "description",
+          "is_active"
+        ],
+        "title": "BulkPartnerSectionSchema",
+        "type": "object"
+      },
+      "CounterSchema": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "count",
+          "label"
+        ],
+        "title": "CounterSchema",
+        "type": "object"
+      },
+      "HomePageSchema": {
+        "properties": {
+          "about": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AboutSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "promise": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PromiseSectionSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "who_we_are": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WhoWeAreSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "partners": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/BulkPartnerSectionSchema"
+            },
+            "title": "Partners",
+            "type": "array"
+          },
+          "team": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/TeamSectionSchema"
+            },
+            "title": "Team",
+            "type": "array"
+          }
+        },
+        "title": "HomePageSchema",
+        "type": "object"
+      },
+      "PartnerImageSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "PartnerImageSchema",
+        "type": "object"
+      },
+      "PopularServiceSchema": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "PopularServiceSchema",
+        "type": "object"
+      },
+      "PromiseCardSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "icon": {
+            "title": "Icon",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "display_order": {
+            "title": "Display Order",
+            "type": "integer"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "icon",
+          "title",
+          "description",
+          "display_order",
+          "is_active"
+        ],
+        "title": "PromiseCardSchema",
+        "type": "object"
+      },
+      "PromiseSectionSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "section_name": {
+            "title": "Section Name",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "cards": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PromiseCardSchema"
+            },
+            "title": "Cards",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "section_name",
+          "title",
+          "description",
+          "is_active"
+        ],
+        "title": "PromiseSectionSchema",
+        "type": "object"
+      },
+      "TeamSectionSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "section_name": {
+            "title": "Section Name",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "member_description": {
+            "title": "Member Description",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "section_name",
+          "title",
+          "description",
+          "name",
+          "role",
+          "member_description",
+          "is_active"
+        ],
+        "title": "TeamSectionSchema",
+        "type": "object"
+      },
+      "ValueItemSchema": {
+        "properties": {
+          "icon": {
+            "title": "Icon",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          }
+        },
+        "required": [
+          "icon",
+          "title",
+          "description"
+        ],
+        "title": "ValueItemSchema",
+        "type": "object"
+      },
+      "WhoWeAreSchema": {
+        "properties": {
+          "who_we_are_badge": {
+            "title": "Who We Are Badge",
+            "type": "string"
+          },
+          "hero_title": {
+            "title": "Hero Title",
+            "type": "string"
+          },
+          "hero_description": {
+            "title": "Hero Description",
+            "type": "string"
+          },
+          "mission_icon": {
+            "title": "Mission Icon",
+            "type": "string"
+          },
+          "mission_title": {
+            "title": "Mission Title",
+            "type": "string"
+          },
+          "mission_description": {
+            "title": "Mission Description",
+            "type": "string"
+          },
+          "popular_services_title": {
+            "title": "Popular Services Title",
+            "type": "string"
+          },
+          "popular_services_sub": {
+            "title": "Popular Services Sub",
+            "type": "string"
+          },
+          "our_values_badge": {
+            "title": "Our Values Badge",
+            "type": "string"
+          },
+          "values_title": {
+            "title": "Values Title",
+            "type": "string"
+          },
+          "values_description": {
+            "title": "Values Description",
+            "type": "string"
+          },
+          "counters": {
+            "items": {
+              "$ref": "#/components/schemas/CounterSchema"
+            },
+            "title": "Counters",
+            "type": "array"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/PopularServiceSchema"
+            },
+            "title": "Services",
+            "type": "array"
+          },
+          "value_items": {
+            "items": {
+              "$ref": "#/components/schemas/ValueItemSchema"
+            },
+            "title": "Value Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "who_we_are_badge",
+          "hero_title",
+          "hero_description",
+          "mission_icon",
+          "mission_title",
+          "mission_description",
+          "popular_services_title",
+          "popular_services_sub",
+          "our_values_badge",
+          "values_title",
+          "values_description",
+          "counters",
+          "services",
+          "value_items"
+        ],
+        "title": "WhoWeAreSchema",
+        "type": "object"
+      },
+      "ContactEnquirySchema": {
+        "properties": {
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "full_name",
+          "email",
+          "phone",
+          "subject",
+          "message"
+        ],
+        "title": "ContactEnquirySchema",
+        "type": "object"
+      },
+      "ContactEnquiryResponseSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "full_name",
+          "email",
+          "phone",
+          "subject",
+          "message"
+        ],
+        "title": "ContactEnquiryResponseSchema",
+        "type": "object"
+      },
+      "TouristPlaceSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "location": {
+            "title": "Location",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "rating": {
+            "title": "Rating",
+            "type": "number"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "location",
+          "description",
+          "rating",
+          "image"
+        ],
+        "title": "TouristPlaceSchema",
+        "type": "object"
+      },
+      "LegalPageOutSchema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "content",
+          "is_active",
+          "updated_at"
+        ],
+        "title": "LegalPageOutSchema",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "CustomJWTAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "servers": []
+}

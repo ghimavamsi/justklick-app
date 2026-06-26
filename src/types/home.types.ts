@@ -1,6 +1,7 @@
 export interface Category {
   id: string;
   name: string;
+  slug?: string;
   iconName: string;
   iconLibrary?: 'Ionicons' | 'SymbolView';
   color: string;

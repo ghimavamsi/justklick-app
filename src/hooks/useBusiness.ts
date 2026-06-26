@@ -17,7 +17,7 @@ export function useBusinessDetails(id: string) {
       const getImageUrl = (url: string | null | undefined, fallback: string) => {
         if (!url) return fallback;
         if (url.startsWith('http')) return url;
-        if (url.startsWith('/')) return `https://justklick-backend-kjrdc8-2f68d5-162-35-161-160.sslip.io${url}`;
+        if (url.startsWith('/')) return `https://api.justklick.co.in${url}`;
         return url;
       };
 

@@ -47,7 +47,7 @@ export function useHomeData() {
         
         // It's a relative path. Ensure it has a leading slash
         const relativePath = url.startsWith('/') ? url : `/${url}`;
-        return `https://justklick-backend-kjrdc8-2f68d5-162-35-161-160.sslip.io${relativePath}`;
+        return `https://api.justklick.co.in${relativePath}`;
       };
 
       // Map Advertisements to Banners
@@ -89,6 +89,7 @@ export function useHomeData() {
       const categories: Category[] = extractArray(apiCategories).map((c: any, index: number) => ({
         id: String(c?.id || c?.slug || index),
         name: c?.name || c?.category_name || `Category ${index + 1}`,
+        slug: c?.slug || (c?.name || c?.category_name || `Category ${index + 1}`).toLowerCase().replace(/\s+/g, '-'),
         iconName: getImageUrl(c?.image || c?.icon, 'grid-outline'), 
         iconLibrary: 'Ionicons',
         color: '#1C398E',

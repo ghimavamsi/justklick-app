@@ -40,8 +40,6 @@ export function FavoriteBusinessCard({ business, index, onRemove }: Props) {
 
   return (
     <Animated.View 
-      entering={FadeInUp.delay(Math.min(index * 100, 500)).springify()}
-      layout={Layout.springify()}
       className="w-full mb-4"
     >
       <Swipeable

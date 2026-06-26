@@ -123,7 +123,7 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
     // Setting target left to 85 gives a perfect 10px gap!
     const left = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [20, 85], Extrapolation.CLAMP);
     const right = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [20, 125], Extrapolation.CLAMP);
-    const height = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [50, 44], Extrapolation.CLAMP);
+    const height = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [56, 50], Extrapolation.CLAMP);
     
     return {
       top,

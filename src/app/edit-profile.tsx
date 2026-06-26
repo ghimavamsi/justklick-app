@@ -46,7 +46,14 @@ export default function EditProfileScreen() {
 
   useEffect(() => {
     if (profile) {
-      setFormData(profile);
+      setFormData({
+        ...profile,
+        course: profile.course || (profile as any).dept_course || '',
+        interested_abroad: (profile as any).interested_abroad === 'Yes' || profile.interested_abroad === true,
+        internship_completed: (profile as any).internship_completed === 'Yes' || profile.internship_completed === true,
+        interested_in_internship: (profile as any).interested_in_internship === 'Yes' || profile.interested_in_internship === true,
+        certifications: (profile as any).certifications === 'Yes' || profile.certifications === true,
+      });
     }
   }, [profile]);
 
@@ -59,7 +66,21 @@ export default function EditProfileScreen() {
     },
     onError: (err: any) => {
       console.log('Update Profile Error:', err?.response?.data || err.message);
-      alert('Failed to update profile. Please check all fields.');
+      
+      let errorMsg = 'Failed to update profile. Please check all fields.';
+      if (err?.response?.data) {
+        if (typeof err.response.data === 'string') {
+          errorMsg = 'Server returned an error. Please check your connection.';
+        } else if (err.response.data.detail) {
+          errorMsg = typeof err.response.data.detail === 'string' 
+            ? err.response.data.detail 
+            : JSON.stringify(err.response.data.detail);
+        } else {
+          errorMsg = JSON.stringify(err.response.data);
+        }
+      }
+      
+      alert(errorMsg);
     }
   });
 

@@ -16,6 +16,7 @@ import { useAuthStore } from '../../store/auth-store';
 import { useUserStore } from '../../store/user-store';
 import { useMutation } from '@tanstack/react-query';
 import { authApi } from '../../api/auth';
+import SmsRetriever from 'react-native-sms-retriever';
 
 const { height } = Dimensions.get('window');
 
@@ -88,45 +89,6 @@ export default function PremiumVerifyOTPScreen() {
   const floatStyle3 = useAnimatedStyle(() => ({
     transform: [{ translateY: float3.value * 15 }]
   }));
-
-  const handleOtpChange = (value: string, index: number) => {
-    if (error) setError('');
-
-    // Handle pasting or auto-fill (value > 1 character)
-    if (value.length > 1) {
-      const digits = value.replace(/\D/g, '').split('').slice(0, 6);
-      const newOtp = [...otp];
-      for (let i = 0; i < digits.length; i++) {
-        newOtp[i] = digits[i];
-      }
-      setOtp(newOtp);
-      
-      const lastIndex = Math.min(digits.length - 1, 5);
-      if (lastIndex >= 0) {
-        inputs.current[lastIndex]?.focus();
-      }
-      return;
-    }
-
-    // Normal logic: Extract the last typed character in case of fast typing
-    const digit = value.length > 0 ? value.slice(-1) : '';
-
-    const newOtp = [...otp];
-    newOtp[index] = digit;
-    setOtp(newOtp);
-
-    // Move to next input if a digit was entered
-    if (digit && index < 5) {
-      inputs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyPress = (e: any, index: number) => {
-    // Move to previous input on backspace if current is empty
-    if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
-      inputs.current[index - 1]?.focus();
-    }
-  };
 
   const { phone, type, firstName, lastName, email } = useLocalSearchParams<{ 
     phone: string, 
@@ -283,22 +245,22 @@ export default function PremiumVerifyOTPScreen() {
           </View>
 
           <View className="w-full bg-muted rounded-[24px] p-6 border border-border/50 mb-6 relative">
-            
-            {/* Hidden Input for Auto-Fill & KeyPress */}
             <TextInput
               ref={(ref) => { inputs.current[0] = ref; }}
-              style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 10, color: 'transparent' }}
+              style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', zIndex: 999 }}
               caretHidden={true}
               keyboardType="number-pad"
               maxLength={6}
               textContentType="oneTimeCode"
               autoComplete="sms-otp"
+              importantForAutofill="yes"
+              autoFocus={true}
               value={otp.join('')}
               onChangeText={(val) => {
-                const digits = val.replace(/\D/g, '').split('').slice(0, 6);
+                const cleanValue = val.replace(/\D/g, '');
                 const newOtp = ['', '', '', '', '', ''];
-                for (let i = 0; i < digits.length; i++) {
-                  newOtp[i] = digits[i];
+                for (let i = 0; i < cleanValue.length; i++) {
+                  if (i < 6) newOtp[i] = cleanValue[i];
                 }
                 setOtp(newOtp);
                 if (error) setError('');
@@ -307,24 +269,28 @@ export default function PremiumVerifyOTPScreen() {
 
             {/* OTP Visual Container */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: 8 }} pointerEvents="none">
-              {otp.map((digit, index) => (
-                <View 
-                  key={index} 
-                  style={{ width: '14%', aspectRatio: 0.8 }}
-                  className={`rounded-[8px] bg-card border ${digit ? 'border-primary' : 'border-border'} shadow-sm items-center justify-center`}
-                >
-                  <Text className={`text-center text-xl font-black ${digit ? 'text-primary' : 'text-foreground'}`}>
-                    {digit}
-                  </Text>
-                </View>
-              ))}
+              {otp.map((digit, index) => {
+                const currentLength = otp.join('').length;
+                const isCurrent = currentLength === index || (currentLength === 6 && index === 5);
+                const isActive = digit !== '' || isCurrent;
+                return (
+                  <View 
+                    key={index} 
+                    style={{ width: '14%', aspectRatio: 0.8 }}
+                    className={`rounded-[8px] bg-card border ${isActive ? 'border-primary' : 'border-border'} shadow-sm items-center justify-center`}
+                  >
+                    <Text className={`text-center text-xl font-black ${digit ? 'text-primary' : 'text-foreground'}`}>
+                      {digit}
+                    </Text>
+                  </View>
+                );
+              })}
             </View>
 
             {/* Error Message */}
             {error ? (
               <Text style={{ color: '#EF4444' }} className="text-xs font-semibold text-center mt-4">{error}</Text>
             ) : null}
-
           </View>
 
           {/* Resend Timer */}

@@ -56,7 +56,7 @@ export default function ExploreScreen() {
             {touristPlaces.map((place) => (
               <View key={place.id} className="w-64 bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
                 <Image 
-                  source={{ uri: place.image ? (place.image.startsWith('http') ? place.image : `https://justklick-backend-kjrdc8-2f68d5-162-35-161-160.sslip.io${place.image}`) : 'https://via.placeholder.com/400x200' }} 
+                  source={{ uri: place.image ? (place.image.startsWith('http') ? place.image : `https://api.justklick.co.in${place.image}`) : 'https://via.placeholder.com/400x200' }} 
                   className="w-full h-32" 
                 />
                 <View className="p-4">

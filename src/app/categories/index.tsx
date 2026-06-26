@@ -14,11 +14,13 @@ import { CategoryGrid } from '../../components/categories/CategoryGrid';
 import { TrendingCategoryRow } from '../../components/categories/TrendingCategoryRow';
 import { CategorySkeletons } from '../../components/categories/CategorySkeletons';
 import { CategoryEmptyState } from '../../components/categories/CategoryEmptyState';
+import { useSearchStore } from '../../store/search-store';
 
 export default function ExploreCategoriesScreen() {
   const { colorScheme } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { setQuery, setPhase } = useSearchStore();
   
   const scrollY = useSharedValue(0);
   
@@ -45,9 +47,9 @@ export default function ExploreCategoriesScreen() {
   });
 
   const handleCategoryPress = (category: ExploreCategory) => {
-    // Navigate to business listing (to be implemented later)
-    // router.push(`/business/category/${category.id}`);
-    console.log('Navigating to category:', category.name);
+    setQuery(category.name);
+    setPhase('results');
+    router.push('/search');
   };
 
   const isSearching = debouncedQuery.length > 0;

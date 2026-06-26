@@ -27,7 +27,7 @@ export function useSearchAPI(query: string, category: string | null) {
         if (url.startsWith('https:')) return url;
         
         const relativePath = url.startsWith('/') ? url : `/${url}`;
-        return `https://justklick-backend-kjrdc8-2f68d5-162-35-161-160.sslip.io${relativePath}`;
+        return `https://api.justklick.co.in${relativePath}`;
       };
 
       // 2. Map API schema to Business UI schema

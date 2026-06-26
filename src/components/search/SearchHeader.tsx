@@ -177,7 +177,7 @@ export function SearchHeader() {
                   <Text 
                     className="text-[10px] text-muted-foreground font-semibold" 
                     numberOfLines={1}
-                    style={{ marginTop: -6, includeFontPadding: false }}
+                    style={{ marginTop: 2, includeFontPadding: false }}
                   >
                     in {activeLocation.shortAddress}
                   </Text>

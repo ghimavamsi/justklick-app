@@ -40,12 +40,12 @@ export const studentApi = {
       area_of_interest: data.area_of_interest || [],
       skills_to_develop: data.skills_to_develop || [],
       plan_after_graduation: data.plan_after_graduation || '',
-      interested_abroad: data.interested_abroad ? 'Yes' : 'No', // string required here
+      interested_abroad: (data.interested_abroad === true || data.interested_abroad === 'Yes') ? 'Yes' : 'No', // string required here
       preferred_country: data.preferred_country || '',
       career_goal: data.career_goal || '',
-      internship_completed: Boolean(data.internship_completed),
-      interested_in_internship: Boolean(data.interested_in_internship),
-      certifications: Boolean(data.certifications),
+      internship_completed: Boolean(data.internship_completed && data.internship_completed !== 'No'),
+      interested_in_internship: Boolean(data.interested_in_internship && data.interested_in_internship !== 'No'),
+      certifications: Boolean(data.certifications && data.certifications !== 'No'),
     };
     const response = await apiClient.put<StudentProfileResponse>('/api/student-profile-update', payload);
     return response.data;

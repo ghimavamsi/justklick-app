@@ -5,6 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Category } from '../../types/home.types';
 import { useTheme } from '../../hooks/useTheme';
 
+import { useSearchStore } from '../../store/search-store';
+
 interface CategoryCarouselProps {
   categories: Category[];
 }
@@ -13,6 +15,13 @@ export function CategoryCarousel({ categories }: CategoryCarouselProps) {
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
+  const { setQuery, setPhase } = useSearchStore();
+
+  const handleCategoryPress = (category: Category) => {
+    setQuery(category.name);
+    setPhase('results');
+    router.push('/search');
+  };
 
   const renderItem = ({ item }: { item: Category }) => {
     // In dark mode, we use a stronger opacity (33 in hex = ~20%) to make the color pop against black.
@@ -24,6 +33,7 @@ export function CategoryCarousel({ categories }: CategoryCarouselProps) {
         className="items-center justify-start mr-4"
         style={{ minWidth: 76, maxWidth: 110 }}
         activeOpacity={0.7}
+        onPress={() => handleCategoryPress(item)}
       >
         <View 
           className="w-16 h-16 rounded-3xl items-center justify-center mb-3 border"

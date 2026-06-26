@@ -9,16 +9,33 @@ export function useProfileDashboard() {
     queryFn: async () => {
       try {
         const response = await authApi.getDashboard();
-        // The backend might not return exactly the structure expected by the UI.
-        // We will merge it with the MOCK_PROFILE_DASHBOARD to ensure safe defaults.
+        
+        // Safety check: if backend returns HTML instead of JSON
+        if (typeof response === 'string' && response.includes('<!DOCTYPE html>')) {
+          console.warn('Backend returned HTML for /api/dashboard. Falling back to defaults.');
+          throw new Error('Backend returned HTML for dashboard');
+        }
+        
+        // Merge with safe defaults so the UI doesn't crash if fields are missing
         return {
-          ...MOCK_PROFILE_DASHBOARD,
-          ...response,
+          statistics: {
+            favoritesCount: response?.statistics?.favoritesCount ?? 0,
+            reviewsCount: response?.statistics?.reviewsCount ?? 0,
+            viewsCount: response?.statistics?.viewsCount ?? 0,
+            offersClaimed: response?.statistics?.offersClaimed ?? 0,
+          },
+          recentActivity: response?.recentActivity || [],
+          completionPercentage: response?.completionPercentage ?? 100,
+          completionTasks: response?.completionTasks || []
         } as ProfileDashboardData;
       } catch (err) {
-        // Fallback to mock data if the API call fails or is not authenticated properly
-        console.warn('Failed to fetch dashboard API, falling back to mock.', err);
-        return MOCK_PROFILE_DASHBOARD;
+        console.warn('Failed to fetch dashboard API', err);
+        return {
+          statistics: { favoritesCount: 0, reviewsCount: 0, viewsCount: 0, offersClaimed: 0 },
+          recentActivity: [],
+          completionPercentage: 100,
+          completionTasks: []
+        } as ProfileDashboardData;
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

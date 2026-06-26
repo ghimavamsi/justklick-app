@@ -1,7 +1,6 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, Modal, Pressable, Animated, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
 import { useTheme } from '../../hooks/useTheme';
 
 interface Props {
@@ -17,9 +16,59 @@ const SORT_OPTIONS = [
   { id: 'nearest', label: 'Nearest to Me', icon: 'location-outline' },
 ];
 
+const SHEET_HEIGHT = 280;
+
 export function FavoritesSortSheet({ visible, onClose, currentSort, onSortChange }: Props) {
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
+
+  const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.timing(backdropOpacity, {
+          toValue: 1,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(backdropOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: SHEET_HEIGHT,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [visible]);
+
+  const handleClose = () => {
+    Animated.parallel([
+      Animated.timing(backdropOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: SHEET_HEIGHT,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+    ]).start(() => onClose());
+  };
 
   if (!visible) return null;
 
@@ -28,24 +77,24 @@ export function FavoritesSortSheet({ visible, onClose, currentSort, onSortChange
       visible={visible}
       transparent
       animationType="none"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
+      statusBarTranslucent
     >
       <View className="flex-1 justify-end">
-        <Animated.View 
-          entering={FadeIn.duration(200)} 
+        <Animated.View
+          style={{ opacity: backdropOpacity }}
           className="absolute inset-0"
         >
-          <Pressable 
-            className="flex-1 bg-black/40" 
-            onPress={onClose} 
+          <Pressable
+            className="flex-1 bg-black/40"
+            onPress={handleClose}
           />
         </Animated.View>
 
-        <Animated.View 
-          entering={SlideInDown.springify().damping(20).stiffness(200)}
+        <Animated.View
+          style={{ transform: [{ translateY }] }}
           className="bg-card rounded-t-[32px] pt-4 pb-8 shadow-lg"
         >
-          {/* Handle bar */}
           <View className="items-center mb-4">
             <View className="w-12 h-1.5 rounded-full bg-border" />
           </View>
@@ -63,18 +112,18 @@ export function FavoritesSortSheet({ visible, onClose, currentSort, onSortChange
                   key={option.id}
                   onPress={() => {
                     onSortChange(option.id);
-                    onClose();
+                    handleClose();
                   }}
                   className={`flex-row items-center justify-between p-4 rounded-[16px] mb-2 ${
                     isActive ? 'bg-primary/10' : 'bg-transparent'
                   }`}
                 >
                   <View className="flex-row items-center">
-                    <Ionicons 
-                      name={option.icon as any} 
-                      size={20} 
-                      color={isActive ? '#1C398E' : (isDark ? '#94A3B8' : '#64748B')} 
-                      style={{ marginRight: 12 }} 
+                    <Ionicons
+                      name={option.icon as any}
+                      size={20}
+                      color={isActive ? '#1C398E' : (isDark ? '#94A3B8' : '#64748B')}
+                      style={{ marginRight: 12 }}
                     />
                     <Text className={`text-base font-bold ${
                       isActive ? 'text-primary' : 'text-foreground'

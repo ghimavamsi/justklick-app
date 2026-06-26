@@ -106,6 +106,20 @@ export default function PremiumLoginScreen() {
     onSuccess: (data: any, variables) => {
       console.log('Google Auth API Success:', data);
 
+      // If backend indicates user not found, redirect to registration
+      if (data.success === false && /not.*found|no.*account/i.test(data.message)) {
+        const googleUser = variables.user;
+        // Pass email and name to register screen via params
+        router.push({
+          pathname: '/(auth)/register',
+          params: {
+            email: googleUser.email || '',
+            name: googleUser.name || `${googleUser.givenName || ''} ${googleUser.familyName || ''}`.trim(),
+          },
+        });
+        return;
+      }
+
       // Backend might return 200 OK but with success: false in the JSON body
       if (data.success === false) {
         setError(data.message || 'Google Sign-In failed on our server. Please try again.');

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { businessesApi } from '../api/businesses';
+import { homeApi } from '../api/home';
 import { Business } from '../types/home.types';
 
 export const FAVORITES_QUERY_KEY = ['favorites'];
@@ -10,47 +11,70 @@ export function useFavorites() {
     queryFn: async () => {
       try {
         const response = await businessesApi.getSavedBusinesses();
-        if (Array.isArray(response)) {
-          // Helper to fix relative URLs and force HTTPS
-          const getImageUrl = (url: string | null | undefined, fallback: string) => {
-            if (!url) return fallback;
-            if (url.startsWith('http:')) return url.replace('http:', 'https:');
-            if (url.startsWith('https:')) return url;
-            
-            const relativePath = url.startsWith('/') ? url : `/${url}`;
-            return `https://justklick-backend-kjrdc8-2f68d5-162-35-161-160.sslip.io${relativePath}`;
-          };
+        if (!Array.isArray(response) || response.length === 0) return [];
 
-          return response.map((b: any) => {
-            const businessData = b?.business || b;
-            
-            let firstImageUrl = null;
-            if (Array.isArray(businessData?.images) && businessData.images.length > 0) {
-              firstImageUrl = businessData.images[0].image || businessData.images[0].image_url;
+        const BASE_URL = 'https://api.justklick.co.in';
+
+        const getImageUrl = (url: string | null | undefined, fallback: string) => {
+          if (!url) return fallback;
+          let fixed = url;
+          if (fixed.startsWith('http:')) fixed = fixed.replace('http:', 'https:');
+          if (fixed.startsWith('https://') || fixed.startsWith('http://')) return fixed;
+          const relativePath = fixed.startsWith('/') ? fixed : `/${fixed}`;
+          return `${BASE_URL}${relativePath}`;
+        };
+
+        const results = await Promise.all(
+          response.map(async (fav: any) => {
+            const slug = fav?.slug || fav?.business?.slug;
+            const savedId = fav?.id || fav?.saved_id;
+            const businessId = fav?.business_id;
+
+            let detail: any = null;
+            if (slug) {
+              try {
+                detail = await homeApi.fetchBusinessDetails(slug);
+              } catch (e) {
+                console.warn('[FAVORITES] Failed to fetch details for slug:', slug, e);
+              }
             }
-            
+
+            const b = detail || fav?.business || fav;
+
+            let firstImageUrl: string | null = null;
+            if (Array.isArray(b?.images) && b.images.length > 0) {
+              const img = b.images[0];
+              firstImageUrl = typeof img === 'string' ? img : (img?.image || img?.image_url || img?.url || img?.src || null);
+            }
+
+            const coverImage = getImageUrl(
+              firstImageUrl || b?.image || b?.cover_image || b?.logo || b?.thumbnail || b?.profile_image || b?.photo,
+              'https://via.placeholder.com/400x300'
+            );
+
             return {
-              id: String(businessData?.id),
-              name: businessData?.company_name || businessData?.business_name || businessData?.name || 'Unknown',
-              slug: businessData?.slug || String(businessData?.id),
-              category: businessData?.category || 'General',
-              rating: Number(businessData?.rating) || 0,
-              reviewsCount: businessData?.reviews_count || 0,
-              isVerified: businessData?.status === 'verified',
-              coverImage: getImageUrl(firstImageUrl || businessData?.image || businessData?.cover_image, 'https://via.placeholder.com/400x300'),
-              isPremium: false,
-              isTrending: false,
-              tags: Array.isArray(businessData?.services) ? businessData.services : [],
-              isOpenNow: true,
-              fullAddress: businessData?.location || businessData?.address || '',
-              distanceStr: businessData?.distance ? `${Number(businessData.distance).toFixed(1)} km` : '',
-              saved_id: b?.saved_id || b?.id // Ensure we have the saved_id to unsave later if backend requires
+              id: String(businessId || b?.id),
+              name: b?.company_name || b?.business_name || b?.name || fav?.company_name || 'Unknown',
+              slug: slug || String(b?.id),
+              category: typeof b?.category === 'object' ? b?.category?.name : (b?.category || 'General'),
+              rating: Number(b?.rating) || 0,
+              reviewsCount: b?.reviews_count || b?.review_count || 0,
+              isVerified: b?.status === 'verified' || b?.is_verified === true,
+              coverImage,
+              isPremium: b?.is_premium || false,
+              isTrending: b?.is_trending || false,
+              tags: Array.isArray(b?.services) ? b.services.map((s: any) => typeof s === 'string' ? s : s?.name || '') : [],
+              isOpenNow: b?.is_open_now ?? true,
+              fullAddress: b?.location || b?.address || b?.full_address || fav?.location || '',
+              distanceStr: b?.distance ? `${Number(b.distance).toFixed(1)} km` : '',
+              saved_id: savedId
             };
-          });
-        }
-        return [];
+          })
+        );
+
+        return results;
       } catch (err) {
-        console.error('Failed to fetch real favorites', err);
+        console.error('Failed to fetch favorites', err);
         return [];
       }
     },

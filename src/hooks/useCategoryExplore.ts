@@ -14,7 +14,7 @@ const mapToExploreCategory = (c: any, index: number): ExploreCategory => {
     if (url.startsWith('https:')) return url;
     
     const relativePath = url.startsWith('/') ? url : `/${url}`;
-    return `https://justklick-backend-kjrdc8-2f68d5-162-35-161-160.sslip.io${relativePath}`;
+    return `https://api.justklick.co.in${relativePath}`;
   };
 
   const gradients: [string, string][] = [

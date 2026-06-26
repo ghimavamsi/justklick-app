@@ -7,7 +7,7 @@ import { useTheme } from '../../hooks/useTheme';
 
 // Components
 import { HomeHeader } from '../../components/home/HomeHeader';
-import { HeroSearch } from '../../components/home/HeroSearch';
+
 import { CategoryCarousel } from '../../components/home/CategoryCarousel';
 import { PromoBannerCarousel } from '../../components/home/PromoBannerCarousel';
 import { BusinessSection } from '../../components/home/BusinessSection';
@@ -16,7 +16,6 @@ import { HomeSkeletons } from '../../components/home/HomeSkeletons';
 
 // Section Enum for FlatList
 type HomeSectionType = 
-  | 'search' 
   | 'categories' 
   | 'banners' 
   | 'featured' 
@@ -27,15 +26,14 @@ type HomeSectionType =
   | 'footer';
 
 const SECTIONS: HomeSectionType[] = [
-  'search', 
-  'categories', 
-  'banners', 
-  'featured', 
-  'premium', 
-  'nearby', 
-  'trending', 
+  'categories',
+  'banners',
+  'featured',
+  'premium',
+  'nearby',
+  'trending',
   'recommended',
-  'footer'
+  'footer',
 ];
 
 export default function HomeScreen() {
@@ -98,8 +96,7 @@ export default function HomeScreen() {
 
   const renderSection: ListRenderItem<HomeSectionType> = ({ item }) => {
     switch (item) {
-      case 'search':
-        return <HeroSearch />;
+
       case 'categories':
         return <CategoryCarousel categories={data.categories} />;
       case 'banners':

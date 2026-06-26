@@ -114,12 +114,6 @@ export function NotificationHeader({ scrollY, searchQuery, setSearchQuery }: Not
             >
               <Text className="text-xs font-bold text-primary">Mark all read</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => router.push('/notifications/settings' as any)}
-              className="w-10 h-10 rounded-full bg-muted items-center justify-center border border-border/50"
-            >
-              <Ionicons name="settings-outline" size={20} color={isDark ? '#FFF' : '#000'} />
-            </TouchableOpacity>
           </View>
         </View>
 

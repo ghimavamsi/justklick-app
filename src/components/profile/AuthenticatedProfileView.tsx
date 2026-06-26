@@ -157,8 +157,7 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
         <View className="px-6 mb-8">
           <Text className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4 ml-1">Preferences</Text>
           <View className="bg-card rounded-[24px] border border-border shadow-sm overflow-hidden mb-4">
-            <SettingsRow icon="person-outline" title="Account Details" color="#3b82f6" />
-            <SettingsRow icon="notifications-outline" title="Notification Preferences" color="#a855f7" />
+            <SettingsRow icon="person-outline" title="Account Details" color="#3b82f6" onPress={() => router.push('/settings' as any)} />
             <SettingsRow icon="location-outline" title="Location Settings" color="#10b981" isLast />
           </View>
         </View>

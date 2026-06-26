@@ -96,40 +96,6 @@ export function ResultsState() {
   const renderHeaders = () => (
     <View className="mb-4">
       
-      {/* Promotional Banners */}
-      <View className="mb-4 mt-2">
-        <FlatList
-          ref={bannerListRef}
-          data={MOCK_SEARCH_BANNERS}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={width}
-          decelerationRate="fast"
-          getItemLayout={(_, index) => ({
-            length: width,
-            offset: width * index,
-            index,
-          })}
-          onScrollToIndexFailed={(info) => {
-            const wait = new Promise(resolve => setTimeout(resolve, 500));
-            wait.then(() => {
-              bannerListRef.current?.scrollToIndex({ index: info.index, animated: true });
-            });
-          }}
-          onMomentumScrollEnd={(event) => {
-            const index = Math.round(event.nativeEvent.contentOffset.x / width);
-            setActiveBannerIndex(index);
-          }}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={{ width, paddingHorizontal: 16 }}>
-              <TouchableOpacity activeOpacity={0.9} className="rounded-2xl overflow-hidden shadow-sm w-full bg-muted" style={{ height: 200 }}>
-                <Image source={{ uri: item.image }} className="w-full h-full" resizeMode="stretch" />
-              </TouchableOpacity>
-            </View>
-          )}
-        />
-      </View>
 
       {/* Subcategories Ribbon */}
       {availableSubcategories.length > 0 && (

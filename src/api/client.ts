@@ -2,7 +2,7 @@ import axios from 'axios';
 import { setupInterceptors } from './interceptors';
 
 // Live backend URL
-export const API_BASE_URL = 'https://justklick-backend-kjrdc8-2f68d5-162-35-161-160.sslip.io';
+export const API_BASE_URL = 'https://api.justklick.co.in';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
