@@ -157,7 +157,7 @@ export default function PremiumLoginScreen() {
   useEffect(() => {
     // Configure Google Sign-In with the Web Client ID provided by the user
     GoogleSignin.configure({
-      webClientId: '831597823890-cj7922dosfj6mq44ql15guisi7s7brp1.apps.googleusercontent.com',
+      webClientId: '481533763438-dnfsieetsh3gd6a4dno3arsna8hrujst.apps.googleusercontent.com',
       offlineAccess: true, // required to get the idToken/serverAuthCode
     });
   }, []);
@@ -193,14 +193,17 @@ export default function PremiumLoginScreen() {
     } catch (error: any) {
       console.log('Google Sign-In Exception:', error);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
+        console.log('User cancelled the login flow');
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
+        console.log('Sign in is in progress already');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        setError('Play services not available or outdated.');
+        console.log('Play services not available or outdated');
+        setError('Google Play Services is not available on this device.');
       } else {
-        setError('An unexpected Google error occurred.');
-        console.error(error);
+        console.log('Google Sign-In Exception Code:', error.code);
+        console.log('Google Sign-In Exception Message:', error.message);
+        console.log('Google Sign-In Exception Full:', error);
+        setError('Failed to sign in with Google. Please try again.');
       }
     }
   };

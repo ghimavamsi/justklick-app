@@ -25,7 +25,7 @@ export const homeApi = {
       params.search = query; // Or params.q = query, based on DRF conventions (usually 'search')
     }
     if (category) {
-      params.category = category;
+      params.category_slug = category;
     }
     const response = await apiClient.get<ApiBusiness[]>('/api/businesses/', { params });
     return response.data;

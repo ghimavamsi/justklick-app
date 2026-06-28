@@ -35,7 +35,7 @@ const mapToExploreCategory = (c: any, index: number): ExploreCategory => {
   const sizes: ('large' | 'medium' | 'small')[] = ['large', 'large', 'medium', 'medium', 'small', 'medium', 'small', 'small', 'medium', 'small', 'small', 'large'];
 
   return {
-    id: String(c?.id || c?.slug || index),
+    id: String(c?.slug || c?.id || index),
     name: c?.name || c?.category_name || `Category ${index + 1}`,
     iconName: getImageUrl(c?.image || c?.icon, 'grid-outline'), 
     iconLibrary: 'Ionicons',
@@ -89,9 +89,15 @@ export function useCategorySearch(query: string) {
       if (!query) return categories;
 
       const lowerQuery = query.toLowerCase();
-      return categories.filter((c: ExploreCategory) => 
-        c.name.toLowerCase().includes(lowerQuery)
-      );
+      // Remove trailing 's' for simple plural matching, or check reverse includes
+      const singularQuery = lowerQuery.endsWith('s') ? lowerQuery.slice(0, -1) : lowerQuery;
+      
+      return categories.filter((c: ExploreCategory) => {
+        const catName = c.name.toLowerCase();
+        return catName.includes(lowerQuery) || 
+               catName.includes(singularQuery) || 
+               lowerQuery.includes(catName);
+      });
     },
     enabled: true, 
     staleTime: 1000 * 60, // 1 minute

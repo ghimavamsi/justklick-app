@@ -21,11 +21,9 @@ export const authApi = {
 
   // Student Login using Query Parameters
   studentLogin: async (phone: string, otp: string): Promise<any> => {
-    const response = await apiClient.post<any>('/api/student-login', null, {
-      params: {
-        phone,
-        otp
-      }
+    const response = await apiClient.post<any>('/api/student-login', {
+      phone,
+      otp
     });
     return response;
   },
@@ -44,14 +42,12 @@ export const authApi = {
     phone: string, 
     otp: string
   ): Promise<any> => {
-    const response = await apiClient.post<any>('/api/student-register', null, {
-      params: {
-        first_name: firstName,
-        last_name: lastName,
-        email,
-        phone,
-        otp
-      }
+    const response = await apiClient.post<any>('/api/student-register', {
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      phone,
+      otp
     });
     return response;
   },

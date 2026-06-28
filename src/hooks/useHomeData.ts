@@ -87,7 +87,7 @@ export function useHomeData() {
 
       // Map Categories
       const categories: Category[] = extractArray(apiCategories).map((c: any, index: number) => ({
-        id: String(c?.id || c?.slug || index),
+        id: String(c?.slug || c?.id || index),
         name: c?.name || c?.category_name || `Category ${index + 1}`,
         slug: c?.slug || (c?.name || c?.category_name || `Category ${index + 1}`).toLowerCase().replace(/\s+/g, '-'),
         iconName: getImageUrl(c?.image || c?.icon, 'grid-outline'), 

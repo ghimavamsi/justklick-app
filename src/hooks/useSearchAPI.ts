@@ -13,10 +13,22 @@ export function useSearchAPI(query: string, category: string | null) {
     queryKey: [...SEARCH_BUSINESSES_KEY(query, category), activeLocation?.latitude, activeLocation?.longitude],
     queryFn: async () => {
       // 1. Fetch businesses with location, query, and category filters
+      // If the user typed a specific query or selected a category, we omit lat/lng 
+      // so the backend doesn't aggressively filter out results by distance (which causes 0 results if they are slightly far)
+      const isGlobalSearch = !!query || !!category;
+      
+      // Fix strict backend pluralization mismatches
+      let apiQuery = query;
+      if (apiQuery) {
+        const lower = apiQuery.toLowerCase().trim();
+        if (lower === 'hostels') apiQuery = 'hostel';
+        if (lower === 'collages' || lower === 'colleges') apiQuery = 'collage';
+      }
+      
       const businessData = await homeApi.fetchBusinesses(
-        activeLocation?.latitude,
-        activeLocation?.longitude,
-        query,
+        isGlobalSearch ? undefined : activeLocation?.latitude,
+        isGlobalSearch ? undefined : activeLocation?.longitude,
+        apiQuery,
         category || undefined
       );
 
@@ -58,6 +70,6 @@ export function useSearchAPI(query: string, category: string | null) {
       return businesses;
     },
     // Don't execute if we don't have query or category
-    enabled: (!!query || !!category) && !!activeLocation,
+    enabled: !!query || !!category,
   });
 }

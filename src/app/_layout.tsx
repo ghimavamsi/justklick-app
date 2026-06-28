@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import { Stack, ThemeProvider, DarkTheme, DefaultTheme, usePathname } from 'expo-router';
+import { Stack, ThemeProvider, DarkTheme, DefaultTheme } from 'expo-router';
 // Removed duplicate nativewind import
 import { useEffect } from 'react';
 import { View, Image } from 'react-native';
@@ -31,11 +31,13 @@ function ThemeWrapper({ children }: { children: React.ReactNode }) {
 import { useProtectedRoute } from '../hooks/useProtectedRoute';
 import { useLocationStore } from '../store/location-store';
 
+function RouteGuard() {
+  useProtectedRoute();
+  return null;
+}
+
 export default function RootLayout() {
   const osColorScheme = useReactNavigationColorScheme();
-  
-  // Initialize the global route guard
-  useProtectedRoute();
 
   const [loaded, error] = useFonts({
     PlusJakartaSans_400Regular,
@@ -45,7 +47,7 @@ export default function RootLayout() {
     PlusJakartaSans_800ExtraBold,
   });
 
-  const pathname = usePathname();
+
 
   useEffect(() => {
     if (loaded || error) {
@@ -80,6 +82,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: osColorScheme === 'dark' ? '#09090b' : '#FFFFFF' }}>
       <AppProviders>
+        <RouteGuard />
         <ThemeProvider value={osColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <ThemeWrapper>
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }} />

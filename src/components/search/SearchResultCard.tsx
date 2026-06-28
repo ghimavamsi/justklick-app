@@ -10,6 +10,8 @@ interface SearchResultCardProps {
 
 const { width } = Dimensions.get('window');
 
+import { router } from 'expo-router';
+
 export function SearchResultCard({ business }: SearchResultCardProps) {
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
@@ -24,7 +26,11 @@ export function SearchResultCard({ business }: SearchResultCardProps) {
   };
 
   return (
-    <View className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm mb-6">
+    <TouchableOpacity 
+      activeOpacity={0.9}
+      onPress={() => router.push(`/business/${business.slug || business.id}`)}
+      className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm mb-6"
+    >
       
       {/* Image Carousel */}
       <View style={{ height: 200, width: '100%' }}>
@@ -173,6 +179,6 @@ export function SearchResultCard({ business }: SearchResultCardProps) {
         </View>
 
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
