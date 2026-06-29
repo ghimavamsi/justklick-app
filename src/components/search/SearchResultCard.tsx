@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, Image, Dimensions, FlatList, NativeSynthe
 import { Ionicons } from '@expo/vector-icons';
 import { Business } from '../../types/home.types';
 import { useTheme } from '../../hooks/useTheme';
+import { useQuery } from '@tanstack/react-query';
+import { vendorsApi } from '../../api/vendors';
 
 interface SearchResultCardProps {
   business: Business;
@@ -16,6 +18,16 @@ export function SearchResultCard({ business }: SearchResultCardProps) {
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const { data: dynamicReviewData } = useQuery({
+    queryKey: ['reviewsCount', business.id],
+    queryFn: () => vendorsApi.getReviewsCount(Number(business.id)),
+    staleTime: 5 * 60 * 1000,
+  });
+  
+  const displayReviewsCount = dynamicReviewData?.count 
+    ?? dynamicReviewData?.total_reviews 
+    ?? (typeof dynamicReviewData === 'number' ? dynamicReviewData : business.reviewsCount);
 
   const images = business.images && business.images.length > 0 ? business.images : [business.coverImage];
 
@@ -104,7 +116,7 @@ export function SearchResultCard({ business }: SearchResultCardProps) {
         
         {/* Ratings Count */}
         <Text className="text-xs text-muted-foreground font-medium mb-3">
-          {business.reviewsCount} Ratings
+          {displayReviewsCount} Ratings
         </Text>
 
         {/* Address */}

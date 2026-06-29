@@ -23,6 +23,12 @@ export interface Business {
   tags?: string[];
   isOpenNow?: boolean;
   images?: string[];
+  phone?: string;
+  email?: string;
+  description?: string;
+  website?: string;
+  latitude?: number;
+  longitude?: number;
   experience?: string;
   timings?: string;
   fullAddress?: string;

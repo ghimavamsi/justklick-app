@@ -134,10 +134,6 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
     };
   });
 
-  const getInitials = () => {
-    if (!isAuthenticated || !profile?.name) return 'G';
-    return profile.name.substring(0, 2).toUpperCase();
-  };
 
   const isDark = colorScheme === 'dark';
   const gradientColors = isDark 
@@ -184,15 +180,18 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
         <Animated.View className="flex-row items-center gap-3" style={rightSideStyle}>
           <TouchableOpacity 
             onPress={() => router.push('/notifications')}
-            className="w-11 h-11 rounded-full bg-muted items-center justify-center border border-border relative"
+            className="w-12 h-12 rounded-full bg-muted items-center justify-center border border-border relative"
           >
-            <Ionicons name="notifications-outline" size={22} color={isDark ? '#FFF' : '#000'} />
+            <Ionicons name="notifications-outline" size={26} color={isDark ? '#FFF' : '#000'} />
             {hasUnreadNotifications && (
-              <View className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-[#c10007]" />
+              <View className="absolute top-2.5 right-2.5 w-3 h-3 rounded-full bg-[#c10007]" />
             )}
           </TouchableOpacity>
-          <TouchableOpacity className="w-11 h-11 rounded-full bg-primary items-center justify-center shadow-sm">
-            <Text className="text-primary-foreground font-bold text-base">{getInitials()}</Text>
+          <TouchableOpacity 
+            onPress={() => router.push('/(tabs)/profile' as any)}
+            className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center border border-primary/20 shadow-sm"
+          >
+            <Ionicons name="person" size={24} color="#1C398E" />
           </TouchableOpacity>
         </Animated.View>
 

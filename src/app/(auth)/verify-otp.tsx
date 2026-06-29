@@ -16,6 +16,7 @@ import { useAuthStore } from '../../store/auth-store';
 import { useUserStore } from '../../store/user-store';
 import { useMutation } from '@tanstack/react-query';
 import { authApi } from '../../api/auth';
+import { studentApi } from '../../api/student';
 import SmsRetriever from 'react-native-sms-retriever';
 
 const { height } = Dimensions.get('window');
@@ -27,7 +28,7 @@ export default function PremiumVerifyOTPScreen() {
   const router = useRouter();
   const { colorScheme } = useTheme();
   const { login } = useAuthStore();
-  const { setProfile } = useUserStore();
+  const { setProfile, setProfileComplete } = useUserStore();
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(30);
@@ -153,7 +154,22 @@ export default function PremiumVerifyOTPScreen() {
       if (type === 'register') {
         router.replace('/(auth)/student-onboarding');
       } else {
-        router.replace('/(tabs)');
+        // Fetch profile to see if onboarding is completed
+        studentApi.getProfile()
+          .then((profile) => {
+            if (profile && profile.college_code) {
+              setProfileComplete(true);
+              router.replace('/(tabs)');
+            } else {
+              setProfileComplete(false);
+              router.replace('/(auth)/student-onboarding');
+            }
+          })
+          .catch((err) => {
+            console.log('Error fetching profile after OTP Login:', err);
+            setProfileComplete(false);
+            router.replace('/(auth)/student-onboarding');
+          });
       }
     },
     onError: (err: any) => {

@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import { useRouter, useSegments } from 'expo-router';
 import { useAuthStore } from '../store/auth-store';
 import { useAppStore } from '../store/app-store';
+import { useUserStore } from '../store/user-store';
 
 export function useProtectedRoute() {
   const segments = useSegments();
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
+  const { isProfileComplete } = useUserStore();
   const { hasSeenOnboarding, hasSeenPermissions } = useAppStore();
 
   useEffect(() => {
@@ -16,28 +18,40 @@ export function useProtectedRoute() {
     const isLegalScreen = segments[0] === 'privacy-policy' || segments[0] === 'terms-of-use';
 
     if (
-      // If the user is not authenticated and they are NOT on a public screen
       !isAuthenticated &&
-      !inAuthGroup &&
-      !inOnboardingOrPermissions &&
       !isSplashScreen &&
-      !isLegalScreen
+      !isLegalScreen &&
+      !(segments[0] === '(auth)' && segments[1] === 'login') &&
+      !(segments[0] === '(auth)' && segments[1] === 'register') &&
+      !(segments[0] === '(auth)' && segments[1] === 'verify-otp')
     ) {
       // Flow 1: Must see onboarding first
       if (!hasSeenOnboarding) {
-        router.replace('/onboarding');
+        if (segments[0] !== 'onboarding') {
+          router.replace('/onboarding');
+        }
       } 
       // Flow 2: Must complete permissions second
       else if (!hasSeenPermissions) {
-        router.replace('/permissions/location');
+        // Prevent infinite loop if they are already anywhere inside the permissions flow
+        if (segments[0] !== 'permissions') {
+          router.replace('/permissions/location');
+        }
       } 
       // Flow 3: Must login third
       else {
         router.replace('/(auth)/login');
       }
-    } else if (isAuthenticated && (inAuthGroup || inOnboardingOrPermissions)) {
-      // If the user is authenticated, they shouldn't see the auth, onboarding, or permission screens
-      router.replace('/(tabs)');
+    } else if (isAuthenticated) {
+      const isStudentOnboarding = segments[0] === '(auth)' && segments[1] === 'student-onboarding';
+      
+      if (!isProfileComplete && !isStudentOnboarding) {
+        // Enforce onboarding if profile isn't complete
+        router.replace('/(auth)/student-onboarding');
+      } else if (isProfileComplete && (segments[0] === '(auth)' || segments[0] === 'onboarding' || segments[0] === 'permissions')) {
+        // If the user is authenticated and profile is complete, they shouldn't see auth/onboarding/permission screens
+        router.replace('/(tabs)');
+      }
     }
-  }, [isAuthenticated, hasSeenOnboarding, hasSeenPermissions, segments]);
+  }, [isAuthenticated, isProfileComplete, hasSeenOnboarding, hasSeenPermissions, segments]);
 }

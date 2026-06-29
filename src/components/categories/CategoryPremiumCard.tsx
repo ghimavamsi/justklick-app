@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -25,6 +25,8 @@ export function CategoryPremiumCard({ category, onPress, style }: CategoryPremiu
 
   // Calculate height based on cardSize
   const height = category.cardSize === 'large' ? 180 : category.cardSize === 'medium' ? 140 : 100;
+  
+  const isUrlIcon = category.iconName.includes('http') || category.iconName.includes('/');
 
   return (
     <Animated.View style={[animatedStyle, style]} className="mb-4">
@@ -63,11 +65,19 @@ export function CategoryPremiumCard({ category, onPress, style }: CategoryPremiu
               end={{ x: 1, y: 1 }}
               className={`items-center justify-center rounded-2xl shadow-sm ${category.cardSize === 'small' ? 'w-10 h-10' : 'w-14 h-14'}`}
             >
-              <Ionicons 
-                name={category.iconName as any} 
-                size={category.cardSize === 'small' ? 20 : 28} 
-                color="#FFF" 
-              />
+              {isUrlIcon ? (
+                <Image 
+                  source={{ uri: category.iconName }} 
+                  style={{ width: category.cardSize === 'small' ? 24 : 32, height: category.cardSize === 'small' ? 24 : 32 }}
+                  resizeMode="contain"
+                />
+              ) : (
+                <Ionicons 
+                  name={category.iconName as any} 
+                  size={category.cardSize === 'small' ? 20 : 28} 
+                  color="#FFF" 
+                />
+              )}
             </LinearGradient>
 
             {/* Badges */}

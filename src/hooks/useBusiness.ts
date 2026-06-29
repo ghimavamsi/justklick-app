@@ -113,10 +113,24 @@ export function useBusinessReviews(id: string) {
     queryFn: async () => {
       try {
         const response = await vendorsApi.getBusinessReviews(Number(id));
-        // Ensure we return an array. Assuming API returns an array or { results: [] }
-        if (Array.isArray(response)) return response;
-        if (response && Array.isArray(response.results)) return response.results;
-        return [];
+        
+        let rawReviews = [];
+        if (Array.isArray(response)) rawReviews = response;
+        else if (response && Array.isArray(response.results)) rawReviews = response.results;
+        else if (response && Array.isArray(response.data)) rawReviews = response.data;
+        
+        return rawReviews.map((r: any, index: number) => ({
+          id: r.id?.toString() || r._id || `review-${index}`,
+          authorName: r.authorName || r.user_name || r.name || (r.user?.first_name ? `${r.user.first_name} ${r.user.last_name || ''}` : 'Anonymous'),
+          authorImage: r.authorImage || r.user_avatar || r.profile_pic || r.user?.profile_pic || undefined,
+          rating: Number(r.rating || r.score || r.stars || 5),
+          date: r.date || r.created_at || r.updated_at || 'Recently',
+          text: r.text || r.comment || r.description || r.review || '',
+          isVerified: r.isVerified ?? r.is_verified ?? true,
+          helpfulCount: Number(r.helpfulCount || r.helpful_count || r.likes || 0),
+          images: r.images || r.photos || [],
+          businessResponse: r.businessResponse || r.reply || r.owner_response || undefined,
+        }));
       } catch (err) {
         console.warn('Failed to fetch real reviews, returning empty', err);
         return [];

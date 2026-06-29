@@ -6,6 +6,8 @@ import { useRouter } from 'expo-router';
 import { Business } from '../../types/home.types';
 import { useTheme } from '../../hooks/useTheme';
 import { useFavorites, useToggleFavorite } from '../../hooks/useFavorites';
+import { useQuery } from '@tanstack/react-query';
+import { vendorsApi } from '../../api/vendors';
 
 interface BusinessCardProps {
   business: Business;
@@ -19,6 +21,17 @@ export function BusinessCard({ business, variant = 'featured' }: BusinessCardPro
   const router = useRouter();
   const { data: favorites } = useFavorites();
   const { mutate: toggleFavorite } = useToggleFavorite();
+  
+  const { data: dynamicReviewData } = useQuery({
+    queryKey: ['reviewsCount', business.id],
+    queryFn: () => vendorsApi.getReviewsCount(Number(business.id)),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+  
+  // Extract count from API response (assuming it might be an object with 'count' or 'total_reviews')
+  const displayReviewsCount = dynamicReviewData?.count 
+    ?? dynamicReviewData?.total_reviews 
+    ?? (typeof dynamicReviewData === 'number' ? dynamicReviewData : business.reviewsCount);
   
   const scale = useSharedValue(1);
 
@@ -41,10 +54,13 @@ export function BusinessCard({ business, variant = 'featured' }: BusinessCardPro
   let imageHeight = 160;
   let isCompact = false;
 
+  let isHalfWidth = false;
+
   if (variant === 'nearby' || variant === 'recommended') {
-    cardWidth = width * 0.65;
-    imageHeight = 120;
+    cardWidth = (width - 60) / 2;
+    imageHeight = 130;
     isCompact = true;
+    isHalfWidth = true;
   }
 
   const isPremium = variant === 'premium' || business.isPremium;
@@ -78,50 +94,52 @@ export function BusinessCard({ business, variant = 'featured' }: BusinessCardPro
           {/* Favorite Button Overlay */}
           <TouchableOpacity 
             onPress={handleFavoritePress}
-            className="absolute top-3 right-3 w-8 h-8 bg-background/80 rounded-full items-center justify-center backdrop-blur-md"
+            className={`absolute top-2 right-2 ${isHalfWidth ? 'w-7 h-7' : 'w-8 h-8'} bg-background/80 rounded-full items-center justify-center backdrop-blur-md`}
           >
             <Ionicons 
               name={isFavorite ? "heart" : "heart-outline"} 
-              size={18} 
+              size={isHalfWidth ? 16 : 18} 
               color={isFavorite ? "#ef4444" : (colorScheme === 'dark' ? '#FFF' : '#000')} 
             />
           </TouchableOpacity>
 
           {/* Premium Badge Overlay */}
           {isPremium && (
-            <View className="absolute top-3 left-3 bg-[#F59E0B] px-2 py-1 rounded-full flex-row items-center border border-white/20 shadow-sm">
-              <Ionicons name="star" size={10} color="#FFF" />
-              <Text className="text-white text-[10px] font-bold uppercase ml-1 tracking-wider">Premium</Text>
+            <View className={`absolute top-2 left-2 bg-[#F59E0B] ${isHalfWidth ? 'px-1.5 py-0.5' : 'px-2 py-1'} rounded-full flex-row items-center border border-white/20 shadow-sm`}>
+              <Ionicons name="star" size={isHalfWidth ? 8 : 10} color="#FFF" />
+              <Text className={`text-white ${isHalfWidth ? 'text-[8px]' : 'text-[10px]'} font-bold uppercase ml-1 tracking-wider`}>Premium</Text>
             </View>
           )}
         </View>
 
         {/* Content Details */}
-        <View className="p-4">
+        <View className={isHalfWidth ? "p-3" : "p-4"}>
           <View className="flex-row items-center justify-between mb-1">
-            <Text className="text-xs font-semibold text-primary">{business.category}</Text>
+            <Text className="font-semibold text-primary flex-1 mr-1" style={{ fontSize: isHalfWidth ? 10 : 12 }} numberOfLines={1}>{business.category}</Text>
             {business.distanceStr && (
-              <View className="flex-row items-center">
-                <Ionicons name="location-outline" size={12} color="#64748B" />
-                <Text className="text-[10px] text-muted-foreground font-medium ml-0.5">{business.distanceStr}</Text>
+              <View className="flex-row items-center shrink-0">
+                <Ionicons name="location-outline" size={isHalfWidth ? 10 : 12} color="#64748B" />
+                <Text className="text-muted-foreground font-medium ml-0.5" style={{ fontSize: isHalfWidth ? 9 : 10 }}>{business.distanceStr}</Text>
               </View>
             )}
           </View>
 
-          <Text className="text-lg font-extrabold text-foreground mb-2" numberOfLines={1}>
-            {business.name}
+          <View className="flex-row items-start mb-2" style={{ minHeight: isHalfWidth ? 36 : 24 }}>
+            <Text className="font-extrabold text-foreground flex-1" style={{ fontSize: isHalfWidth ? 14 : 18, lineHeight: isHalfWidth ? 18 : 24 }} numberOfLines={isHalfWidth ? 2 : 1}>
+              {business.name}
+            </Text>
             {business.isVerified && (
-              <Ionicons name="checkmark-circle" size={16} color="#10B981" style={{ marginLeft: 4 }} />
+              <Ionicons name="checkmark-circle" size={isHalfWidth ? 14 : 16} color="#10B981" style={{ marginLeft: 4, marginTop: isHalfWidth ? 2 : 4 }} />
             )}
-          </Text>
+          </View>
 
           <View className="flex-row items-center justify-between mt-auto">
-            <View className="flex-row items-center">
-              <View className="bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5 rounded flex-row items-center mr-2 border border-amber-200 dark:border-amber-800/50">
-                <Ionicons name="star" size={12} color="#F59E0B" />
-                <Text className="text-amber-700 dark:text-amber-400 text-xs font-bold ml-1">{business.rating}</Text>
+            <View className="flex-row items-center flex-1">
+              <View className="bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5 rounded flex-row items-center mr-1 border border-amber-200 dark:border-amber-800/50">
+                <Ionicons name="star" size={isHalfWidth ? 10 : 12} color="#F59E0B" />
+                <Text className="text-amber-700 dark:text-amber-400 font-bold ml-1" style={{ fontSize: isHalfWidth ? 10 : 12 }}>{business.rating}</Text>
               </View>
-              <Text className="text-xs text-muted-foreground font-medium">({business.reviewsCount} reviews)</Text>
+              <Text className="text-muted-foreground font-medium flex-1" style={{ fontSize: isHalfWidth ? 9 : 12 }} numberOfLines={1}>({displayReviewsCount} reviews)</Text>
             </View>
           </View>
         </View>

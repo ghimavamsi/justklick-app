@@ -2,12 +2,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { businessesApi } from '../api/businesses';
 import { homeApi } from '../api/home';
 import { Business } from '../types/home.types';
+import { useAuthStore } from '../store/auth-store';
 
 export const FAVORITES_QUERY_KEY = ['favorites'];
 
 export function useFavorites() {
+  const { isAuthenticated } = useAuthStore();
+  
   return useQuery({
     queryKey: FAVORITES_QUERY_KEY,
+    enabled: isAuthenticated,
     queryFn: async () => {
       try {
         const response = await businessesApi.getSavedBusinesses();

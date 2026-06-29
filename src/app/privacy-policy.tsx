@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Platform, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +10,7 @@ export default function PrivacyPolicyScreen() {
   const insets = useSafeAreaInsets();
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
+  const [showContact, setShowContact] = useState(false);
 
   const sections = [
     {
@@ -89,15 +90,45 @@ export default function PrivacyPolicyScreen() {
           ))}
         </View>
 
-        <View className="mt-10 p-6 bg-muted rounded-[24px] border border-border items-center">
-          <Text className="text-foreground font-bold mb-2">Have questions about your privacy?</Text>
-          <Text className="text-muted-foreground text-center text-sm mb-4">
+        <View className="mt-10 p-6 bg-card rounded-[24px] border border-border shadow-sm items-center">
+          <Text className="text-foreground font-extrabold text-lg mb-2">Have questions about your privacy?</Text>
+          <Text className="text-muted-foreground text-center text-sm mb-6 leading-relaxed">
             Our support team is here to help you understand how we protect your data.
           </Text>
-          <TouchableOpacity className="bg-primary px-6 py-3 rounded-full flex-row items-center">
-            <Ionicons name="mail-outline" size={18} color="#FFF" style={{ marginRight: 8 }} />
-            <Text className="text-white font-bold text-[15px]">Contact Privacy Team</Text>
-          </TouchableOpacity>
+          
+          {!showContact ? (
+            <TouchableOpacity 
+              onPress={() => setShowContact(true)}
+              className="bg-primary px-8 py-3.5 rounded-full flex-row items-center shadow-lg shadow-primary/30"
+            >
+              <Ionicons name="chatbubbles-outline" size={20} color="#FFF" style={{ marginRight: 8 }} />
+              <Text className="text-white font-bold text-[15px]">Contact Privacy Team</Text>
+            </TouchableOpacity>
+          ) : (
+            <View className="w-full gap-4 mt-2">
+              <TouchableOpacity onPress={() => Linking.openURL('mailto:privacy@justklick.com')} className="flex-row items-center">
+                <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
+                  <Ionicons name="mail" size={24} color="#1C398E" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm font-bold text-muted-foreground mb-1">Email Us</Text>
+                  <Text className="text-base font-bold text-primary">privacy@justklick.com</Text>
+                </View>
+              </TouchableOpacity>
+              
+              <View className="h-[1px] bg-border w-full my-1" />
+              
+              <TouchableOpacity onPress={() => Linking.openURL('tel:+919876543210')} className="flex-row items-center">
+                <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
+                  <Ionicons name="call" size={24} color="#1C398E" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm font-bold text-muted-foreground mb-1">Call Us</Text>
+                  <Text className="text-base font-bold text-primary">+91 9876543210</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>

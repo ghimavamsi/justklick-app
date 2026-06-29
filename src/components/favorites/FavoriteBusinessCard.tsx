@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Animated, { FadeInUp, Layout } from 'react-native-reanimated';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Business } from '../../types/home.types';
 import { useTheme } from '../../hooks/useTheme';
+import { useQuery } from '@tanstack/react-query';
+import { vendorsApi } from '../../api/vendors';
 
 interface Props {
   business: Business;
@@ -17,6 +19,16 @@ export function FavoriteBusinessCard({ business, index, onRemove }: Props) {
   const router = useRouter();
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
+
+  const { data: dynamicReviewData } = useQuery({
+    queryKey: ['reviewsCount', business.id],
+    queryFn: () => vendorsApi.getReviewsCount(Number(business.id)),
+    staleTime: 5 * 60 * 1000,
+  });
+  
+  const displayReviewsCount = dynamicReviewData?.count 
+    ?? dynamicReviewData?.total_reviews 
+    ?? (typeof dynamicReviewData === 'number' ? dynamicReviewData : business.reviewsCount);
 
   const renderRightActions = () => {
     return (
@@ -89,14 +101,42 @@ export function FavoriteBusinessCard({ business, index, onRemove }: Props) {
                   </Text>
                 </View>
                 
-                <Ionicons name="heart" size={16} color="#ef4444" style={{ marginTop: 2 }} />
+                <View className="flex-row gap-2">
+                  <TouchableOpacity 
+                    onPress={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        await Share.share({
+                          message: `Check out ${business.name} on JustKlick!`,
+                        });
+                      } catch (error) {
+                        console.log('Error sharing:', error);
+                      }
+                    }}
+                    className="w-8 h-8 rounded-full bg-primary/10 items-center justify-center"
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="share-social-outline" size={16} color="#1C398E" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    onPress={(e) => {
+                      e.stopPropagation(); // Prevent navigating to the business details
+                      onRemove(business.id);
+                    }}
+                    className="w-8 h-8 rounded-full bg-destructive/10 items-center justify-center"
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="trash-outline" size={16} color="#ef4444" />
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <View className="flex-row items-center mb-2">
                 <Ionicons name="star" size={12} color="#f59e0b" />
                 <Text className="text-xs font-bold text-foreground ml-1">{business.rating}</Text>
                 <Text className="text-xs font-medium text-muted-foreground ml-1">
-                  ({business.reviewsCount})
+                  ({displayReviewsCount})
                 </Text>
                 {business.distanceStr && (
                   <>

@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { View, Image } from 'react-native';
 import { useFonts, PlusJakartaSans_400Regular, PlusJakartaSans_500Medium, PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold, PlusJakartaSans_800ExtraBold } from '@expo-google-fonts/plus-jakarta-sans';
 import { SplashScreen } from 'expo-router';
+import { ToastProvider } from '../components/ui/ToastProvider';
 import '../global.css';
 import { AppProviders } from '../api/providers';
 
@@ -82,12 +83,14 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: osColorScheme === 'dark' ? '#09090b' : '#FFFFFF' }}>
       <AppProviders>
-        <RouteGuard />
-        <ThemeProvider value={osColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <ThemeWrapper>
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }} />
-          </ThemeWrapper>
-        </ThemeProvider>
+        <ToastProvider>
+          <RouteGuard />
+          <ThemeProvider value={osColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <ThemeWrapper>
+              <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }} />
+            </ThemeWrapper>
+          </ThemeProvider>
+        </ToastProvider>
       </AppProviders>
     </GestureHandlerRootView>
   );

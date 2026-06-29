@@ -45,14 +45,15 @@ export default function EditProfileScreen() {
   });
 
   useEffect(() => {
+    console.log('[DEBUG] Edit Profile fetched data:', JSON.stringify(profile, null, 2));
     if (profile) {
       setFormData({
         ...profile,
         course: profile.course || (profile as any).dept_course || '',
-        interested_abroad: (profile as any).interested_abroad === 'Yes' || profile.interested_abroad === true,
-        internship_completed: (profile as any).internship_completed === 'Yes' || profile.internship_completed === true,
-        interested_in_internship: (profile as any).interested_in_internship === 'Yes' || profile.interested_in_internship === true,
-        certifications: (profile as any).certifications === 'Yes' || profile.certifications === true,
+        interested_abroad: (profile as any).interested_abroad === 'Yes' || (profile as any).interested_abroad === 'True' || profile.interested_abroad === true,
+        internship_completed: (profile as any).internship_completed === 'Yes' || (profile as any).internship_completed === 'True' || profile.internship_completed === true,
+        interested_in_internship: (profile as any).interested_in_internship === 'Yes' || (profile as any).interested_in_internship === 'True' || profile.interested_in_internship === true,
+        certifications: (profile as any).certifications === 'Yes' || (profile as any).certifications === 'True' || profile.certifications === true,
       });
     }
   }, [profile]);

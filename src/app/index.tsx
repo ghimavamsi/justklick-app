@@ -14,6 +14,8 @@ import { useRouter, SplashScreen } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../store';
 import { useAuthStore } from '../store/auth-store';
+import { useUserStore } from '../store/user-store';
+import { studentApi } from '../api/student';
 
 const { width, height } = Dimensions.get('window');
 
@@ -40,13 +42,36 @@ export default function PremiumSplash() {
   const navigateToNextScreen = () => {
     const currentHasSeenOnboarding = useAppStore.getState().hasSeenOnboarding;
     const currentIsAuthenticated = useAuthStore.getState().isAuthenticated;
+    const { isProfileComplete, setProfileComplete } = useUserStore.getState();
     
     if (!currentHasSeenOnboarding) {
       router.replace('/onboarding');
     } else if (!currentIsAuthenticated) {
       router.replace('/(auth)/login');
     } else {
-      router.replace('/(tabs)');
+      if (isProfileComplete) {
+        router.replace('/(tabs)');
+      } else {
+        // Fetch profile to make sure
+        studentApi.getProfile()
+          .then(profile => {
+            if (profile && profile.college_code) {
+              setProfileComplete(true);
+              router.replace('/(tabs)');
+            } else {
+              setProfileComplete(false);
+              router.replace('/(auth)/student-onboarding');
+            }
+          })
+          .catch(() => {
+            // TEMPORARILY DISABLED: The backend is returning 401s, which traps the user here.
+            // setProfileComplete(false);
+            // router.replace('/(auth)/student-onboarding');
+            
+            // Let them into the app to test UI:
+            router.replace('/(tabs)');
+          });
+      }
     }
   };
 

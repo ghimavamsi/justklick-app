@@ -28,9 +28,9 @@ type HomeSectionType =
 const SECTIONS: HomeSectionType[] = [
   'categories',
   'banners',
+  'nearby',
   'featured',
   'premium',
-  'nearby',
   'trending',
   'recommended',
   'footer',
@@ -125,7 +125,7 @@ export default function HomeScreen() {
       case 'nearby':
         return (
           <BusinessSection 
-            title="Near You" 
+            title="Popular Near You" 
             subtitle="Discover great places around you"
             businesses={data.nearbyBusinesses} 
             variant="nearby"

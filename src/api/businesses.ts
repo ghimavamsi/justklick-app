@@ -18,7 +18,7 @@ export const businessesApi = {
 
   // Remove a business from favourites
   unsaveBusiness: async (savedId: number): Promise<MessageOut> => {
-    const response = await apiClient.delete<MessageOut>(`/api/businesses/favourites/${savedId}/`);
+    const response = await apiClient.delete<MessageOut>(`/api/businesses/favourites/${savedId}`);
     return response.data;
   },
 

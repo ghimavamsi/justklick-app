@@ -154,6 +154,12 @@ export function useHomeData() {
           isOpenNow: true,
           fullAddress: b?.location || b?.address || 'Location not specified',
           distanceStr: b?.distance ? `${Number(b.distance).toFixed(1)} km` : 'Near you',
+          phone: b?.phone,
+          email: b?.email,
+          description: b?.description,
+          website: b?.website,
+          latitude: b?.latitude,
+          longitude: b?.longitude,
         };
       });
 

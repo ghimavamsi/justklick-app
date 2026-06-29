@@ -51,9 +51,16 @@ export const studentApi = {
     return response.data;
   },
 
-  // Get Profile
-  getProfile: async (): Promise<StudentProfileResponse> => {
-    const response = await apiClient.get<StudentProfileResponse>('/api/student-profile');
+  getProfile: async (): Promise<any> => {
+    const response = await apiClient.get<any>('/api/student-profile');
+    // Handle specific error case where profile doesn't exist
+    if (response.data && response.data.success === false) {
+      return null;
+    }
+    // Unwrap the { success: true, data: {...} } envelope if present
+    if (response.data && response.data.success !== undefined && response.data.data) {
+      return response.data.data;
+    }
     return response.data;
   }
 };

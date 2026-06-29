@@ -15,6 +15,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 import { authApi } from '../../api/auth';
+import { studentApi } from '../../api/student';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuthStore } from '../../store/auth-store';
 import { useUserStore } from '../../store/user-store';
@@ -99,58 +100,96 @@ export default function PremiumLoginScreen() {
   });
 
   const { login } = useAuthStore();
-  const { setProfile } = useUserStore();
+  const { setProfile, setProfileComplete } = useUserStore();
 
   const googleMutation = useMutation({
     mutationFn: (data: { idToken: string; user: any }) => authApi.googleLogin(data.idToken),
     onSuccess: (data: any, variables) => {
       console.log('Google Auth API Success:', data);
 
-      // If backend indicates user not found, redirect to registration
-      if (data.success === false && /not.*found|no.*account/i.test(data.message)) {
-        const googleUser = variables.user;
-        // Pass email and name to register screen via params
-        router.push({
-          pathname: '/(auth)/register',
-          params: {
-            email: googleUser.email || '',
-            name: googleUser.name || `${googleUser.givenName || ''} ${googleUser.familyName || ''}`.trim(),
-          },
-        });
+      // 1. Check for 'not_registered' status explicitly
+      if (data.status === 'not_registered' || (data.success === false && /not.*found|no.*account/i.test(data.message))) {
+        setError(data.message || 'No account found for this Google email. Please register first.');
         return;
       }
 
-      // Backend might return 200 OK but with success: false in the JSON body
+      // Backend might return 200 OK but with success: false in the JSON body for other errors
       if (data.success === false) {
         setError(data.message || 'Google Sign-In failed on our server. Please try again.');
         return;
       }
 
-      // Handle both "access" and "access_token" variations from the backend
-      console.log('Google Auth Response:', JSON.stringify(data, null, 2));
       const accessToken = data.access || data.access_token || data?.token?.access || data?.data?.access;
       const refreshToken = data.refresh || data.refresh_token || data?.token?.refresh || data?.data?.refresh;
 
       if (!accessToken) {
-        setError(`Received invalid authentication token from the server. Payload: ${JSON.stringify(data)}`);
+        setError(`Received invalid authentication token from the server.`);
         return;
       }
 
       login(accessToken, refreshToken);
 
-      // Use the actual Google user data returned by the SDK!
       const googleUser = variables.user;
       setProfile({
         id: googleUser.id || 'google_user',
         name: googleUser.name || `${googleUser.givenName || ''} ${googleUser.familyName || ''}`.trim() || 'Google User',
         email: googleUser.email || '',
-        phone: '', // Google Auth usually doesn't provide phone numbers 
+        phone: '', 
       });
-      router.replace('/(tabs)');
+      
+      // 2. Use the 'onboarding_complete' flag if the backend provides it, saving us an extra API call!
+      if (typeof data.onboarding_complete === 'boolean') {
+        setProfileComplete(data.onboarding_complete);
+        if (data.onboarding_complete) {
+           router.replace('/(tabs)');
+        } else {
+           router.replace('/(auth)/student-onboarding');
+        }
+      } else {
+        // Fallback to fetching profile if the flag is missing
+        studentApi.getProfile()
+          .then((profile) => {
+            if (profile && profile.college_code) {
+              setProfileComplete(true);
+              router.replace('/(tabs)');
+            } else {
+              setProfileComplete(false);
+              router.replace('/(auth)/student-onboarding');
+            }
+          })
+          .catch((err) => {
+            console.log('Error fetching profile after Google Login:', err);
+            setProfileComplete(false);
+            router.replace('/(auth)/student-onboarding');
+          });
+      }
     },
-    onError: (err: any) => {
+    onError: (err: any, variables) => {
       console.log('Google Auth API Error:', err?.response?.status, err?.response?.data);
-      setError(err?.response?.data?.message || 'Google Sign-In failed on our server. Please try again.');
+      const errorData = err?.response?.data;
+      
+      // Safely extract a string error message
+      let errorMessage = 'Google Sign-In failed on our server. Please try again.';
+      
+      if (errorData) {
+        if (typeof errorData === 'string') {
+          errorMessage = errorData;
+        } else if (typeof errorData.message === 'string') {
+          errorMessage = errorData.message;
+        } else if (typeof errorData.detail === 'string') {
+          errorMessage = errorData.detail;
+        } else {
+          errorMessage = JSON.stringify(errorData);
+        }
+      }
+
+      // Handle the case where the backend returns a 400 or 401 HTTP error code along with the not_registered status
+      if (errorData && (errorData.status === 'not_registered' || /not.*found|no.*account/i.test(errorMessage))) {
+        setError(typeof errorData.message === 'string' ? errorData.message : 'No account found for this Google email. Please register first.');
+        return;
+      }
+
+      setError(errorMessage);
     }
   });
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Platform, Image, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Platform, Image, Modal, Linking, Share } from 'react-native';
 import Animated, { useAnimatedScrollHandler, useSharedValue, useAnimatedStyle, interpolate, Extrapolation } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,28 +8,61 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '../../hooks/useTheme';
 import { useUserStore } from '../../store/user-store';
 import { useAuthStore } from '../../store/auth-store';
-import { ProfileDashboardData, ProfileActivityItem } from '../../types/profile.types';
+import { useAppStore } from '../../store/app-store';
 import { StudentProfileResponse } from '../../types/student.types';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { businessesApi } from '../../api/businesses';
+import { authApi } from '../../api/auth';
 
 interface AuthenticatedProfileViewProps {
-  data: ProfileDashboardData;
   studentProfile?: StudentProfileResponse;
   onSettingsPress: () => void;
 }
 
-export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress }: AuthenticatedProfileViewProps) {
+export function AuthenticatedProfileView({ studentProfile, onSettingsPress }: AuthenticatedProfileViewProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { colorScheme, changeTheme, themeMode } = useTheme();
   const { profile, clearProfile } = useUserStore();
-  const { logout } = useAuthStore();
+  const { logout, refreshToken } = useAuthStore();
   const [isSupportModalVisible, setIsSupportModalVisible] = useState(false);
   
-  const handleLogout = () => {
-    queryClient.clear(); // Clear all cached queries (favorites, notifications, etc.) to prevent data leak between accounts
-    clearProfile();
-    logout();
+  const { isAuthenticated } = useAuthStore();
+
+  const { data: favorites } = useQuery({
+    queryKey: ['savedBusinesses'],
+    queryFn: businessesApi.getSavedBusinesses,
+    enabled: isAuthenticated,
+  });
+
+  const handleLogout = async () => {
+    try {
+      if (refreshToken) {
+        await authApi.studentLogout(refreshToken);
+        console.log('Successfully logged out from backend');
+      }
+    } catch (e) {
+      console.log('Backend logout failed or token was already invalid', e);
+    } finally {
+      queryClient.clear(); // Clear all cached queries (favorites, notifications, etc.) to prevent data leak between accounts
+      clearProfile();
+      // Ensure the user doesn't get sent back to onboarding/permissions after logout
+      useAppStore.getState().completeOnboarding();
+      useAppStore.getState().completePermissions();
+      logout();
+      // Explicitly route to login to prevent race conditions with useProtectedRoute
+      router.replace('/(auth)/login');
+    }
+  };
+
+  const handleShareApp = async () => {
+    try {
+      await Share.share({
+        message: 'Check out JustKlick, the best platform for students! Download the app today: https://play.google.com/store/apps/details?id=placeholder',
+      });
+    } catch (error) {
+      console.log('Error sharing app:', error);
+    }
   };
   const insets = useSafeAreaInsets();
   const isDark = colorScheme === 'dark';
@@ -56,8 +89,7 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
     return { transform: [{ scale }, { translateY }] };
   });
 
-  // Determine if profile is incomplete
-  const isProfileComplete = studentProfile && studentProfile.college_code && studentProfile.course;
+  // No longer checking isProfileComplete since router guards prevent incomplete profiles from reaching this screen
 
   return (
     <View className="flex-1 bg-background">
@@ -66,18 +98,15 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
         <View className="px-6 shadow-sm flex-row items-center justify-between h-full w-full">
           <Animated.View style={headerTitleOpacity}>
           <View className="flex-row items-center">
-            <View className="w-8 h-8 rounded-full bg-primary items-center justify-center mr-3">
-              <Text className="text-primary-foreground font-bold text-xs">{profile?.name?.substring(0,2).toUpperCase() || 'JK'}</Text>
+            <View className="w-8 h-8 rounded-full bg-primary/10 items-center justify-center mr-3">
+              <Ionicons name="person" size={16} color="#1C398E" />
             </View>
-            <Text className="text-lg font-bold text-foreground">{profile?.name || 'User'}</Text>
+            <View className="flex-row items-center">
+              <Text className="text-lg font-bold text-foreground mr-1">{profile?.name || 'User'}</Text>
+              <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+            </View>
           </View>
         </Animated.View>
-        <TouchableOpacity 
-          className="w-10 h-10 rounded-full bg-muted items-center justify-center border border-border"
-          onPress={onSettingsPress}
-        >
-          <Ionicons name="settings-outline" size={20} color={isDark ? '#FFF' : '#000'} />
-        </TouchableOpacity>
         </View>
       </Animated.View>
 
@@ -91,15 +120,18 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
         <View className="px-6 items-center mb-8">
           <Animated.View style={avatarScale}>
             <View className="relative mb-4">
-              <View className="w-24 h-24 rounded-full bg-primary/10 border-4 border-background items-center justify-center shadow-sm">
-                <Text className="text-3xl font-extrabold text-primary">
-                  {profile?.name?.substring(0,2).toUpperCase() || 'JK'}
-                </Text>
+              <View className="w-24 h-24 rounded-full bg-primary/5 border-4 border-background items-center justify-center shadow-sm">
+                <Ionicons name="person" size={48} color="#1C398E" />
+              </View>
+              <View className="absolute bottom-0 right-2 bg-background rounded-full p-0.5">
+                <Ionicons name="checkmark-circle" size={24} color="#10B981" />
               </View>
             </View>
           </Animated.View>
           
-          <Text className="text-2xl font-extrabold text-foreground mb-1">{profile?.name || 'JustKlick User'}</Text>
+          <View className="flex-row items-center mb-1">
+            <Text className="text-2xl font-extrabold text-foreground mr-1">{profile?.name || 'JustKlick User'}</Text>
+          </View>
           <Text className="text-sm font-medium text-muted-foreground mb-4">{profile?.phone || '9876543210'} • {profile?.email || 'user@example.com'}</Text>
 
           <TouchableOpacity 
@@ -111,54 +143,44 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
           </TouchableOpacity>
         </View>
 
-        {/* Profile Completion Prompt */}
-        {!isProfileComplete && (
-          <View className="px-6 mb-8">
-            <View className="bg-[#c10007]/10 p-5 rounded-3xl border border-[#c10007]/20 flex-row items-center justify-between">
-              <View className="flex-1 mr-4">
-                <Text className="text-[#c10007] font-bold text-lg mb-1">Profile Incomplete</Text>
-                <Text className="text-muted-foreground text-xs leading-relaxed">Fill out your academic and career details to get personalized recommendations and unlock all features.</Text>
+        {/* Quick Actions */}
+        <View className="px-6 mb-8 flex-row justify-between">
+          <TouchableOpacity 
+            onPress={() => router.push('/(tabs)/favorites' as any)}
+            className="flex-1 items-center bg-card py-4 rounded-[20px] border border-border shadow-sm mx-1 relative"
+          >
+            {favorites && favorites.length > 0 && (
+              <View className="absolute top-2 right-2 bg-destructive rounded-full px-1.5 py-0.5 min-w-[20px] items-center justify-center">
+                <Text className="text-[10px] font-bold text-white">{favorites.length > 99 ? '99+' : favorites.length}</Text>
               </View>
-              <TouchableOpacity 
-                onPress={() => router.push('/edit-profile')}
-                className="bg-[#c10007] h-12 px-5 rounded-full items-center justify-center shadow-md shadow-[#c10007]/30"
-              >
-                <Text className="text-white font-bold text-sm">Complete Now</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-
-        {/* Dashboard Stats */}
-        <View className="px-6 mb-8">
-          <Text className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4 ml-1">My Dashboard</Text>
-          <View className="flex-row flex-wrap justify-between gap-y-3">
-            <StatCard icon="heart" title="Favorites" value={data.statistics.favoritesCount} color="#ef4444" />
-            <StatCard icon="star" title="Reviews" value={data.statistics.reviewsCount} color="#f59e0b" />
-            <StatCard icon="eye" title="Viewed" value={data.statistics.viewsCount} color="#3b82f6" />
-            <StatCard icon="pricetags" title="Offers" value={data.statistics.offersClaimed} color="#10b981" />
-          </View>
+            )}
+            <Ionicons name="heart" size={24} color="#ef4444" style={{ marginBottom: 4 }} />
+            <Text className="text-[11px] font-bold text-foreground">Favorites</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=placeholder')}
+            className="flex-1 items-center bg-card py-4 rounded-[20px] border border-border shadow-sm mx-1"
+          >
+            <Ionicons name="star" size={24} color="#f59e0b" style={{ marginBottom: 4 }} />
+            <Text className="text-[11px] font-bold text-foreground">Rate Us</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => setIsSupportModalVisible(true)}
+            className="flex-1 items-center bg-card py-4 rounded-[20px] border border-border shadow-sm mx-1"
+          >
+            <Ionicons name="help-buoy" size={24} color="#3b82f6" style={{ marginBottom: 4 }} />
+            <Text className="text-[11px] font-bold text-foreground">Help</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Recent Activity */}
-        <View className="mb-8">
-          <View className="px-6 flex-row items-center justify-between mb-4">
-            <Text className="text-sm font-bold text-muted-foreground uppercase tracking-wider ml-1">Recent Activity</Text>
-            <TouchableOpacity><Text className="text-sm font-bold text-primary">View All</Text></TouchableOpacity>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}>
-            {data.recentActivity.map((item) => (
-              <ActivityCard key={item.id} item={item} />
-            ))}
-          </ScrollView>
-        </View>
+
 
         {/* Settings Links */}
         <View className="px-6 mb-8">
           <Text className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4 ml-1">Preferences</Text>
           <View className="bg-card rounded-[24px] border border-border shadow-sm overflow-hidden mb-4">
             <SettingsRow icon="person-outline" title="Account Details" color="#3b82f6" onPress={() => router.push('/settings' as any)} />
-            <SettingsRow icon="location-outline" title="Location Settings" color="#10b981" isLast />
+            <SettingsRow icon="share-social-outline" title="Share App" color="#ec4899" isLast onPress={handleShareApp} />
           </View>
         </View>
 
@@ -205,14 +227,8 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
           </View>
         </View>
 
-        <View className="px-6 gap-3">
-          <TouchableOpacity 
-            onPress={() => router.push('/contact' as any)}
-            className="w-full h-14 rounded-[16px] bg-card border border-border flex-row items-center justify-center shadow-sm"
-          >
-            <Ionicons name="help-buoy-outline" size={20} color={isDark ? '#FFF' : '#000'} style={{ marginRight: 8 }} />
-            <Text className="text-foreground font-bold text-[16px]">Help & Support</Text>
-          </TouchableOpacity>
+
+        <View className="px-6 gap-3 mb-10">
           <TouchableOpacity 
             onPress={handleLogout}
             className="w-full h-14 rounded-[16px] bg-destructive/10 border border-destructive/20 flex-row items-center justify-center"
@@ -241,25 +257,25 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
             </View>
             
             <View className="gap-5">
-              <View className="flex-row items-center">
+              <TouchableOpacity onPress={() => Linking.openURL('mailto:support@justklick.com')} activeOpacity={0.7} className="flex-row items-center">
                 <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
                   <Ionicons name="mail-outline" size={24} color="#1C398E" />
                 </View>
                 <View className="flex-1">
                   <Text className="text-sm font-bold text-muted-foreground mb-1">Support Email ID</Text>
-                  <Text className="text-base font-medium text-foreground">support@justklick.com</Text>
+                  <Text className="text-base font-medium text-primary">support@justklick.com</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
 
-              <View className="flex-row items-center">
+              <TouchableOpacity onPress={() => Linking.openURL('tel:+919876543210')} activeOpacity={0.7} className="flex-row items-center">
                 <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
                   <Ionicons name="call-outline" size={24} color="#1C398E" />
                 </View>
                 <View className="flex-1">
                   <Text className="text-sm font-bold text-muted-foreground mb-1">Support Mobile Number</Text>
-                  <Text className="text-base font-medium text-foreground">+91 9876543210</Text>
+                  <Text className="text-base font-medium text-primary">+91 9876543210</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
 
               <View className="flex-row items-center">
                 <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
@@ -279,33 +295,6 @@ export function AuthenticatedProfileView({ data, studentProfile, onSettingsPress
 }
 
 // Sub-components
-
-function StatCard({ icon, title, value, color }: { icon: any, title: string, value: number, color: string }) {
-  return (
-    <View className="w-[48%] bg-card rounded-[20px] p-4 border border-border shadow-sm flex-row items-center">
-      <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${color}15` }}>
-        <Ionicons name={icon} size={20} color={color} />
-      </View>
-      <View>
-        <Text className="text-xl font-extrabold text-foreground">{value}</Text>
-        <Text className="text-[11px] font-bold text-muted-foreground uppercase">{title}</Text>
-      </View>
-    </View>
-  );
-}
-
-function ActivityCard({ item }: { item: ProfileActivityItem }) {
-  return (
-    <View className="w-64 bg-card rounded-[20px] p-3 border border-border shadow-sm flex-row items-center">
-      <Image source={{ uri: item.imageUrl }} className="w-14 h-14 rounded-[12px] bg-muted mr-3" />
-      <View className="flex-1">
-        <Text className="text-sm font-bold text-foreground mb-0.5" numberOfLines={1}>{item.title}</Text>
-        <Text className="text-xs text-muted-foreground font-medium mb-1" numberOfLines={1}>{item.subtitle}</Text>
-        <Text className="text-[10px] font-bold text-muted-foreground uppercase">{item.timestamp}</Text>
-      </View>
-    </View>
-  );
-}
 
 function SettingsRow({ icon, title, color, isLast, onPress }: { icon: any, title: string, color: string, isLast?: boolean, onPress?: () => void }) {
   return (

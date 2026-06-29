@@ -4,7 +4,6 @@ import { router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../store/auth-store';
 import { useTheme } from '../../hooks/useTheme';
-import { useProfileDashboard } from '../../hooks/useProfileData';
 import { studentApi } from '../../api/student';
 
 import { GuestProfileView } from '../../components/profile/GuestProfileView';
@@ -15,9 +14,6 @@ export default function PremiumProfileScreen() {
   const { isAuthenticated } = useAuthStore();
   const { colorScheme } = useTheme();
   
-  // Fetch dashboard stats
-  const { data: dashboardData, isLoading: isDashboardLoading } = useProfileDashboard();
-
   // Fetch actual student profile to check completion status
   const { data: studentProfile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['studentProfile'],
@@ -26,7 +22,7 @@ export default function PremiumProfileScreen() {
     retry: false
   });
 
-  const isLoading = isDashboardLoading || (isAuthenticated && isProfileLoading);
+  const isLoading = (isAuthenticated && isProfileLoading);
 
   return (
     <View className="flex-1 bg-background">
@@ -41,11 +37,10 @@ export default function PremiumProfileScreen() {
           onLoginPress={() => router.push('/(auth)/login' as any)} 
           onExplorePress={() => router.push('/(tabs)/search' as any)} 
         />
-      ) : isLoading || !dashboardData ? (
+      ) : isLoading ? (
         <ProfileSkeletons />
       ) : (
         <AuthenticatedProfileView 
-          data={dashboardData} 
           studentProfile={studentProfile}
           onSettingsPress={() => router.push('/settings' as any)} 
         />

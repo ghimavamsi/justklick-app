@@ -12,7 +12,9 @@ interface UserProfile {
 
 interface UserState {
   profile: UserProfile | null;
+  isProfileComplete: boolean;
   setProfile: (profile: UserProfile) => void;
+  setProfileComplete: (isComplete: boolean) => void;
   clearProfile: () => void;
 }
 
@@ -20,8 +22,10 @@ export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
       profile: null,
+      isProfileComplete: false,
       setProfile: (profile) => set({ profile }),
-      clearProfile: () => set({ profile: null }),
+      setProfileComplete: (isComplete) => set({ isProfileComplete: isComplete }),
+      clearProfile: () => set({ profile: null, isProfileComplete: false }),
     }),
     {
       name: 'user-storage',

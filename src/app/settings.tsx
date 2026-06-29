@@ -6,8 +6,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { studentApi } from '../api/student';
 import { useTheme } from '../hooks/useTheme';
-import { useProfileDashboard } from '../hooks/useProfileData';
-
 // Reusable Section Component
 const SectionCard = ({ title, children, icon, iconColor }: { title: string, children: React.ReactNode, icon: string, iconColor: string }) => (
   <View className="bg-card rounded-[24px] border border-border shadow-sm mb-6 overflow-hidden">
@@ -58,9 +56,7 @@ export default function ProfileSettingsScreen() {
     queryFn: studentApi.getProfile
   });
 
-  const { data: dashboard, isLoading: isDashboardLoading } = useProfileDashboard();
-
-  const isLoading = isProfileLoading || isDashboardLoading;
+  const isLoading = isProfileLoading;
 
   return (
     <View className="flex-1 bg-background">
@@ -95,41 +91,6 @@ export default function ProfileSettingsScreen() {
         </View>
       ) : (
         <ScrollView className="flex-1 px-5 pt-6" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}>
-          
-          {/* Dashboard Stats Summary */}
-          {dashboard && (
-            <View className="flex-row flex-wrap justify-between gap-y-4 mb-6">
-              <View className="w-[48%] bg-card rounded-[20px] p-4 border border-border shadow-sm items-center">
-                <View className="w-10 h-10 rounded-full bg-red-500/10 items-center justify-center mb-2">
-                  <Ionicons name="heart" size={20} color="#ef4444" />
-                </View>
-                <Text className="text-2xl font-extrabold text-foreground">{dashboard.statistics.favoritesCount}</Text>
-                <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-1">Favorites</Text>
-              </View>
-              <View className="w-[48%] bg-card rounded-[20px] p-4 border border-border shadow-sm items-center">
-                <View className="w-10 h-10 rounded-full bg-amber-500/10 items-center justify-center mb-2">
-                  <Ionicons name="star" size={20} color="#f59e0b" />
-                </View>
-                <Text className="text-2xl font-extrabold text-foreground">{dashboard.statistics.reviewsCount}</Text>
-                <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-1">Reviews</Text>
-              </View>
-              <View className="w-[48%] bg-card rounded-[20px] p-4 border border-border shadow-sm items-center">
-                <View className="w-10 h-10 rounded-full bg-blue-500/10 items-center justify-center mb-2">
-                  <Ionicons name="eye" size={20} color="#3b82f6" />
-                </View>
-                <Text className="text-2xl font-extrabold text-foreground">{dashboard.statistics.viewsCount}</Text>
-                <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-1">Viewed</Text>
-              </View>
-              <View className="w-[48%] bg-card rounded-[20px] p-4 border border-border shadow-sm items-center">
-                <View className="w-10 h-10 rounded-full bg-emerald-500/10 items-center justify-center mb-2">
-                  <Ionicons name="pricetags" size={20} color="#10b981" />
-                </View>
-                <Text className="text-2xl font-extrabold text-foreground">{dashboard.statistics.offersClaimed}</Text>
-                <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-1">Offers</Text>
-              </View>
-            </View>
-          )}
-
           {/* Academic Profile */}
           <SectionCard title="Academic Profile" icon="school" iconColor="#3b82f6">
             <DetailRow label="College Code" value={profile?.college_code} />
