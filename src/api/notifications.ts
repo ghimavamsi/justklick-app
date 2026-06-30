@@ -28,13 +28,13 @@ export const notificationsApi = {
 
   // Mark specific notification as read
   markNotificationRead: async (notificationId: string): Promise<MessageOut> => {
-    const response = await apiClient.post<MessageOut>(`/api/notifications/${notificationId}/mark-read`);
+    const response = await apiClient.patch<MessageOut>(`/api/notifications/${notificationId}/mark-read`);
     return response.data;
   },
 
   // Mark all notifications as read for current user
   markAllNotificationsRead: async (): Promise<MessageOut> => {
-    const response = await apiClient.post<MessageOut>('/api/notifications/mark-all-read');
+    const response = await apiClient.patch<MessageOut>('/api/notifications/mark-all-read');
     return response.data;
   },
 

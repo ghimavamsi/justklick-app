@@ -165,12 +165,12 @@ export default function HomeScreen() {
         <View 
           className="w-48 h-24 rounded-full" 
           style={{ 
-            backgroundColor: colorScheme === 'dark' ? 'rgba(193, 0, 7, 0.15)' : 'rgba(28, 57, 142, 0.1)',
-            shadowColor: colorScheme === 'dark' ? '#c10007' : '#1C398E',
+            backgroundColor: 'rgba(28, 57, 142, 0.05)',
+            shadowColor: '#1C398E',
             shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 1,
-            shadowRadius: 30,
-            elevation: 10,
+            shadowOpacity: 0.4,
+            shadowRadius: 15,
+            elevation: 4,
           }} 
         />
       </Animated.View>
@@ -188,8 +188,8 @@ export default function HomeScreen() {
           <RefreshControl 
             refreshing={isRefetching} 
             onRefresh={refetch}
-            tintColor={colorScheme === 'dark' ? '#c10007' : '#1C398E'}
-            colors={['#c10007', '#1C398E', '#F59E0B']}
+            tintColor="#1C398E"
+            colors={['#1C398E', '#3b82f6']}
             progressBackgroundColor={colorScheme === 'dark' ? '#1e293b' : '#ffffff'}
             progressViewOffset={headerHeight + 10}
           />

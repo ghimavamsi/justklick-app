@@ -11,7 +11,7 @@ import { NotificationCategory, NotificationItem } from '../../types/notification
 // Components
 import { NotificationHeader } from '../../components/notifications/NotificationHeader';
 import { NotificationSummaryCard } from '../../components/notifications/NotificationSummaryCard';
-import { NotificationCategoryChips } from '../../components/notifications/NotificationCategoryChips';
+
 import { SwipeableNotificationRow } from '../../components/notifications/SwipeableNotificationRow';
 import { NotificationSkeletons } from '../../components/notifications/NotificationSkeletons';
 import { NotificationEmptyState } from '../../components/notifications/NotificationEmptyState';
@@ -50,7 +50,7 @@ export default function NotificationsScreen() {
 
   const handleNotificationPress = (notification: NotificationItem) => {
     if (!notification.is_read) {
-      markAsRead(notification.id);
+      markAsRead(String(notification.id));
     }
     
     // Intelligent Navigation based on notification type
@@ -100,13 +100,7 @@ export default function NotificationsScreen() {
           <>
             {/* Summary Card Removed per user request */}
 
-            {!isSearchActive && (
-              <NotificationCategoryChips 
-                categories={CATEGORIES} 
-                activeCategory={activeCategory} 
-                onSelectCategory={setActiveCategory} 
-              />
-            )}
+
 
             {data?.notifications && data.notifications.length > 0 ? (
               <View className="bg-card">

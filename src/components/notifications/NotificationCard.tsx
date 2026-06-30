@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NotificationItem } from '../../types/notification.types';
 import { useTheme } from '../../hooks/useTheme';
+import { useMarkNotificationRead, useDeleteNotification } from '../../hooks/useNotifications';
 
 interface NotificationCardProps {
   notification: NotificationItem;
@@ -12,6 +13,8 @@ interface NotificationCardProps {
 export function NotificationCard({ notification, onPress }: NotificationCardProps) {
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
+  const { mutate: markAsRead } = useMarkNotificationRead();
+  const { mutate: deleteNotif } = useDeleteNotification();
 
   const getIconConfig = () => {
     const type = notification.data?.type || 'system';
@@ -74,12 +77,33 @@ export function NotificationCard({ notification, onPress }: NotificationCardProp
 
       {/* Content Area */}
       <View className="flex-1 justify-center">
-        <Text 
-          className={`text-base mb-1 ${!notification.is_read ? 'font-extrabold text-foreground' : 'font-bold text-foreground/80'}`}
-          numberOfLines={2}
-        >
-          {notification.title}
-        </Text>
+        <View className="flex-row justify-between items-start mb-1">
+          <Text 
+            className={`flex-1 text-base pr-2 ${!notification.is_read ? 'font-extrabold text-foreground' : 'font-bold text-foreground/80'}`}
+            numberOfLines={2}
+          >
+            {notification.title}
+          </Text>
+          
+          <View className="flex-row gap-2">
+            {!notification.is_read && (
+              <TouchableOpacity 
+                onPress={(e) => { e.stopPropagation(); markAsRead(String(notification.id)); }}
+                className="w-8 h-8 rounded-full bg-primary/10 items-center justify-center"
+                activeOpacity={0.7}
+              >
+                <Ionicons name="checkmark-done" size={16} color="#1C398E" />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity 
+              onPress={(e) => { e.stopPropagation(); deleteNotif(String(notification.id)); }}
+              className="w-8 h-8 rounded-full bg-destructive/10 items-center justify-center"
+              activeOpacity={0.7}
+            >
+              <Ionicons name="trash-outline" size={16} color="#ef4444" />
+            </TouchableOpacity>
+          </View>
+        </View>
         <Text className="text-sm text-muted-foreground font-medium mb-2 leading-tight" numberOfLines={2}>
           {notification.message}
         </Text>

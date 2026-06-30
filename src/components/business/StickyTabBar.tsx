@@ -5,7 +5,7 @@ interface Props {
   onTabPress: (tab: string) => void;
 }
 
-export const TABS = ['Overview', 'Services', 'Photos', 'Reviews', 'Similar'];
+export const TABS = ['Overview', 'Gallery', 'About', 'Location', 'Reviews', 'Contact'];
 
 export function StickyTabBar({ activeTab, onTabPress }: Props) {
   return (

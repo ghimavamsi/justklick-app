@@ -17,6 +17,13 @@ const mapToExploreCategory = (c: any, index: number): ExploreCategory => {
     return `https://api.justklick.co.in${relativePath}`;
   };
 
+  const hexToRgba = (hex: string, alpha: number) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
   const gradients: [string, string][] = [
     ['#FF9A9E', '#FECFEF'],
     ['#a18cd1', '#fbc2eb'],
@@ -39,8 +46,8 @@ const mapToExploreCategory = (c: any, index: number): ExploreCategory => {
     name: c?.name || c?.category_name || `Category ${index + 1}`,
     iconName: getImageUrl(c?.image || c?.icon, 'grid-outline'), 
     iconLibrary: 'Ionicons',
-    color: '#1C398E',
-    bgColor: 'rgba(28, 57, 142, 0.1)',
+    color: gradients[index % gradients.length][0],
+    bgColor: hexToRgba(gradients[index % gradients.length][0], 0.1),
     gradientColors: gradients[index % gradients.length],
     businessCount: c?.business_count || 0, // Using real data
     isPopular: index % 3 === 0,

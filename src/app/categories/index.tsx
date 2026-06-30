@@ -120,7 +120,7 @@ export default function ExploreCategoriesScreen() {
             <View className="px-5 mt-10 mb-2">
               <Text className="text-xl font-extrabold text-foreground tracking-tight">All Categories</Text>
             </View>
-            <CategoryGrid categories={exploreData.all.filter(c => !exploreData.recommended.find(r => r.id === c.id))} onCategoryPress={handleCategoryPress} />
+            <CategoryGrid categories={exploreData.all} onCategoryPress={handleCategoryPress} />
           </View>
         ) : (
           // Error State

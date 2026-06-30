@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert, StatusBar } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert, StatusBar, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,6 +18,8 @@ export default function ContactScreen() {
   const [phone, setPhone] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [errors, setErrors] = useState<{name?: string, email?: string, phone?: string, message?: string}>({});
 
   const submitMutation = useMutation({
     mutationFn: () => dynamicApi.submitContact({
@@ -28,7 +30,7 @@ export default function ContactScreen() {
       message,
     }),
     onSuccess: () => {
-      Alert.alert('Success', 'Your message has been sent successfully. We will get back to you soon.');
+      setShowSuccess(true);
       setName('');
       setEmail('');
       setPhone('');
@@ -41,10 +43,28 @@ export default function ContactScreen() {
   });
 
   const handleSubmit = () => {
-    if (!name || !email || !message) {
-      Alert.alert('Validation Error', 'Please fill in all required fields (Name, Email, Message).');
-      return;
+    const newErrors: {name?: string, email?: string, phone?: string, message?: string} = {};
+    
+    if (!name.trim()) newErrors.name = 'Full name is required';
+    if (!message.trim()) newErrors.message = 'Message is required';
+    
+    if (!email.trim()) {
+      newErrors.email = 'Email address is required';
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        newErrors.email = 'Please enter a valid email address';
+      }
     }
+    
+    if (phone && phone.length < 10) {
+      newErrors.phone = 'Please enter a valid phone number';
+    }
+    
+    setErrors(newErrors);
+    
+    if (Object.keys(newErrors).length > 0) return;
+    
     submitMutation.mutate();
   };
 
@@ -77,36 +97,39 @@ export default function ContactScreen() {
             <Text className="text-sm font-bold text-foreground mb-2">Full Name *</Text>
             <TextInput
               value={name}
-              onChangeText={setName}
+              onChangeText={(text) => { setName(text); if (errors.name) setErrors({...errors, name: undefined}); }}
               placeholder="John Doe"
               placeholderTextColor="#94A3B8"
-              className="bg-background border border-border rounded-[16px] px-4 h-12 text-foreground"
+              className={`bg-background border rounded-[16px] px-4 h-12 text-foreground ${errors.name ? 'border-destructive/50 bg-destructive/5' : 'border-border'}`}
             />
+            {errors.name && <Text className="text-destructive text-xs mt-1 ml-1">{errors.name}</Text>}
           </View>
 
           <View className="mb-4">
             <Text className="text-sm font-bold text-foreground mb-2">Email Address *</Text>
             <TextInput
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => { setEmail(text); if (errors.email) setErrors({...errors, email: undefined}); }}
               placeholder="john@example.com"
               keyboardType="email-address"
               autoCapitalize="none"
               placeholderTextColor="#94A3B8"
-              className="bg-background border border-border rounded-[16px] px-4 h-12 text-foreground"
+              className={`bg-background border rounded-[16px] px-4 h-12 text-foreground ${errors.email ? 'border-destructive/50 bg-destructive/5' : 'border-border'}`}
             />
+            {errors.email && <Text className="text-destructive text-xs mt-1 ml-1">{errors.email}</Text>}
           </View>
 
           <View className="mb-4">
             <Text className="text-sm font-bold text-foreground mb-2">Phone Number</Text>
             <TextInput
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={(text) => { setPhone(text); if (errors.phone) setErrors({...errors, phone: undefined}); }}
               placeholder="+91 9876543210"
               keyboardType="phone-pad"
               placeholderTextColor="#94A3B8"
-              className="bg-background border border-border rounded-[16px] px-4 h-12 text-foreground"
+              className={`bg-background border rounded-[16px] px-4 h-12 text-foreground ${errors.phone ? 'border-destructive/50 bg-destructive/5' : 'border-border'}`}
             />
+            {errors.phone && <Text className="text-destructive text-xs mt-1 ml-1">{errors.phone}</Text>}
           </View>
 
           <View className="mb-4">
@@ -124,14 +147,15 @@ export default function ContactScreen() {
             <Text className="text-sm font-bold text-foreground mb-2">Message *</Text>
             <TextInput
               value={message}
-              onChangeText={setMessage}
+              onChangeText={(text) => { setMessage(text); if (errors.message) setErrors({...errors, message: undefined}); }}
               placeholder="Describe your issue..."
               multiline
               numberOfLines={4}
               textAlignVertical="top"
               placeholderTextColor="#94A3B8"
-              className="bg-background border border-border rounded-[16px] p-4 min-h-[100px] text-foreground"
+              className={`bg-background border rounded-[16px] p-4 min-h-[100px] text-foreground ${errors.message ? 'border-destructive/50 bg-destructive/5' : 'border-border'}`}
             />
+            {errors.message && <Text className="text-destructive text-xs mt-1 ml-1">{errors.message}</Text>}
           </View>
 
           <TouchableOpacity 
@@ -173,6 +197,30 @@ export default function ContactScreen() {
         </View>
 
       </ScrollView>
+
+      {/* Success Modal */}
+      <Modal visible={showSuccess} transparent animationType="fade">
+        <View className="flex-1 bg-black/50 justify-center items-center px-6">
+          <View className="bg-card w-full rounded-[32px] p-8 items-center border border-border shadow-xl">
+            <View className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 items-center justify-center mb-6">
+              <Ionicons name="checkmark-circle" size={48} color="#10B981" />
+            </View>
+            <Text className="text-2xl font-extrabold text-foreground text-center mb-2">Message Sent!</Text>
+            <Text className="text-muted-foreground text-center mb-8 leading-relaxed">
+              Thank you for reaching out to us. Our support team will get back to you shortly.
+            </Text>
+            <TouchableOpacity 
+              onPress={() => {
+                setShowSuccess(false);
+                router.back();
+              }}
+              className="w-full bg-primary h-14 rounded-full items-center justify-center"
+            >
+              <Text className="text-white font-bold text-[16px]">Done</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

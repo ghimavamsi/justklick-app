@@ -64,7 +64,7 @@ export function TypingState() {
     .filter(s => s.toLowerCase().includes(query.toLowerCase()))
     .filter(s => !catSuggestions.find(c => c.text.toLowerCase() === s.toLowerCase())) // prevent duplicates
     .filter(s => !businessSuggestions.find(b => b.text.toLowerCase() === s.toLowerCase()))
-    .map((s, index) => ({ id: `recent-${index}`, text: s, type: 'query' }));
+    .map((s, index) => ({ id: `recent-${index}`, text: s, type: 'query', slug: undefined }));
 
   // Limit total suggestions
   const suggestions = [...catSuggestions, ...businessSuggestions, ...recentSuggestions].slice(0, 10);

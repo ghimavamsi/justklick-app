@@ -26,7 +26,7 @@ export function SwipeableNotificationRow({ notification, onPress }: SwipeableNot
       <View className="flex-row items-center w-32 justify-end">
         {!notification.is_read && (
           <TouchableOpacity 
-            onPress={() => markAsRead(notification.id)}
+            onPress={() => markAsRead(String(notification.id))}
             className="w-16 h-full items-center justify-center bg-blue-500"
           >
             <RNAnimated.View style={{ transform: [{ scale }] }}>
@@ -35,7 +35,7 @@ export function SwipeableNotificationRow({ notification, onPress }: SwipeableNot
           </TouchableOpacity>
         )}
         <TouchableOpacity 
-          onPress={() => deleteNotif(notification.id)}
+          onPress={() => deleteNotif(String(notification.id))}
           className="w-16 h-full items-center justify-center bg-rose-600"
         >
           <RNAnimated.View style={{ transform: [{ scale }] }}>

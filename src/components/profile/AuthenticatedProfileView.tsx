@@ -25,7 +25,6 @@ export function AuthenticatedProfileView({ studentProfile, onSettingsPress }: Au
   const { colorScheme, changeTheme, themeMode } = useTheme();
   const { profile, clearProfile } = useUserStore();
   const { logout, refreshToken } = useAuthStore();
-  const [isSupportModalVisible, setIsSupportModalVisible] = useState(false);
   
   const { isAuthenticated } = useAuthStore();
 
@@ -165,11 +164,11 @@ export function AuthenticatedProfileView({ studentProfile, onSettingsPress }: Au
             <Text className="text-[11px] font-bold text-foreground">Rate Us</Text>
           </TouchableOpacity>
           <TouchableOpacity 
-            onPress={() => setIsSupportModalVisible(true)}
+            onPress={() => router.push('/contact' as any)}
             className="flex-1 items-center bg-card py-4 rounded-[20px] border border-border shadow-sm mx-1"
           >
-            <Ionicons name="help-buoy" size={24} color="#3b82f6" style={{ marginBottom: 4 }} />
-            <Text className="text-[11px] font-bold text-foreground">Help</Text>
+            <Ionicons name="chatbubbles" size={24} color="#3b82f6" style={{ marginBottom: 4 }} />
+            <Text className="text-[11px] font-bold text-foreground">Contact</Text>
           </TouchableOpacity>
         </View>
 
@@ -240,56 +239,7 @@ export function AuthenticatedProfileView({ studentProfile, onSettingsPress }: Au
 
       </Animated.ScrollView>
 
-      {/* Help & Support Modal */}
-      <Modal
-        visible={isSupportModalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setIsSupportModalVisible(false)}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center px-6">
-          <View className="w-full bg-card rounded-3xl p-6 border border-border shadow-lg">
-            <View className="flex-row justify-between items-center mb-6">
-              <Text className="text-xl font-bold text-foreground">Help & Support</Text>
-              <TouchableOpacity onPress={() => setIsSupportModalVisible(false)} className="w-8 h-8 rounded-full bg-muted items-center justify-center">
-                <Ionicons name="close" size={20} color={isDark ? '#FFF' : '#000'} />
-              </TouchableOpacity>
-            </View>
-            
-            <View className="gap-5">
-              <TouchableOpacity onPress={() => Linking.openURL('mailto:support@justklick.com')} activeOpacity={0.7} className="flex-row items-center">
-                <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
-                  <Ionicons name="mail-outline" size={24} color="#1C398E" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-sm font-bold text-muted-foreground mb-1">Support Email ID</Text>
-                  <Text className="text-base font-medium text-primary">support@justklick.com</Text>
-                </View>
-              </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => Linking.openURL('tel:+919876543210')} activeOpacity={0.7} className="flex-row items-center">
-                <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
-                  <Ionicons name="call-outline" size={24} color="#1C398E" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-sm font-bold text-muted-foreground mb-1">Support Mobile Number</Text>
-                  <Text className="text-base font-medium text-primary">+91 9876543210</Text>
-                </View>
-              </TouchableOpacity>
-
-              <View className="flex-row items-center">
-                <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
-                  <Ionicons name="location-outline" size={24} color="#1C398E" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-sm font-bold text-muted-foreground mb-1">Office Address</Text>
-                  <Text className="text-base font-medium text-foreground">123, JustKlick Towers, Tech Park, City, India</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }

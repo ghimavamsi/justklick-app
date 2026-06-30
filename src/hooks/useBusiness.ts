@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { homeApi } from '../api/home';
-import { businessDetailsService } from '../api/mock/business.mock';
 import { BusinessDetails } from '../types/business.types';
 
 export const BUSINESS_DETAILS_KEY = 'businessDetails';
@@ -13,7 +12,7 @@ export function useBusinessDetails(id: string) {
     queryFn: async () => {
       // Fetch live data
       const b: any = await homeApi.fetchBusinessDetails(id);
-      
+
       const getImageUrl = (url: string | null | undefined, fallback: string) => {
         if (!url) return fallback;
         if (url.startsWith('http')) return url;
@@ -23,10 +22,10 @@ export function useBusinessDetails(id: string) {
 
       // Extract images array of strings
       const rawImages = Array.isArray(b?.images) ? b.images : [];
-      let gallery = rawImages.length > 0 
+      let gallery = rawImages.length > 0
         ? rawImages.map((imgObj: any) => getImageUrl(imgObj.image || imgObj.image_url, 'https://via.placeholder.com/800x600'))
         : [];
-      
+
       if (gallery.length === 0 && (b?.image || b?.cover_image)) {
         gallery = [getImageUrl(b?.image || b?.cover_image, 'https://via.placeholder.com/800x600')];
       }
@@ -46,7 +45,7 @@ export function useBusinessDetails(id: string) {
             if (Array.isArray(arr)) {
               parsedServices = arr.map((s, i) => ({ id: String(i), name: s, iconName: 'checkmark-circle-outline' }));
             }
-          } catch (e) {}
+          } catch (e) { }
         }
         const amenitiesField = b.field_values.find((f: any) => f.field_key === 'amenities');
         if (amenitiesField && amenitiesField.value) {
@@ -55,10 +54,10 @@ export function useBusinessDetails(id: string) {
             if (Array.isArray(arr)) {
               parsedAmenities = arr.map((s, i) => ({ id: String(i), name: s, iconName: 'star-outline' }));
             }
-          } catch (e) {}
+          } catch (e) { }
         }
       }
-      
+
       // Map API schema to UI schema without dummy data
       return {
         id: String(b?.id || id),
@@ -113,12 +112,12 @@ export function useBusinessReviews(id: string) {
     queryFn: async () => {
       try {
         const response = await vendorsApi.getBusinessReviews(Number(id));
-        
+
         let rawReviews = [];
         if (Array.isArray(response)) rawReviews = response;
         else if (response && Array.isArray(response.results)) rawReviews = response.results;
         else if (response && Array.isArray(response.data)) rawReviews = response.data;
-        
+
         return rawReviews.map((r: any, index: number) => ({
           id: r.id?.toString() || r._id || `review-${index}`,
           authorName: r.authorName || r.user_name || r.name || (r.user?.first_name ? `${r.user.first_name} ${r.user.last_name || ''}` : 'Anonymous'),

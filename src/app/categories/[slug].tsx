@@ -9,6 +9,8 @@ import { SearchResultSkeleton } from '../../components/search/SearchResultSkelet
 import { FilterSheet } from '../../components/search/FilterSheet';
 import { useTheme } from '../../hooks/useTheme';
 import { useSearchStore } from '../../store/search-store';
+import { useQuery } from '@tanstack/react-query';
+import { businessesApi } from '../../api/businesses';
 
 export default function CategoryListingScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -21,6 +23,13 @@ export default function CategoryListingScreen() {
   // Fetch businesses for this category slug
   const { data: apiData, isLoading: isApiLoading } = useSearchAPI('', slug);
   const [isFilterSheetVisible, setFilterSheetVisible] = useState(false);
+
+  // Fetch dynamic filters for this category
+  const { data: dynamicFiltersData } = useQuery({
+    queryKey: ['categoryFilters', slug],
+    queryFn: () => businessesApi.getCategoryFilters(slug as string),
+    enabled: !!slug,
+  });
 
   const handleToggleFilter = (filterId: string) => {
     if (filterId === 'sort_distance' && !activeFilters['sort_distance']) {
@@ -63,11 +72,21 @@ export default function CategoryListingScreen() {
     return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   }, [slug]);
 
+  const dynamicFilters = Array.isArray(dynamicFiltersData) 
+    ? dynamicFiltersData.map((f: any) => ({
+        id: f.field_key || `dynamic_${f.id}`,
+        label: f.label || f.name || 'Filter',
+        icon: 'options-outline',
+        color: '#6366f1',
+      }))
+    : [];
+
   const FILTERS = [
     { id: 'top_rated', label: 'Top Rated', icon: 'star', color: '#F59E0B' },
     { id: 'open_now', label: 'Open Now', icon: 'time', color: '#10B981' },
     { id: 'verified', label: 'Verified', icon: 'checkmark-circle', color: '#3B82F6' },
     { id: 'premium', label: 'Premium', icon: 'diamond', color: '#8B5CF6' },
+    ...dynamicFilters
   ];
 
   const renderHeader = () => (
@@ -77,7 +96,7 @@ export default function CategoryListingScreen() {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16, paddingTop: 8 }}
-        data={[{ id: 'filters_btn' }, ...FILTERS]}
+        data={[{ id: 'filters_btn', label: '', icon: '', color: '' }, ...FILTERS]}
         keyExtractor={item => item.id}
         renderItem={({ item }) => {
           if (item.id === 'filters_btn') {
@@ -156,7 +175,7 @@ export default function CategoryListingScreen() {
       </View>
 
       <FlatList 
-        data={isApiLoading ? [1, 2, 3] : filteredData}
+        data={(isApiLoading ? [1, 2, 3] : filteredData) as any[]}
         keyExtractor={(item, index) => isApiLoading ? `skeleton-${index}` : (item as any).id}
         contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
         showsVerticalScrollIndicator={false}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, SharedValue, Extrapolation, withTiming, useSharedValue, Easing, withRepeat } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,6 +31,17 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
   const [isLocationSelectorVisible, setIsLocationSelectorVisible] = useState(false);
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const isNavigating = useRef(false);
+
+  const handleNavigation = (path: any) => {
+    if (isNavigating.current) return;
+    isNavigating.current = true;
+    router.push(path);
+    setTimeout(() => {
+      isNavigating.current = false;
+    }, 500); // 500ms debounce
+  };
+
   
   const activeLocation = manualLocation || currentLocation;
   const locationText = activeLocation?.shortAddress || 'Set Location';
@@ -179,7 +190,7 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
         {/* Right: Notification & Avatar */}
         <Animated.View className="flex-row items-center gap-3" style={rightSideStyle}>
           <TouchableOpacity 
-            onPress={() => router.push('/notifications')}
+            onPress={() => handleNavigation('/notifications')}
             className="w-12 h-12 rounded-full bg-muted items-center justify-center border border-border relative"
           >
             <Ionicons name="notifications-outline" size={26} color={isDark ? '#FFF' : '#000'} />
@@ -188,7 +199,7 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
             )}
           </TouchableOpacity>
           <TouchableOpacity 
-            onPress={() => router.push('/(tabs)/profile' as any)}
+            onPress={() => handleNavigation('/(tabs)/profile')}
             className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center border border-primary/20 shadow-sm"
           >
             <Ionicons name="person" size={24} color="#1C398E" />
@@ -218,7 +229,7 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
         <TouchableOpacity 
           activeOpacity={0.9} 
           style={{ flex: 1, borderRadius: 999 }}
-          onPress={() => router.push('/(tabs)/search')}
+          onPress={() => handleNavigation('/(tabs)/search')}
         >
           {/* Gradient Border Wrapper */}
           <View 
@@ -263,7 +274,7 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
               
               <View style={{ flex: 1, marginLeft: 12 }}>
                 <Text style={{ color: isDark ? '#cbd5e1' : '#64748B', fontSize: 12, fontWeight: '600', letterSpacing: 0.2 }} numberOfLines={1}>
-                  Search businesses, restaurants and more...
+                  Search across Hostels, Colleges & Services
                 </Text>
               </View>
 

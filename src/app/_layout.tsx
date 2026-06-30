@@ -31,9 +31,15 @@ function ThemeWrapper({ children }: { children: React.ReactNode }) {
 
 import { useProtectedRoute } from '../hooks/useProtectedRoute';
 import { useLocationStore } from '../store/location-store';
+import { usePushNotifications } from '../hooks/usePushNotifications';
 
 function RouteGuard() {
   useProtectedRoute();
+  return null;
+}
+
+function PushNotificationGuard() {
+  usePushNotifications();
   return null;
 }
 
@@ -85,6 +91,7 @@ export default function RootLayout() {
       <AppProviders>
         <ToastProvider>
           <RouteGuard />
+          <PushNotificationGuard />
           <ThemeProvider value={osColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <ThemeWrapper>
               <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }} />

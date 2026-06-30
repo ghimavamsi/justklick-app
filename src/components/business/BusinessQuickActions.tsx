@@ -6,15 +6,15 @@ import { BusinessDetails } from '../../types/business.types';
 
 interface Props {
   business: BusinessDetails;
+  onEnquirePress?: () => void;
 }
 
-export function BusinessQuickActions({ business }: Props) {
+export function BusinessQuickActions({ business, onEnquirePress }: Props) {
   const insets = useSafeAreaInsets();
 
   const handleCall = () => Linking.openURL(`tel:${business.contact.mobile}`);
   const handleWhatsApp = () => Linking.openURL(`whatsapp://send?phone=${business.contact.mobile}`);
   const handleDirection = () => Linking.openURL(`https://maps.google.com/?q=${encodeURIComponent(business.name + ', ' + business.location.address)}`);
-  const handleEnquiry = () => console.log('Open Enquiry Form');
 
   return (
     <View 
@@ -52,7 +52,7 @@ export function BusinessQuickActions({ business }: Props) {
 
         {/* Enquire Now Button */}
         <TouchableOpacity 
-          onPress={handleEnquiry}
+          onPress={onEnquirePress}
           className="flex-1 py-3 rounded-xl flex-row items-center justify-center mx-1 shadow-sm"
           style={{ backgroundColor: '#F97316' }}
         >

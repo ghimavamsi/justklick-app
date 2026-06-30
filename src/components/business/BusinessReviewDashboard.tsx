@@ -79,7 +79,7 @@ export function BusinessReviewDashboard({ business }: Props) {
         onPress={() => router.push(`/business/${business.slug || business.id}/write-review`)}
       >
         <Ionicons name="create-outline" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
-        <Text className="text-white font-bold text-base flex-shrink-0">Write a Review</Text>
+        <Text className="text-white font-bold text-base flex-shrink-0">Write a Review...</Text>
       </TouchableOpacity>
     </View>
   );

@@ -7,10 +7,9 @@ interface Props {
   business: BusinessDetails;
 }
 
-export function BusinessContact({ business }: Props) {
+export function BusinessLocationSection({ business }: Props) {
   return (
     <View className="px-6 mb-8">
-      {/* Location Section */}
       <View className="mb-6">
         <Text className="text-xl font-extrabold text-foreground mb-4">Location</Text>
         <TouchableOpacity 
@@ -34,8 +33,13 @@ export function BusinessContact({ business }: Props) {
           </View>
         </TouchableOpacity>
       </View>
+    </View>
+  );
+}
 
-      {/* Contact Section */}
+export function BusinessContactSection({ business }: Props) {
+  return (
+    <View className="px-6 mb-8">
       <View className="mb-6">
         <Text className="text-xl font-extrabold text-foreground mb-4">Contact Info</Text>
         {(!business.contact.mobile && !business.contact.email && !business.contact.website) ? (

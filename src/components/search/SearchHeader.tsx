@@ -18,7 +18,7 @@ export function SearchHeader() {
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
   
-  const { query, setQuery, phase, setPhase, isFocused, setIsFocused } = useSearchStore();
+  const { query, setQuery, phase, setPhase, isFocused, setIsFocused, addRecentSearch } = useSearchStore();
   const { manualLocation, currentLocation } = useLocationStore();
   const activeLocation = manualLocation || currentLocation;
   const inputRef = useRef<TextInput>(null);
@@ -63,6 +63,7 @@ export function SearchHeader() {
   const handleSubmit = () => {
     if (query.trim().length > 0) {
       setPhase('results');
+      addRecentSearch(query.trim());
       inputRef.current?.blur();
       setIsFocused(false);
     }
@@ -161,7 +162,7 @@ export function SearchHeader() {
                   onBlur={() => setIsFocused(false)}
                   onSubmitEditing={handleSubmit}
                   returnKeyType="search"
-                  placeholder="Search businesses, restaurants and more..."
+                  placeholder="Search across Hostels, Colleges & Services"
                   placeholderTextColor="#64748B"
                   className="text-base text-foreground font-bold p-0 m-0"
                   autoCapitalize="none"
@@ -193,11 +194,6 @@ export function SearchHeader() {
             </View>
           </View>
         </Animated.View>
-
-        {/* Share Button */}
-        <TouchableOpacity className="w-10 h-10 rounded-full items-center justify-center bg-muted ml-3 border border-border">
-          <Ionicons name="share-social-outline" size={20} color={isDark ? '#FFF' : '#000'} />
-        </TouchableOpacity>
 
       </View>
     </View>

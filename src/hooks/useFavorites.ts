@@ -110,8 +110,36 @@ export function useToggleFavorite() {
   return useMutation({
     mutationFn: async ({ business, isCurrentlyFavorite }: { business: Business & { saved_id?: number }; isCurrentlyFavorite: boolean }) => {
       if (isCurrentlyFavorite) {
-        // If we have a specific saved_id from the backend, use it, otherwise use the business id
-        const idToRemove = business.saved_id || Number(business.id);
+        // If we have a specific saved_id from the backend, use it
+        let idToRemove = business.saved_id;
+        
+        // If not found (e.g. clicked from Home Screen), look it up in the favorites cache
+        if (!idToRemove) {
+          const favorites = queryClient.getQueryData<any[]>(FAVORITES_QUERY_KEY) || [];
+          const matched = favorites.find(f => String(f.id) === String(business.id));
+          
+          if (matched && matched.saved_id) {
+            idToRemove = matched.saved_id;
+          } else {
+            // If cache is empty or we just favorited it and don't have the saved_id yet, fetch from API
+            try {
+              console.log('Fetching fresh favorites to find saved_id...');
+              const rawFavs = await businessesApi.getSavedBusinesses();
+              const apiMatched = rawFavs.find((f: any) => String(f.business_id) === String(business.id));
+              if (apiMatched && (apiMatched.id || apiMatched.saved_id)) {
+                idToRemove = apiMatched.id || apiMatched.saved_id;
+              }
+            } catch (e) {
+              console.warn('Failed to fetch fresh favorites list for unsave', e);
+            }
+          }
+        }
+
+        // Fallback to business id if everything fails, though it might throw a 404
+        if (!idToRemove) {
+          idToRemove = Number(business.id);
+        }
+
         return businessesApi.unsaveBusiness(idToRemove);
       } else {
         return businessesApi.saveBusiness(Number(business.id));

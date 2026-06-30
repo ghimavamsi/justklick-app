@@ -56,15 +56,13 @@ export function BusinessHeader({ business, scrollY }: Props) {
             style={{ top: HEADER_HEIGHT - 10 }}
           >
             {[
-              { icon: 'star-outline', label: 'Write a Review' },
-              { icon: 'camera-outline', label: 'Add photo' },
-              { icon: 'call-outline', label: 'Call now' },
+              { icon: 'camera-outline', label: 'Add pic' },
               { icon: 'warning-outline', label: 'Report error' },
               { icon: 'create-outline', label: 'Suggest an edit' },
             ].map((item, idx) => (
               <TouchableOpacity 
                 key={idx} 
-                className={`flex-row items-center px-4 py-3 ${idx !== 4 ? 'border-b border-border/50' : ''}`}
+                className={`flex-row items-center px-4 py-3 ${idx !== 2 ? 'border-b border-border/50' : ''}`}
                 onPress={() => {
                   setMenuVisible(false);
                   if (item.label === 'Write a Review') {
@@ -105,14 +103,8 @@ export function BusinessHeader({ business, scrollY }: Props) {
             <Animated.View style={iconBackgroundStyle} className="absolute inset-0 bg-black/40 rounded-full" />
             <Ionicons name="share-social-outline" size={22} color={isDark ? '#FFF' : '#000'} />
           </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setMenuVisible(true)} className="w-10 h-10 items-center justify-center rounded-full">
-            <Animated.View style={iconBackgroundStyle} className="absolute inset-0 bg-black/40 rounded-full" />
-            <Ionicons name="ellipsis-vertical" size={22} color={isDark ? '#FFF' : '#000'} />
-          </TouchableOpacity>
         </View>
       </View>
-      {renderDropdownMenu()}
     </>
   );
 }

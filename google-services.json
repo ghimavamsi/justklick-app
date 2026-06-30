@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "481533763438-7hmosjtr4j3ivk1lgkedvtog0ph7fjrg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.himavamsigumpu.justklick_app",
+            "certificate_hash": "8845732e3440b1479a75cda67a95112016d2123c"
+          }
+        },
+        {
           "client_id": "481533763438-gl0j726b1ehtpm8tq8b9vu2cgd4q846p.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

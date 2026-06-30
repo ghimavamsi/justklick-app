@@ -32,8 +32,15 @@ export function setupInterceptors(client: AxiosInstance) {
       // Handle 401 Unauthorized globally
       if (error.response?.status === 401) {
         console.warn('Caught 401 Unauthorized.');
-        // TEMPORARILY DISABLED: useAuthStore.getState().logout(); 
-        // We are disabling auto-logout so the user doesn't get kicked out if a single buggy endpoint returns 401.
+        
+        // Only log out if it's explicitly an expiration/invalid token, 
+        // to prevent buggy endpoints from randomly kicking users out.
+        const responseData = error.response?.data as any;
+        const detail = responseData?.detail || responseData?.message;
+        if (detail === 'Unauthorized' || detail === 'Authentication credentials were not provided.' || typeof detail === 'string' && detail.toLowerCase().includes('expire')) {
+          console.warn('Session expired. Logging out user automatically.');
+          useAuthStore.getState().logout();
+        }
       }
 
       // HOTFIX: Backend incorrectly throws a 500 Server Error on expired tokens
