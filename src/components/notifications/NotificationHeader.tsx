@@ -79,7 +79,17 @@ export function NotificationHeader({ scrollY, searchQuery, setSearchQuery }: Not
       [0, -20],
       Extrapolation.CLAMP
     );
-    return { transform: [{ scale }, { translateX }] };
+    const opacity = interpolate(
+      scrollY.value,
+      [20, 80], // Starts fading early, completely gone by 80px scroll
+      [1, 0],
+      Extrapolation.CLAMP
+    );
+    return { 
+      transform: [{ scale }, { translateX }],
+      opacity,
+      zIndex: opacity === 0 ? -1 : 1, // Prevent it from capturing touches if it was under search bar
+    };
   });
 
   const searchTransform = useAnimatedStyle(() => {

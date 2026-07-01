@@ -148,11 +148,6 @@ export function AuthenticatedProfileView({ studentProfile, onSettingsPress }: Au
             onPress={() => router.push('/(tabs)/favorites' as any)}
             className="flex-1 items-center bg-card py-4 rounded-[20px] border border-border shadow-sm mx-1 relative"
           >
-            {favorites && favorites.length > 0 && (
-              <View className="absolute top-2 right-2 bg-destructive rounded-full px-1.5 py-0.5 min-w-[20px] items-center justify-center">
-                <Text className="text-[10px] font-bold text-white">{favorites.length > 99 ? '99+' : favorites.length}</Text>
-              </View>
-            )}
             <Ionicons name="heart" size={24} color="#ef4444" style={{ marginBottom: 4 }} />
             <Text className="text-[11px] font-bold text-foreground">Favorites</Text>
           </TouchableOpacity>

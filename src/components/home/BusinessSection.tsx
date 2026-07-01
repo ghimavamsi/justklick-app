@@ -3,6 +3,8 @@ import { View, Text, FlatList } from 'react-native';
 import { Business } from '../../types/home.types';
 import { BusinessCard } from './BusinessCard';
 import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 
 interface BusinessSectionProps {
   title: string;
@@ -21,6 +23,7 @@ export function BusinessSection({
   icon,
   iconColor
 }: BusinessSectionProps) {
+  const router = useRouter();
   
   if (!businesses || businesses.length === 0) return null;
 
@@ -34,7 +37,9 @@ export function BusinessSection({
           </View>
           {subtitle && <Text className="text-sm font-medium text-muted-foreground">{subtitle}</Text>}
         </View>
-        <Text className="text-sm font-bold text-primary">See All</Text>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/search')}>
+          <Text className="text-sm font-bold text-primary">See All</Text>
+        </TouchableOpacity>
       </View>
 
       <FlatList

@@ -209,9 +209,13 @@ export default function PremiumLoginScreen() {
 
       // Force Google Account Chooser to appear every time (clears remembered account)
       try {
-        await GoogleSignin.signOut();
+        const hasPreviousSignIn = GoogleSignin.hasPreviousSignIn();
+        if (hasPreviousSignIn) {
+          await GoogleSignin.signOut();
+        }
       } catch (e) {
-        // ignore if already signed out
+        // ignore if already signed out or fails
+        console.log('Sign out error before sign in:', e);
       }
 
       const userInfo = await GoogleSignin.signIn();

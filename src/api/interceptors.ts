@@ -1,5 +1,21 @@
 import { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import axios from 'axios';
 import { useAuthStore } from '../store/auth-store';
+
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: AxiosError | null, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
 
 export function setupInterceptors(client: AxiosInstance) {
   client.interceptors.request.use(
@@ -25,16 +41,76 @@ export function setupInterceptors(client: AxiosInstance) {
       // console.log(`[API RESPONSE SUCCESS] ${response.config?.method?.toUpperCase()} ${response.config?.url} => ${response.status}`);
       return response;
     },
-    (error: AxiosError) => {
+    async (error: AxiosError) => {
+      const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
       console.error(`[API RESPONSE ERROR] ${error.config?.method?.toUpperCase()} ${error.config?.url} => ${error.response?.status}`);
       console.error(`[API RESPONSE DATA]`, error.response?.data);
       
-      // Handle 401 Unauthorized globally
+      // Handle 401 Unauthorized
+      if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+        if (isRefreshing) {
+          return new Promise(function(resolve, reject) {
+            failedQueue.push({ resolve, reject });
+          }).then(token => {
+            originalRequest.headers.Authorization = 'Bearer ' + token;
+            return client(originalRequest);
+          }).catch(err => {
+            return Promise.reject(err);
+          });
+        }
+
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        const refreshToken = useAuthStore.getState().refreshToken;
+
+        if (!refreshToken) {
+          isRefreshing = false;
+          useAuthStore.getState().logout();
+          return Promise.reject(error);
+        }
+
+        try {
+          // Attempt to refresh token
+          const response = await axios.post('https://api.justklick.co.in/api/token/refresh', {
+            refresh_token: refreshToken
+          }, {
+            headers: { 'Content-Type': 'application/json' }
+          });
+
+          const data = response.data;
+          
+          if (data.success === false) {
+             throw new Error(data.message || 'Refresh failed');
+          }
+
+          let newAccessToken = data.access || data.access_token || data?.data?.access;
+          let newRefreshToken = data.refresh || data.refresh_token || data?.data?.refresh;
+
+          if (newAccessToken) {
+            useAuthStore.getState().updateTokens(newAccessToken, newRefreshToken);
+            
+            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+            processQueue(null, newAccessToken);
+            
+            // Retry the original request
+            return client(originalRequest);
+          } else {
+            throw new Error('No access token returned from refresh');
+          }
+        } catch (refreshError) {
+          processQueue(refreshError as AxiosError, null);
+          useAuthStore.getState().logout();
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      }
+
+      // If already retried or not 401 but explicit unauthorized message
       if (error.response?.status === 401) {
         console.warn('Caught 401 Unauthorized.');
         
-        // Only log out if it's explicitly an expiration/invalid token, 
-        // to prevent buggy endpoints from randomly kicking users out.
         const responseData = error.response?.data as any;
         const detail = responseData?.detail || responseData?.message;
         if (detail === 'Unauthorized' || detail === 'Authentication credentials were not provided.' || typeof detail === 'string' && detail.toLowerCase().includes('expire')) {

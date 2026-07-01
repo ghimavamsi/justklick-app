@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Category } from '../../types/home.types';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
+import { useRouter } from 'expo-router';
+import { useSearchStore } from '../../store/search-store';
 
 interface TrendingCategoriesProps {
   categories: Category[];
@@ -10,8 +12,16 @@ interface TrendingCategoriesProps {
 
 export function TrendingCategories({ categories }: TrendingCategoriesProps) {
   const { colorScheme } = useTheme();
+  const router = useRouter();
+  const { setQuery, setPhase } = useSearchStore();
   
   if (!categories || categories.length === 0) return null;
+
+  const handleCategoryPress = (categoryName: string) => {
+    setQuery(categoryName);
+    setPhase('results');
+    router.push('/(tabs)/search');
+  };
 
   return (
     <View className="py-5 px-5">
@@ -25,6 +35,7 @@ export function TrendingCategories({ categories }: TrendingCategoriesProps) {
             key={cat.id} 
             className="w-[48%] bg-card p-4 rounded-3xl mb-4 border border-border/50 shadow-sm"
             activeOpacity={0.8}
+            onPress={() => handleCategoryPress(cat.name)}
             style={{
               shadowColor: colorScheme === 'dark' ? '#000' : cat.color,
               shadowOffset: { width: 0, height: 4 },

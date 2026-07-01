@@ -108,6 +108,30 @@ export default function PremiumStudentOnboardingScreen() {
   });
 
   const updateField = (key: keyof StudentProfilePayload, value: any) => {
+    if (key === 'cgpa_percentage' && typeof value === 'string') {
+      // 1. Remove any non-numeric and non-decimal characters
+      let cleaned = value.replace(/[^0-9.]/g, '');
+      
+      // 2. Prevent multiple decimal points
+      const parts = cleaned.split('.');
+      if (parts.length > 2) {
+        cleaned = parts[0] + '.' + parts.slice(1).join('').slice(0, 2);
+      } else if (parts.length === 2) {
+        // 3. Limit to 2 decimal places
+        cleaned = `${parts[0]}.${parts[1].slice(0, 2)}`;
+      }
+
+      // 4. Cap at 100
+      if (cleaned !== '' && cleaned !== '.') {
+        const num = parseFloat(cleaned);
+        if (num > 100) {
+          cleaned = '100';
+        }
+      }
+
+      value = cleaned;
+    }
+
     setFormData(prev => ({ ...prev, [key]: value }));
     if (errors[key]) {
       setErrors(prev => ({ ...prev, [key]: undefined }));

@@ -4,16 +4,19 @@ import Animated, { interpolate, useAnimatedStyle, Extrapolation, SharedValue } f
 import { Image } from 'expo-image';
 import { useTheme } from '../../hooks/useTheme';
 
+import { TouchableOpacity } from 'react-native';
+
 interface Props {
   images: string[];
   scrollY: SharedValue<number>;
+  onImagePress?: (index: number) => void;
 }
 
 const { width } = Dimensions.get('window');
 const HERO_HEIGHT = width * 1.0; // Square ratio for premium feel
 const AUTO_SCROLL_INTERVAL = 3500;
 
-export function BusinessHeroGallery({ images, scrollY }: Props) {
+export function BusinessHeroGallery({ images, scrollY, onImagePress }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<Animated.ScrollView>(null);
   const { colorScheme } = useTheme();
@@ -71,13 +74,18 @@ export function BusinessHeroGallery({ images, scrollY }: Props) {
         scrollEventThrottle={16}
       >
         {images.map((img, index) => (
-          <Image
-            key={index}
-            source={{ uri: img }}
-            style={{ width, height: HERO_HEIGHT }}
-            contentFit="cover"
-            transition={300}
-          />
+          <TouchableOpacity 
+            key={index} 
+            activeOpacity={0.9} 
+            onPress={() => onImagePress?.(index)}
+          >
+            <Image
+              source={{ uri: img }}
+              style={{ width, height: HERO_HEIGHT }}
+              contentFit="cover"
+              transition={300}
+            />
+          </TouchableOpacity>
         ))}
       </Animated.ScrollView>
 

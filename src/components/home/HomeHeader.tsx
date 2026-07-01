@@ -47,9 +47,9 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
   const locationText = activeLocation?.shortAddress || 'Set Location';
   
   const paddingTop = Math.max(insets.top, 20) + 8; // Top padding
-  const HEADER_EXPANDED_HEIGHT = Math.max(insets.top, 20) + 120; // Increased to prevent bottom clipping
-  const HEADER_COLLAPSED_HEIGHT = Math.max(insets.top, 20) + 75;
-  const SCROLL_DISTANCE = 60;
+  const HEADER_EXPANDED_HEIGHT = Math.max(insets.top, 20) + 115; // Adjusted for tighter layout
+  const HEADER_COLLAPSED_HEIGHT = Math.max(insets.top, 20) + 60; // Tighter top row
+  const SCROLL_DISTANCE = 50;
 
   // Infinite Rotation for Search Bar Border
   const rotation = useSharedValue(0);
@@ -85,7 +85,7 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
   const logoStyle = useAnimatedStyle(() => {
     const opacity = interpolate(scrollY.value, [0, SCROLL_DISTANCE / 2], [1, 0], Extrapolation.CLAMP);
     const scale = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [1, 0.8], Extrapolation.CLAMP);
-    const translateY = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [0, -10], Extrapolation.CLAMP);
+    const translateY = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [0, -5], Extrapolation.CLAMP);
     
     return {
       opacity,
@@ -114,7 +114,7 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
     const opacity = interpolate(scrollY.value, [0, SCROLL_DISTANCE / 2], [1, 0], Extrapolation.CLAMP);
     // 80 is roughly the width of the text + chevron
     const width = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [85, 0], Extrapolation.CLAMP);
-    const marginLeft = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [6, 0], Extrapolation.CLAMP);
+    const marginLeft = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [4, 0], Extrapolation.CLAMP);
     
     return {
       opacity,
@@ -128,13 +128,13 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
 
   // Search Bar Animation (Moves up and shrinks width perfectly into center)
   const searchStyle = useAnimatedStyle(() => {
-    // Target Top is paddingTop + 13 so it's perfectly centered in the 70px collapsed row
-    const top = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [paddingTop + 60, paddingTop + 13], Extrapolation.CLAMP);
-    // Since Location text collapses, left side only takes up ~55px + 20px padding = 75px.
-    // Setting target left to 85 gives a perfect 10px gap!
-    const left = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [20, 85], Extrapolation.CLAMP);
-    const right = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [20, 125], Extrapolation.CLAMP);
-    const height = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [56, 50], Extrapolation.CLAMP);
+    // Target Top is perfectly centered in the 60px collapsed row
+    const top = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [paddingTop + 55, paddingTop + 8], Extrapolation.CLAMP);
+    // Left constraint: Collapsed location pill is just an icon, taking ~40px + 20px padding = 60px. Left=68 gives a perfect 8px gap.
+    const left = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [20, 68], Extrapolation.CLAMP);
+    // Right constraint: Two 36px icons + 8px gap = 80px + 20px padding = 100px. Right=108 gives a perfect 8px gap.
+    const right = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [20, 108], Extrapolation.CLAMP);
+    const height = interpolate(scrollY.value, [0, SCROLL_DISTANCE], [50, 44], Extrapolation.CLAMP);
     
     return {
       top,
@@ -165,44 +165,43 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
         TOP ROW STATIC ELEMENTS
         Location (Left) and Icons (Right)
       */}
-      <View style={{ paddingTop, height: paddingTop + 70, paddingHorizontal: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <View style={{ paddingTop, height: paddingTop + 60, paddingHorizontal: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         
-        {/* Left: Location Pill */}
-        <Animated.View style={leftSideStyle}>
+        {/* Left: Location Pill (Takes maximum 35% of screen width to never overlap center) */}
+        <Animated.View style={[leftSideStyle, { maxWidth: screenWidth * 0.35 }]}>
           <TouchableOpacity 
             onPress={() => setIsLocationSelectorVisible(true)}
-            className="flex-row items-center justify-center bg-muted/80 px-4 h-11 rounded-full border border-border/50" 
+            className="flex-row items-center justify-center bg-muted/80 px-2.5 h-9 rounded-full border border-border/50" 
             activeOpacity={0.7} 
-            style={{ maxWidth: 200 }}
           >
-            <Ionicons name="location" size={24} color="#c10007" />
+            <Ionicons name="location" size={18} color="#c10007" />
             <Animated.View style={locationTextStyle}>
-              <Text className="text-xs font-extrabold text-foreground" numberOfLines={1}>
+              <Text className="text-[11px] font-extrabold text-foreground" numberOfLines={1}>
                 {locationText}
               </Text>
-              <View className="ml-1">
-                <Ionicons name="chevron-down" size={18} color="#64748B" />
+              <View className="ml-0.5">
+                <Ionicons name="chevron-down" size={14} color="#64748B" />
               </View>
             </Animated.View>
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Right: Notification & Avatar */}
-        <Animated.View className="flex-row items-center gap-3" style={rightSideStyle}>
+        {/* Right: Notification & Avatar (Takes maximum 35% of screen width) */}
+        <Animated.View className="flex-row items-center gap-2" style={[rightSideStyle, { maxWidth: screenWidth * 0.35, justifyContent: 'flex-end' }]}>
           <TouchableOpacity 
             onPress={() => handleNavigation('/notifications')}
-            className="w-12 h-12 rounded-full bg-muted items-center justify-center border border-border relative"
+            className="w-9 h-9 rounded-full bg-muted items-center justify-center border border-border relative"
           >
-            <Ionicons name="notifications-outline" size={26} color={isDark ? '#FFF' : '#000'} />
+            <Ionicons name="notifications-outline" size={20} color={isDark ? '#FFF' : '#000'} />
             {hasUnreadNotifications && (
-              <View className="absolute top-2.5 right-2.5 w-3 h-3 rounded-full bg-[#c10007]" />
+              <View className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#c10007]" />
             )}
           </TouchableOpacity>
           <TouchableOpacity 
             onPress={() => handleNavigation('/(tabs)/profile')}
-            className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center border border-primary/20 shadow-sm"
+            className="w-9 h-9 rounded-full bg-primary/10 items-center justify-center border border-primary/20 shadow-sm"
           >
-            <Ionicons name="person" size={24} color="#1C398E" />
+            <Ionicons name="person" size={18} color="#1C398E" />
           </TouchableOpacity>
         </Animated.View>
 
@@ -210,10 +209,10 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
 
       {/* ANIMATED CENTER LOGO */}
       <Animated.View 
-        style={[{ position: 'absolute', top: paddingTop + 18, left: 0, right: 0, alignItems: 'center', justifyContent: 'center' }, logoStyle]}
+        style={[{ position: 'absolute', top: paddingTop + 15, left: screenWidth * 0.3, right: screenWidth * 0.3, alignItems: 'center', justifyContent: 'center' }, logoStyle]}
         pointerEvents="none"
       >
-        <Text className="text-3xl font-extrabold tracking-tight text-primary">
+        <Text className="text-2xl font-extrabold tracking-tight text-primary" numberOfLines={1} adjustsFontSizeToFit>
           Just<Text className="text-[#c10007]">Klick</Text>
         </Text>
       </Animated.View>

@@ -57,23 +57,6 @@ export default function HomeScreen() {
     });
   }, []);
 
-  const pullToRefreshGlowStyle = useAnimatedStyle(() => {
-    // When scrollY is negative, the user is pulling down
-    const pullDistance = Math.max(0, -scrollY.value);
-    const opacity = Math.min(pullDistance / 80, 1);
-    const scale = 1 + Math.min(pullDistance / 200, 0.5);
-    
-    return {
-      opacity: isRefetching ? 1 : opacity,
-      transform: [{ scale: isRefetching ? 1.2 : scale }],
-      position: 'absolute',
-      top: headerHeight - 20,
-      left: 0,
-      right: 0,
-      alignItems: 'center',
-      zIndex: 0, // Behind the FlatList content
-    };
-  });
 
   if (isLoading) {
     return (
@@ -159,21 +142,6 @@ export default function HomeScreen() {
   return (
     <View className="flex-1 bg-background">
       <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
-      
-      {/* Innovative Pull-to-Refresh Light Effect */}
-      <Animated.View style={pullToRefreshGlowStyle} pointerEvents="none">
-        <View 
-          className="w-48 h-24 rounded-full" 
-          style={{ 
-            backgroundColor: 'rgba(28, 57, 142, 0.05)',
-            shadowColor: '#1C398E',
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.4,
-            shadowRadius: 15,
-            elevation: 4,
-          }} 
-        />
-      </Animated.View>
 
       <HomeHeader scrollY={scrollY} />
 

@@ -93,7 +93,14 @@ export default function BusinessDetailsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120, minHeight: Dimensions.get('window').height * 1.5 }}
       >
-        <BusinessHeroGallery images={business.gallery || [business.coverImage]} scrollY={scrollY} />
+        <BusinessHeroGallery 
+          images={business.gallery || [business.coverImage]} 
+          scrollY={scrollY} 
+          onImagePress={(index) => {
+            setImageViewerIndex(index);
+            setImageViewerVisible(true);
+          }}
+        />
         
         {/* Inline Tab Bar */}
         <View className="bg-background z-10 relative border-b border-border shadow-sm mb-4">

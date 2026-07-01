@@ -77,8 +77,8 @@ async function registerForPushNotificationsAsync(): Promise<string | undefined> 
   let token;
 
   if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
+    await Notifications.setNotificationChannelAsync('justklick-alerts', {
+      name: 'JustKlick Alerts',
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF231F7C',
